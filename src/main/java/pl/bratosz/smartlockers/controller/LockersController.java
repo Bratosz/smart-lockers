@@ -17,13 +17,9 @@ import java.util.Optional;
 public class LockersController {
 
     private LockersRepository lockersRepository;
-    private BoxesRepository boxesRepository;
-    private EmployeesRepository employeesRepository;
 
-    public LockersController(LockersRepository lockersRepository, BoxesRepository boxesRepository, EmployeesRepository employeesRepository) {
+    public LockersController(LockersRepository lockersRepository) {
         this.lockersRepository = lockersRepository;
-        this.boxesRepository = boxesRepository;
-        this.employeesRepository = employeesRepository;
     }
 
     @JsonView(Views.InternalForLockers.class)

@@ -1,5 +1,9 @@
 package pl.bratosz.smartlockers.controller;
 
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFShape;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.bratosz.smartlockers.model.Box;
+import pl.bratosz.smartlockers.model.Department;
+import pl.bratosz.smartlockers.model.Employee;
+import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
+import pl.bratosz.smartlockers.repository.LockersRepository;
 import pl.bratosz.smartlockers.service.FileStorageService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +34,11 @@ public class FileController {
 
     @Autowired
     private FileStorageService fileStorageService;
+
+    @Autowired
+    private LockersRepository lockersRepository;
+
+
 
     @PostMapping("/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file")MultipartFile file) {
@@ -72,5 +86,21 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
                         + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    @PostMapping("/import")
+    public void mapReapExcelDataToDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
+        XSSFSheet worksheet = workbook.getSheetAt(0);
+
+        for(int i=1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+            XSSFRow row = worksheet.getRow(i);
+
+            Employee employee = new Employee();
+            employee.setId((long) row.getCell(0).getNumericCellValue());
+            employee.setFirstName(row.getCell(1).getStringCellValue());
+            employee.setLastName(row.getCell(2).getStringCellValue());
+            employee.setDepartment(Department.valueOf(Deparrow.getCell(3).getStringCellValue());
+        }
     }
 }
