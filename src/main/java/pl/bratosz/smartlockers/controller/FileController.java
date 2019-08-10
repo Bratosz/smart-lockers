@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFShape;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -14,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import pl.bratosz.smartlockers.model.Box;
-import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.Employee;
-import pl.bratosz.smartlockers.model.Locker;
+import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
 import pl.bratosz.smartlockers.repository.LockersRepository;
 import pl.bratosz.smartlockers.service.FileStorageService;
@@ -25,6 +23,7 @@ import pl.bratosz.smartlockers.service.FileStorageService;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,12 +35,11 @@ public class FileController {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private LockersRepository lockersRepository;
-
+    private EmployeeController employeeController;
 
 
     @PostMapping("/uploadFile")
-    public UploadFileResponse uploadFile(@RequestParam("file")MultipartFile file) {
+    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
         String fileName = fileStorageService.storeFile(file);
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -55,7 +53,7 @@ public class FileController {
 
     @PostMapping("/uploadMultipleFiles")
     public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files")
-                                                        MultipartFile[] files){
+                                                                MultipartFile[] files) {
         return Arrays.asList(files)
                 .stream()
                 .map(file -> uploadFile(file))
@@ -77,7 +75,7 @@ public class FileController {
         }
 
         //Fallback to the default content type if the type could not be determined
-        if(contentType == null) {
+        if (contentType == null) {
             contentType = "application/octet-stream";
         }
 
@@ -88,19 +86,30 @@ public class FileController {
                 .body(resource);
     }
 
+    @JsonView(Views.InternalForEmployees.class)
     @PostMapping("/import")
-    public void mapReapExcelDataToDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException {
+    public List<Employee> mapReapExcelDataToDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException, IllegalArgumentException {
         XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
         XSSFSheet worksheet = workbook.getSheetAt(0);
 
-        for(int i=1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+        List<Employee> employeeList = new LinkedList<>();
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
             XSSFRow row = worksheet.getRow(i);
 
+            //creating instance of employee from row
             Employee employee = new Employee();
             employee.setId((long) row.getCell(0).getNumericCellValue());
             employee.setFirstName(row.getCell(1).getStringCellValue());
             employee.setLastName(row.getCell(2).getStringCellValue());
-            employee.setDepartment(Department.valueOf(Deparrow.getCell(3).getStringCellValue());
+            employee.setDepartment(Department.valueOf(row.getCell(3).getStringCellValue()));
+
+            //adding employee to box
+            Employee createdEmployee = employeeController.createEmployee(Locker.DepartmentNumber.valueOf(row.getCell(4).getStringCellValue()),
+                    (int) row.getCell(5).getNumericCellValue(),
+                    (int) row.getCell(6).getNumericCellValue(),
+                    employee);
+            employeeList.add(createdEmployee);
         }
+        return employeeList;
     }
 }
