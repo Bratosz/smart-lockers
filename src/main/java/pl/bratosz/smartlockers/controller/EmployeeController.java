@@ -7,6 +7,7 @@ import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
+import pl.bratosz.smartlockers.service.EmployeeService;
 
 import java.util.HashSet;
 import java.util.List;
@@ -16,19 +17,15 @@ import java.util.Set;
 @RequestMapping("/employees")
 public class EmployeeController {
 
-    private EmployeesRepository employeesRepository;
-    private BoxesRepository boxesRepository;
-    private LockersRepository lockersRepository;
+    private EmployeeService employeeService;
 
-    public EmployeeController(EmployeesRepository employeesRepository, BoxesRepository boxesRepository, LockersRepository lockersRepository) {
-        this.employeesRepository = employeesRepository;
-        this.boxesRepository = boxesRepository;
-        this.lockersRepository = lockersRepository;
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
     @GetMapping
-    public List<Employee> getAll() {
-        return employeesRepository.findAll();
+    public List<Employee> getAllEmployees() {
+        return employeeService.getAllEmployees();
     }
 
     @JsonView(Views.InternalForEmployees.class)
@@ -37,23 +34,13 @@ public class EmployeeController {
                               @PathVariable Integer lockerNumber,
                               @PathVariable Integer boxNumber,
                               @RequestBody Employee employee) {
-        //saving box with proper status
-        Box box = lockersRepository.getBox(departmentNumber, lockerNumber, boxNumber);
-        employeesRepository.save(employee);
-        box.setEmployee(employee);
-        box.setBoxStatus(Box.BoxStatus.OCCUPY);
-        boxesRepository.save(box);
-
-        //adding adding box to employee
-        Set<Box> boxes = new HashSet<>();
-        boxes.add(box);
-        employee.setBoxes(boxes);
-        return employeesRepository.save(employee);
+        
+        return employeeService.createEmployee(departmentNumber, lockerNumber, boxNumber, employee);
     }
 
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {
-        employeesRepository.deleteById(id);
+        employeeService.deleteById(id);
     }
 
 }

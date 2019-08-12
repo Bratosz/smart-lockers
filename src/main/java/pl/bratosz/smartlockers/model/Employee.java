@@ -26,7 +26,7 @@ public class Employee {
     private Department department;
 
     @JsonView(Views.InternalForEmployees.class)
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private Set<Box> boxes;
 
     public Employee() {

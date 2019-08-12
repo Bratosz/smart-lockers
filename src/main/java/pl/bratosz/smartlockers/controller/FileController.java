@@ -98,7 +98,6 @@ public class FileController {
 
             //creating instance of employee from row
             Employee employee = new Employee();
-            employee.setId((long) row.getCell(0).getNumericCellValue());
             employee.setFirstName(row.getCell(1).getStringCellValue());
             employee.setLastName(row.getCell(2).getStringCellValue());
             employee.setDepartment(Department.valueOf(row.getCell(3).getStringCellValue()));

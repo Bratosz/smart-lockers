@@ -23,7 +23,7 @@ public class Box {
     private Employee employee;
 
     @JsonView(Views.InternalForEmployees.class)
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "locker_id", insertable = false, updatable = false)
     private Locker locker;
 
