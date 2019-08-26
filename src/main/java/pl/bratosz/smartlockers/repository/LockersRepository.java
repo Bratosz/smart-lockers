@@ -23,9 +23,10 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             "(l.department = :department or :department is null) " +
             "and " +
             "(l.location = :location or :location is null) order by l.lockerNumber ")
-    List<Locker> filterAllByDepartmentNoAndDepartmentAndLocation(@Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
-                                                                 @Param("department") Department department,
-                                                                 @Param("location") Locker.Location location);
+    List<Locker> filterAllByDepartmentNoAndDepartmentAndLocation(
+            @Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
+            @Param("department") Department department,
+            @Param("location") Locker.Location location);
 
     @Query("select count(l.departmentNumber) from Locker l where l.departmentNumber = :departmentNumber ")
     int getAmountOfLockersByDepartmentNumber(@Param("departmentNumber") Locker.DepartmentNumber departmentNumber);
@@ -39,4 +40,6 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
     Box getBox(@Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
                @Param("lockerNumber") Integer lockerNumber,
                @Param("boxNumber") Integer boxNumber);
+
+
 }

@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
 import pl.bratosz.smartlockers.repository.LockersRepository;
+import pl.bratosz.smartlockers.service.EmployeeService;
 import pl.bratosz.smartlockers.service.FileStorageService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,14 +29,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/files")
 public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
     private FileStorageService fileStorageService;
-
     @Autowired
     private EmployeeController employeeController;
+
 
 
     @PostMapping("/uploadFile")
@@ -88,27 +90,56 @@ public class FileController {
 
     @JsonView(Views.InternalForEmployees.class)
     @PostMapping("/import")
-    public List<Employee> mapReapExcelDataToDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException, IllegalArgumentException {
-        XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
+    public List<Employee> importEmployeesFromExcelFileToDB(@RequestParam("file") MultipartFile employeesFile) throws IOException, IllegalArgumentException {
+        XSSFWorkbook workbook = new XSSFWorkbook(employeesFile.getInputStream());
         XSSFSheet worksheet = workbook.getSheetAt(0);
 
         List<Employee> employeeList = new LinkedList<>();
-        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows() -1; i++) {
             XSSFRow row = worksheet.getRow(i);
 
             //creating instance of employee from row
             Employee employee = new Employee();
             employee.setFirstName(row.getCell(1).getStringCellValue());
             employee.setLastName(row.getCell(2).getStringCellValue());
-            employee.setDepartment(Department.valueOf(row.getCell(3).getStringCellValue()));
+            employee.setDepartment(Department.METAL);
+
 
             //adding employee to box
-            Employee createdEmployee = employeeController.createEmployee(Locker.DepartmentNumber.valueOf(row.getCell(4).getStringCellValue()),
+            Employee loadedEmployee = employeeController.createEmployee(Locker.DepartmentNumber.DEP_384,
                     (int) row.getCell(5).getNumericCellValue(),
                     (int) row.getCell(6).getNumericCellValue(),
                     employee);
+            employeeList.add(loadedEmployee);
+        }
+        return employeeList;
+    }
+    @JsonView(Views.InternalForEmployees.class)
+    @PostMapping("/add_employees")
+    public List<Employee> addNewEmployeesFromExcelFile(@RequestParam("file") MultipartFile newEmployeesFile) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(newEmployeesFile.getInputStream());
+        XSSFSheet worksheet = workbook.getSheetAt(0);
+
+        List<Employee> employeeList = new LinkedList<>();
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+            XSSFRow row = worksheet.getRow(i);
+
+            Employee employee = new Employee();
+            employee.setFirstName(row.getCell(0).getStringCellValue());
+            employee.setLastName(row.getCell(1).getStringCellValue());
+            employee.setDepartment(Department.valueOf(row.getCell(2).getStringCellValue()));
+
+            Department department = Department.valueOf(row.getCell(2).getStringCellValue());
+            Locker.DepartmentNumber departmentNumber = Locker.DepartmentNumber.valueOf(row.getCell(3).getStringCellValue());
+            Locker.Location location = Locker.Location.valueOf(row.getCell(4).getStringCellValue());
+
+            //creating emploee and assign it to the next free box
+            Employee createdEmployee = employeeController.createEmployee(department, departmentNumber, location, employee);
+
             employeeList.add(createdEmployee);
         }
         return employeeList;
     }
+
+
 }
