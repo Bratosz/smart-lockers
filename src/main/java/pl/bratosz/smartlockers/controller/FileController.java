@@ -1,8 +1,9 @@
 package pl.bratosz.smartlockers.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFShape;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -15,17 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.bratosz.smartlockers.exels.ExcelWriter;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
-import pl.bratosz.smartlockers.repository.LockersRepository;
-import pl.bratosz.smartlockers.service.EmployeeService;
 import pl.bratosz.smartlockers.service.FileStorageService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -37,7 +35,10 @@ public class FileController {
     private FileStorageService fileStorageService;
     @Autowired
     private EmployeeController employeeController;
-
+    @Autowired
+    private BoxesController boxesController;
+    @Autowired
+    private LockersController lockersController;
 
 
     @PostMapping("/uploadFile")
@@ -95,18 +96,19 @@ public class FileController {
         XSSFSheet worksheet = workbook.getSheetAt(0);
 
         List<Employee> employeeList = new LinkedList<>();
-        for (int i = 1; i < worksheet.getPhysicalNumberOfRows() -1; i++) {
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
             XSSFRow row = worksheet.getRow(i);
 
             //creating instance of employee from row
             Employee employee = new Employee();
             employee.setFirstName(row.getCell(1).getStringCellValue());
             employee.setLastName(row.getCell(2).getStringCellValue());
-            employee.setDepartment(Department.METAL);
+            employee.setDepartment(Department.valueOf(row.getCell(3).getStringCellValue()));
 
 
             //adding employee to box
-            Employee loadedEmployee = employeeController.createEmployee(Locker.DepartmentNumber.DEP_384,
+            Employee loadedEmployee = employeeController.createEmployee(
+                    Locker.DepartmentNumber.valueOf(row.getCell(4).getStringCellValue()),
                     (int) row.getCell(5).getNumericCellValue(),
                     (int) row.getCell(6).getNumericCellValue(),
                     employee);
@@ -114,6 +116,7 @@ public class FileController {
         }
         return employeeList;
     }
+
     @JsonView(Views.InternalForEmployees.class)
     @PostMapping("/add_employees")
     public List<Employee> addNewEmployeesFromExcelFile(@RequestParam("file") MultipartFile newEmployeesFile) throws IOException {
@@ -140,6 +143,81 @@ public class FileController {
         }
         return employeeList;
     }
+
+    @JsonView(Views.InternalForLockers.class)
+    @PostMapping("/dismiss_by_id")
+    public List<Box> dismissEmployeesFromFileByID(@RequestParam("file") MultipartFile employeesToDelete) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(employeesToDelete.getInputStream());
+        XSSFSheet sheet = workbook.getSheetAt(0);
+
+        List<Box> releasedBoxes = new LinkedList<>();
+        for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
+            long id = (long) sheet.getRow(i).getCell(0).getNumericCellValue();
+
+            //Adding employee to raport list of deleted employees
+            Employee employee = employeeController.getEmployeeById(id);
+            Set<Box> boxes = employee.getBoxes();
+            for (Box box : boxes) {
+                releasedBoxes.add(boxesController.dismissEmployeeByBox(box));
+            }
+        }
+        return releasedBoxes;
+    }
+
+    @PostMapping("/load_Lockers/{sheetToLoad}")
+    public void loadLockersFromExcelFile(@RequestParam("file") MultipartFile lockersToLoad,
+                                         @PathVariable int sheetToLoad) throws IOException {
+        sheetToLoad = sheetToLoad - 1;
+        XSSFWorkbook workbook = new XSSFWorkbook(lockersToLoad.getInputStream());
+        XSSFSheet sheet = workbook.getSheetAt(sheetToLoad);
+
+        for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
+            Row row = sheet.getRow(i);
+
+            Locker locker = new Locker();
+            locker.setLockerNumber((int) row.getCell(1).getNumericCellValue());
+            locker.setCapacity((int) row.getCell(2).getNumericCellValue());
+            locker.setDepartmentNumber(Locker.DepartmentNumber.valueOf(row.getCell(3).getStringCellValue()));
+            locker.setDepartment(Department.valueOf(row.getCell(4).getStringCellValue()));
+            locker.setLocation(Locker.Location.valueOf(row.getCell(5).getStringCellValue()));
+
+            lockersController.create(locker);
+        }
+    }
+
+    @JsonView(Views.InternalForEmployees.class)
+    @GetMapping("/find_employees")
+    public List<Employee> findEmployeesFromExcelFileAndGenerateExcelRaport(@RequestParam("file") MultipartFile employeesToFind) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(employeesToFind.getInputStream());
+        XSSFSheet worksheet = workbook.getSheetAt(0);
+
+        List<Employee> employeesToFile = new LinkedList<>();
+
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+            XSSFRow row = worksheet.getRow(i);
+            String firstName = row.getCell(1).getStringCellValue();
+            String lastName = row.getCell(2).getStringCellValue();
+
+            List<Employee> employeesFromDB = employeeController.getEmployeesByFirstNameAndLastName(firstName, lastName);
+
+            employeesFromDB.stream().forEach(employee -> employeesToFile.add(employee));
+        }
+
+        List<String> columns = new LinkedList<>();
+        Row row = worksheet.getRow(0);
+        for (Cell cell : row) {
+            String cellHeader = cell.getStringCellValue();
+            columns.add(cellHeader);
+        }
+
+        String sheetName = worksheet.getSheetName();
+        ExcelWriter excelWriter = new ExcelWriter(columns, employeesToFile, sheetName);
+        excelWriter.createExcelRaport();
+
+        return employeesToFile;
+    }
+
+
 
 
 }

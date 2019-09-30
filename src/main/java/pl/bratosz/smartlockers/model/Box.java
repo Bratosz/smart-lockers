@@ -3,6 +3,7 @@ package pl.bratosz.smartlockers.model;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Box {
@@ -18,9 +19,19 @@ public class Box {
     @Enumerated(EnumType.STRING)
     private BoxStatus boxStatus;
 
-    @JsonView(Views.InternalForLockers.class)
+    @JsonView(Views.Public.class)
     @ManyToOne(cascade = CascadeType.ALL)
     private Employee employee;
+
+    private Long emptyBoxEmployeeNo;
+
+    @JsonView(Views.DismissedEmployees.class)
+    @ManyToMany
+    @JoinTable(
+            name = "dismissed_employees",
+            joinColumns = @JoinColumn(name = "box_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id"))
+    private List<Employee> dismissedEmployees;
 
     @JsonView(Views.InternalForEmployees.class)
     @ManyToOne(cascade = CascadeType.ALL)
@@ -33,6 +44,12 @@ public class Box {
     public Box(int boxNumber, BoxStatus boxStatus) {
         this.boxNumber = boxNumber;
         this.boxStatus = boxStatus;
+    }
+
+    public Box(int boxNumber, BoxStatus boxStatus, Long emptyEmployeeNo) {
+        this.boxNumber = boxNumber;
+        this.boxStatus = boxStatus;
+        this.emptyBoxEmployeeNo = emptyEmployeeNo;
     }
 
     public Employee getEmployee() {
@@ -75,9 +92,26 @@ public class Box {
         this.locker = locker;
     }
 
+    public List<Employee> getDismissedEmployees() {
+        return dismissedEmployees;
+    }
+
+    public void setDismissedEmployees(List<Employee> dismissedEmployees) {
+        this.dismissedEmployees = dismissedEmployees;
+    }
+
+    public Long getEmptyBoxEmployeeNo() {
+        return emptyBoxEmployeeNo;
+    }
+
+    public void setEmptyBoxEmployeeNo(Long emptyBoxEmployeeNo) {
+        this.emptyBoxEmployeeNo = emptyBoxEmployeeNo;
+    }
+
     public enum BoxStatus {
         OCCUPY("Zajęta"),
         FREE("Wolna"),
+        UNDEFINED("Niezdefiniowana"),
         DAMAGED("Uszkodzona");
 
         private String name;

@@ -1,7 +1,5 @@
 package pl.bratosz.smartlockers.service;
 
-import org.omg.DynamicAny.DynEnum;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Department;
@@ -11,8 +9,8 @@ import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -34,10 +32,9 @@ public class EmployeeService {
     public Employee createEmployee(Locker.DepartmentNumber departmentNumber,
                                    Integer lockerNumber, Integer boxNumber, Employee employee) {
         Box box = lockersRepository.getBox(departmentNumber, lockerNumber, boxNumber);
-
-        box.setBoxStatus(Box.BoxStatus.OCCUPY);
-        box.setEmployee(employee);
-        return employeesRepository.save(employee);
+            box.setBoxStatus(Box.BoxStatus.OCCUPY);
+            box.setEmployee(employee);
+            return employeesRepository.save(employee);
     }
 
     public Employee createEmployee(Employee employee) {
@@ -64,6 +61,17 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeById(Long id) {
-        return employeesRepository.getOne(id);
+        return employeesRepository.getEmployeeById(id);
+    }
+
+    public List<Employee> getEmployeesByFirstNameAndLastName(String firstName, String lastName){
+        List<Employee> filteredEmployees = new LinkedList<>();
+        List<Employee> employees = employeesRepository.getEmployeesByFirstNameAndLastName(firstName, lastName);
+        for(Employee employee : employees) {
+            if (employee.getBoxes().size() >= 1) {
+                filteredEmployees.add(employee);
+            }
+        }
+        return filteredEmployees;
     }
 }

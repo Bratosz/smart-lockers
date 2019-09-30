@@ -5,7 +5,9 @@ import pl.bratosz.smartlockers.converters.DepartmentConverter;
 
 public enum Department {
     METAL("Structures"),
-    JIT("JIT");
+    JIT("JIT"),
+    MANTRANS("Mantrans"),
+    COMMON("Wspólny");
 
     private String name;
 

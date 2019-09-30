@@ -4,16 +4,19 @@ package pl.bratosz.smartlockers.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.hibernate.sql.Update;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 public class Employee {
-    @JsonView(Views.Public.class)
+    @JsonView(Views.InternalForEmployees.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
     @JsonView(Views.Public.class)
@@ -30,6 +33,11 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private Set<Box> boxes;
 
+    @JsonView(Views.DismissedEmployees.class)
+    @ManyToMany(mappedBy = "dismissedEmployees")
+    private List<Box> boxesOccupiedInPast;
+
+
     public Employee() {
     }
 
@@ -41,6 +49,14 @@ public class Employee {
 
     public Long getId() {
         return id;
+    }
+
+    public List<Box> getBoxesOccupiedInPast() {
+        return boxesOccupiedInPast;
+    }
+
+    public void setBoxesOccupiedInPast(List<Box> boxesOccupiedInPast) {
+        this.boxesOccupiedInPast = boxesOccupiedInPast;
     }
 
     public void setId(Long id) {

@@ -5,6 +5,11 @@ import org.springframework.stereotype.Repository;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.Locker;
 
+import java.util.List;
+
 @Repository
 public interface EmployeesRepository extends JpaRepository<Employee, Long> {
+    List<Employee> getEmployeesByFirstNameAndLastName(String firstName, String lastName);
+
+    Employee getEmployeeById(Long id);
 }

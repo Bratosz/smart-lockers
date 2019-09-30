@@ -25,13 +25,13 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
+    @JsonView(Views.InternalForEmployees.class)
     @GetMapping
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
-    @JsonView(Views.InternalForEmployees.class)
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Employee getEmployeeById(@PathVariable Long id) {
         return employeeService.getEmployeeById(id);
     }
@@ -56,9 +56,15 @@ public class EmployeeController {
         return employeeService.createEmployeeAndAssignToBox(department, departmentNumber, location, employee);
     }
 
+    @JsonView(Views.Public.class)
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {
         employeeService.deleteById(id);
     }
 
+    @GetMapping("/find/{firstName}/{lastName}")
+    public List<Employee> getEmployeesByFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName) {
+        List<Employee> employeesByFirstNameAndLastName = employeeService.getEmployeesByFirstNameAndLastName(firstName, lastName);
+        return employeesByFirstNameAndLastName;
+    }
 }

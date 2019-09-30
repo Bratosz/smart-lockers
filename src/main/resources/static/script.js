@@ -35,8 +35,9 @@ $("#button-filter").click(function () {
     const departmentNo = $("#select-department-number").val();
     const department = $("#select-department").val();
     const location = $("#select-location").val();
+    const boxStatus = $("#select-box-status").val();
     $.ajax({
-        url: `http://localhost:8080/lockers/filter/${departmentNo}/${department}/${location}`,
+        url: `http://localhost:8080/lockers/filter/${departmentNo}/${department}/${location}/${boxStatus}`,
         method: "get",
         success: function (lockers) {
             $("#table-rows > tr:not(#row-template)").remove();

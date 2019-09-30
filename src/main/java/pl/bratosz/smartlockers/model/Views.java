@@ -7,6 +7,10 @@ public class Views {
     public static class InternalForLockers extends Public {
     }
 
-    public static class InternalForEmployees extends Public{
+    public static class InternalForEmployees extends Public {
+    }
+
+    public static class DismissedEmployees extends Public {
+
     }
 }

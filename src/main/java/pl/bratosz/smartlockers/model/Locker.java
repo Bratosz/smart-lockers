@@ -42,14 +42,6 @@ public class Locker {
     public Locker() {
     }
 
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
     public Locker(Integer lockerNumber, Integer capacity, Department department, DepartmentNumber departmentNumber, Location location) {
         this.lockerNumber = lockerNumber;
         this.capacity = capacity;
@@ -106,13 +98,22 @@ public class Locker {
         this.lockerNumber = lockerNumber;
     }
 
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
     public Optional<Box> getBoxByNumber(Integer boxNumber) {
         return boxes.stream().filter(x -> x.getBoxNumber() == boxNumber).findFirst();
     }
 
     public enum DepartmentNumber {
         DEP_384(384),
-        DEP_385(385);
+        DEP_385(385),
+        DEP_386(386);
 
         private int number;
 
@@ -128,6 +129,7 @@ public class Locker {
     public enum Location {
         OLDSIDE("Stara część"),
         NEWSIDE("Nowa część"),
+        MANTRANS("Mantrans"),
         NEWSIDEUPSTAIRS("Nowa część na piętrze"),
         NEWJITSIDE("Nowa część na JIT");
 

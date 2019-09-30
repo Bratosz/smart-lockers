@@ -28,6 +28,21 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             @Param("department") Department department,
             @Param("location") Locker.Location location);
 
+    @Query("select l from Locker l join l.boxes b where " +
+            "(l.departmentNumber = :departmentNumber or :departmentNumber is null) " +
+            "and " +
+            "(l.department = :department or :department is null) " +
+            "and " +
+            "(l.location = :location or :location is null)" +
+            "and " +
+            "(b.boxStatus = :boxStatus or :boxStatus is null) " +
+            "order by l.lockerNumber, b.boxNumber ")
+    List<Locker> filterAllByDepartmentNoAndDepartmentAndLocationAndStatus(
+            @Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
+            @Param("department") Department department,
+            @Param("location") Locker.Location location,
+            @Param("boxStatus")Box.BoxStatus boxStatus);
+
     @Query("select count(l.departmentNumber) from Locker l where l.departmentNumber = :departmentNumber ")
     int getAmountOfLockersByDepartmentNumber(@Param("departmentNumber") Locker.DepartmentNumber departmentNumber);
 

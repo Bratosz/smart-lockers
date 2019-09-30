@@ -27,15 +27,4 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
 
 
 
-//    @Query("select b from Box b join b.locker l where " +
-//            "l.departmentNumber = :departmentNumber and " +
-//            "l.department = :department and " +
-//            "l.location = :location and " +
-//            "b.boxStatus = :boxStatus order by l.lockerNumber, b.boxNumber ")
-//    Page<Box> findBoxesSpecifiedByAmountAndParams(Pageable pageable,
-//                                                  @Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
-//                                                  @Param("department") Department department,
-//                                                  @Param("location") Locker.Location location,
-//                                                  @Param("boxStatus") Box.BoxStatus boxStatus);
-
 }
