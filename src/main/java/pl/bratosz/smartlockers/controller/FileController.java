@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.bratosz.smartlockers.exels.ExcelWriter;
+import pl.bratosz.smartlockers.exels.WriteInExcel;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
+import pl.bratosz.smartlockers.service.EmployeeService;
 import pl.bratosz.smartlockers.service.FileStorageService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -128,19 +130,19 @@ public class FileController {
             XSSFRow row = worksheet.getRow(i);
 
             Employee employee = new Employee();
-            employee.setFirstName(row.getCell(0).getStringCellValue());
+            employee.setFirstName(row.getCell(2).getStringCellValue());
             employee.setLastName(row.getCell(1).getStringCellValue());
-            employee.setDepartment(Department.valueOf(row.getCell(2).getStringCellValue()));
+            employee.setDepartment(Department.valueOf(worksheet.getSheetName()));
 
-            Department department = Department.valueOf(row.getCell(2).getStringCellValue());
-            Locker.DepartmentNumber departmentNumber = Locker.DepartmentNumber.valueOf(row.getCell(3).getStringCellValue());
-            Locker.Location location = Locker.Location.valueOf(row.getCell(4).getStringCellValue());
+            Locker.Location location = Locker.Location.valueOf(row.getCell(5).getStringCellValue());
 
             //creating emploee and assign it to the next free box
-            Employee createdEmployee = employeeController.createEmployee(department, departmentNumber, location, employee);
+            Employee createdEmployee = employeeController.createEmployee(employee.getDepartment(), location, employee);
 
             employeeList.add(createdEmployee);
         }
+        WriteInExcel writeIn = new WriteInExcel(workbook);
+        writeIn.writeLockersAndDepNumbersToFile(employeeList);
         return employeeList;
     }
 
@@ -198,23 +200,28 @@ public class FileController {
             String firstName = row.getCell(1).getStringCellValue();
             String lastName = row.getCell(2).getStringCellValue();
 
+            //get all employees with particular name
             List<Employee> employeesFromDB = employeeController.getEmployeesByFirstNameAndLastName(firstName, lastName);
-
+            //add employees to final list
             employeesFromDB.stream().forEach(employee -> employeesToFile.add(employee));
         }
 
-        List<String> columns = new LinkedList<>();
+        List<Employee> sortedEmployees = employeeController.sortEmployeesByDepartmentLockerAndBox(employeesToFile);
+        employeeController.sortEmployeesByDepartmentLockerAndBox(sortedEmployees);
+
+
+        List<String> columnHeaders = new LinkedList<>();
         Row row = worksheet.getRow(0);
         for (Cell cell : row) {
             String cellHeader = cell.getStringCellValue();
-            columns.add(cellHeader);
+            columnHeaders.add(cellHeader);
         }
 
         String sheetName = worksheet.getSheetName();
-        ExcelWriter excelWriter = new ExcelWriter(columns, employeesToFile, sheetName);
-        excelWriter.createExcelRaport();
+        ExcelWriter excelWriter = new ExcelWriter(columnHeaders, sortedEmployees, sheetName);
+        excelWriter.createExcelRaportWithEmployees();
 
-        return employeesToFile;
+        return sortedEmployees;
     }
 
 

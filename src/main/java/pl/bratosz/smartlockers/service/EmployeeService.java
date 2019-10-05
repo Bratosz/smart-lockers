@@ -1,6 +1,9 @@
 package pl.bratosz.smartlockers.service;
 
 import org.springframework.stereotype.Service;
+import pl.bratosz.smartlockers.comparators.BoxNumberSorter;
+import pl.bratosz.smartlockers.comparators.DepartmentNumberSorter;
+import pl.bratosz.smartlockers.comparators.LockerNumberSorter;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.Employee;
@@ -8,10 +11,7 @@ import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class EmployeeService {
@@ -26,15 +26,15 @@ public class EmployeeService {
     }
 
     public List<Employee> getAllEmployees() {
-      return employeesRepository.findAll();
+        return employeesRepository.findAll();
     }
 
     public Employee createEmployee(Locker.DepartmentNumber departmentNumber,
                                    Integer lockerNumber, Integer boxNumber, Employee employee) {
         Box box = lockersRepository.getBox(departmentNumber, lockerNumber, boxNumber);
-            box.setBoxStatus(Box.BoxStatus.OCCUPY);
-            box.setEmployee(employee);
-            return employeesRepository.save(employee);
+        box.setBoxStatus(Box.BoxStatus.OCCUPY);
+        box.setEmployee(employee);
+        return employeesRepository.save(employee);
     }
 
     public Employee createEmployee(Employee employee) {
@@ -43,8 +43,24 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public Employee createEmployeeAndAssignToBox(Department department, Locker.DepartmentNumber departmentNumber,
-                                                 Locker.Location location, Employee employee) {
+    public Employee createEmployeeAndAssignToBox(Department department, Locker.Location location, Employee employee) {
+        Locker.DepartmentNumber departmentNumber;
+        //chosing department number by location and department
+        if(department.equals(Department.METAL) || (department.equals(Department.JIT) && location.equals(Locker.Location.OLDSIDE))) {
+            departmentNumber = Locker.DepartmentNumber.DEP_384;
+        } else {
+            departmentNumber = Locker.DepartmentNumber.DEP_385;
+        }
+
+        //change location if there is no free boxes
+        if(boxesService.findNextFreeBox(department, departmentNumber, location).equals(null)) {
+            if(department.equals(Department.METAL)) {
+                location = Locker.Location.NEWSIDE;
+            } else if(department.equals(Department.JIT) && location.equals(Locker.Location.OLDSIDE)) {
+                departmentNumber = Locker.DepartmentNumber.DEP_385;
+                location = Locker.Location.NEWSIDEUPSTAIRS;
+            }
+        }
         Box freeBox = boxesService.findNextFreeBox(department, departmentNumber, location);
         freeBox.setBoxStatus(Box.BoxStatus.OCCUPY);
         freeBox.setEmployee(employee);
@@ -64,14 +80,22 @@ public class EmployeeService {
         return employeesRepository.getEmployeeById(id);
     }
 
-    public List<Employee> getEmployeesByFirstNameAndLastName(String firstName, String lastName){
+    public List<Employee> getEmployeesByFirstNameAndLastNameSorted(String firstName, String lastName) {
         List<Employee> filteredEmployees = new LinkedList<>();
         List<Employee> employees = employeesRepository.getEmployeesByFirstNameAndLastName(firstName, lastName);
-        for(Employee employee : employees) {
+        for (Employee employee : employees) {
             if (employee.getBoxes().size() >= 1) {
                 filteredEmployees.add(employee);
             }
         }
         return filteredEmployees;
+    }
+
+    public List<Employee> sortEmployeesByDepartmentBoxAndLocker(List<Employee> employeesToSort) {
+        Collections.sort(employeesToSort, new DepartmentNumberSorter()
+                .thenComparing(new LockerNumberSorter())
+                .thenComparing(new BoxNumberSorter()));
+
+        return employeesToSort;
     }
 }

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import pl.bratosz.smartlockers.converters.DepartmentConverter;
 
 public enum Department {
-    METAL("Structures"),
+    METAL("STRUCTURES"),
     JIT("JIT"),
-    MANTRANS("Mantrans"),
-    COMMON("Wspólny");
+    MANTRANS("MANTRANS"),
+    COMMON("WSPÓLNY");
 
     private String name;
 

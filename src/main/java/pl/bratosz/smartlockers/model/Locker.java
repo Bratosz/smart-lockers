@@ -113,7 +113,8 @@ public class Locker {
     public enum DepartmentNumber {
         DEP_384(384),
         DEP_385(385),
-        DEP_386(386);
+        DEP_386(386),
+        DEP_000(0);
 
         private int number;
 

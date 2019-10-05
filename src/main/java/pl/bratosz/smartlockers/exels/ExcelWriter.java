@@ -24,7 +24,7 @@ public class ExcelWriter {
         this.sheetName = sheetName;
     }
 
-    public void createExcelRaport() throws IOException {
+    public void createExcelRaportWithEmployees() throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(sheetName);
 
@@ -75,7 +75,7 @@ public class ExcelWriter {
             sheet.autoSizeColumn(i);
         }
 
-        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files to testing/test/" + sheetName + ".xlsx");
+        FileOutputStream fileOut = new FileOutputStream("C:/programming/files_to_testing/raports/" + sheetName + ".xlsx");
         workbook.write(fileOut);
         fileOut.close();
 

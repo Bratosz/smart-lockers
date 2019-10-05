@@ -19,7 +19,7 @@ public class Box {
     @Enumerated(EnumType.STRING)
     private BoxStatus boxStatus;
 
-    @JsonView(Views.Public.class)
+    @JsonView(Views.InternalForLockers.class)
     @ManyToOne(cascade = CascadeType.ALL)
     private Employee employee;
 

@@ -94,4 +94,25 @@ public class Employee {
     public void setBoxes(Set<Box> boxes) {
         this.boxes = boxes;
     }
+
+    public int getFirstLockerNumber() {
+        if(getBoxes().size() == 1) {
+            return getBoxes().stream().findFirst().get().getLocker().getLockerNumber();
+        }
+        return 0;
+    }
+
+    public int getFirstBoxNumber() {
+        if (getBoxes().size() == 1) {
+            return getBoxes().stream().findFirst().get().getBoxNumber();
+        }
+        return 0;
+    }
+
+    public Locker.DepartmentNumber getFirstLockerDepartmentNumber() {
+        if (getBoxes().size() == 1) {
+            return getBoxes().stream().findFirst().get().getLocker().getDepartmentNumber();
+        }
+        return Locker.DepartmentNumber.DEP_000;
+    }
 }

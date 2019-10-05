@@ -29,26 +29,29 @@ public class DBInit {
 
     @PostConstruct
     public void init() {
-        Locker locker = new Locker(1, 10, Department.METAL,
-                Locker.DepartmentNumber.DEP_384,
-                Locker.Location.OLDSIDE);
-        lockersRepository.save(locker);
-        List<Box> boxes = new LinkedList<>();
-        for (int i = 1; i <= 10; i++) {
-            Employee employee = employeesRepository.save(new Employee("Jan", "Nowak" + i, Department.METAL));
-            Employee dismissedEmp = employeesRepository.save(new Employee("", "", Department.METAL));
-            Box box = new Box(i, Box.BoxStatus.OCCUPY, dismissedEmp.getId());
+        for (int i = 1; i <= 3; i++) {
+            Locker locker = new Locker(i, 10, Department.METAL,
+                    Locker.DepartmentNumber.DEP_384,
+                    Locker.Location.OLDSIDE);
+            lockersRepository.save(locker);
+            List<Box> boxes = new LinkedList<>();
 
-            List<Employee> dismissedEmployees = new LinkedList<>();
-            dismissedEmployees.add(dismissedEmp);
+            for (int j = 1; j <= 10; j++) {
+                Employee employee = employeesRepository.save(new Employee("Jan", "Nowak" + j, Department.METAL));
+                Employee dismissedEmp = employeesRepository.save(new Employee("", "", Department.METAL));
+                Box box = new Box(j, Box.BoxStatus.OCCUPY, dismissedEmp.getId());
 
-            box.setEmployee(employee);
-            box.setDismissedEmployees(dismissedEmployees);
-            boxes.add(box);
+                List<Employee> dismissedEmployees = new LinkedList<>();
+                dismissedEmployees.add(dismissedEmp);
 
+                box.setEmployee(employee);
+                box.setDismissedEmployees(dismissedEmployees);
+                boxes.add(box);
+
+            }
+            locker.setBoxes(boxes);
+            lockersRepository.save(locker);
         }
-        locker.setBoxes(boxes);
-        lockersRepository.save(locker);
     }
 }
 
