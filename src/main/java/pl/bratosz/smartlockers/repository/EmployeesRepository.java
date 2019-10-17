@@ -13,4 +13,9 @@ public interface EmployeesRepository extends JpaRepository<Employee, Long> {
 
 
     Employee getEmployeeById(Long id);
+
+    List<Employee> getEmployeesByLastName(String lastName);
+
+    Employee deleteEmployeeById(Long id);
+
 }

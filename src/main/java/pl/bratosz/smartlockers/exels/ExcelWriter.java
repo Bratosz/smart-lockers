@@ -51,8 +51,8 @@ public class ExcelWriter {
 
 //            row.createCell(0).setCellValue(employee.getBoxes().stream().findFirst().get().getEmployee().getId());
             row.createCell(0).setCellValue(employee.getId());
-            row.createCell(1).setCellValue(employee.getFirstName());
-            row.createCell(2).setCellValue(employee.getLastName());
+            row.createCell(1).setCellValue(employee.getLastName());
+            row.createCell(2).setCellValue(employee.getFirstName());
             row.createCell(3).setCellValue(employee.getDepartment().getName());
 
             if (employee.getBoxes().size() > 0) {
@@ -75,7 +75,7 @@ public class ExcelWriter {
             sheet.autoSizeColumn(i);
         }
 
-        FileOutputStream fileOut = new FileOutputStream("C:/programming/files_to_testing/raports/" + sheetName + ".xlsx");
+        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + sheetName + ".xlsx");
         workbook.write(fileOut);
         fileOut.close();
 

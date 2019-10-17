@@ -34,4 +34,11 @@ public class BoxesController {
         return boxesService.dismissEmployee(box);
     }
 
+    @JsonView(Views.InternalForBoxes.class)
+    @GetMapping("/{id}")
+    public Box getBoxById(@PathVariable Long id) {
+        return boxesService.getBoxById(id);
+    }
+
+
 }

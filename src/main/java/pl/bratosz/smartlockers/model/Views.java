@@ -13,4 +13,8 @@ public class Views {
     public static class DismissedEmployees extends Public {
 
     }
+
+    public static class InternalForBoxes extends Public{
+
+    }
 }

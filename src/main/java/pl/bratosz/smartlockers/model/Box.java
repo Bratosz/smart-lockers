@@ -13,13 +13,13 @@ public class Box {
     private Long id;
 
     @JsonView(Views.Public.class)
-    private int boxNumber;
+    private Integer boxNumber;
 
     @JsonView(Views.Public.class)
     @Enumerated(EnumType.STRING)
     private BoxStatus boxStatus;
 
-    @JsonView(Views.InternalForLockers.class)
+    @JsonView({Views.InternalForLockers.class, Views.InternalForBoxes.class})
     @ManyToOne(cascade = CascadeType.ALL)
     private Employee employee;
 
@@ -33,7 +33,7 @@ public class Box {
             inverseJoinColumns = @JoinColumn(name = "employee_id"))
     private List<Employee> dismissedEmployees;
 
-    @JsonView(Views.InternalForEmployees.class)
+    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "locker_id", insertable = false, updatable = false)
     private Locker locker;
@@ -80,7 +80,7 @@ public class Box {
         return id;
     }
 
-    public int getBoxNumber() {
+    public Integer getBoxNumber() {
         return boxNumber;
     }
 

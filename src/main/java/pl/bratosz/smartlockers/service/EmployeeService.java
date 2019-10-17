@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.comparators.BoxNumberSorter;
 import pl.bratosz.smartlockers.comparators.DepartmentNumberSorter;
 import pl.bratosz.smartlockers.comparators.LockerNumberSorter;
+import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.Employee;
@@ -29,12 +30,28 @@ public class EmployeeService {
         return employeesRepository.findAll();
     }
 
+    public List<Employee> getEmployeesByLastName(String lastName) {
+        return employeesRepository.getEmployeesByLastName(lastName);
+    }
+
     public Employee createEmployee(Locker.DepartmentNumber departmentNumber,
                                    Integer lockerNumber, Integer boxNumber, Employee employee) {
         Box box = lockersRepository.getBox(departmentNumber, lockerNumber, boxNumber);
+        if (box.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
+            throw new BoxNotAvailableException("Nie udało się dodać pracownika " +
+                    employee.getFirstName() + " " + employee.getLastName()
+                    + " bo szafka o numerze " + lockerNumber + "/" + boxNumber + " jest zajęta");
+        }
         box.setBoxStatus(Box.BoxStatus.OCCUPY);
-        box.setEmployee(employee);
-        return employeesRepository.save(employee);
+
+        String lastName = employee.getLastName().toUpperCase();
+        String firstName = employee.getFirstName().toUpperCase();
+        Department department = employee.getDepartment();
+
+        Employee correctedEmployee = new Employee(firstName, lastName, department);
+
+        box.setEmployee(correctedEmployee);
+        return employeesRepository.save(correctedEmployee);
     }
 
     public Employee createEmployee(Employee employee) {
@@ -46,21 +63,30 @@ public class EmployeeService {
     public Employee createEmployeeAndAssignToBox(Department department, Locker.Location location, Employee employee) {
         Locker.DepartmentNumber departmentNumber;
         //chosing department number by location and department
-        if(department.equals(Department.METAL) || (department.equals(Department.JIT) && location.equals(Locker.Location.OLDSIDE))) {
+        if (department.equals(Department.METAL) || (department.equals(Department.JIT) && location.equals(Locker.Location.OLDSIDE))) {
             departmentNumber = Locker.DepartmentNumber.DEP_384;
         } else {
             departmentNumber = Locker.DepartmentNumber.DEP_385;
         }
 
         //change location if there is no free boxes
-        if(boxesService.findNextFreeBox(department, departmentNumber, location).equals(null)) {
-            if(department.equals(Department.METAL)) {
+        try{boxesService.findNextFreeBox(department, departmentNumber, location);}
+        catch (Exception e) {
+            if (location.equals(Locker.Location.OLDSIDE)) {
                 location = Locker.Location.NEWSIDE;
-            } else if(department.equals(Department.JIT) && location.equals(Locker.Location.OLDSIDE)) {
+            } else if (location.equals(Locker.Location.NEWSIDE)) {
+                location = Locker.Location.OLDSIDE;
+            } else if (department.equals(Department.JIT) && location.equals(Locker.Location.OLDSIDE)) {
                 departmentNumber = Locker.DepartmentNumber.DEP_385;
                 location = Locker.Location.NEWSIDEUPSTAIRS;
+
+                if (boxesService.findNextFreeBox(department, departmentNumber, location).equals(null)) {
+                    departmentNumber = Locker.DepartmentNumber.DEP_384;
+                    location = Locker.Location.NEWSIDE;
+                }
             }
         }
+
         Box freeBox = boxesService.findNextFreeBox(department, departmentNumber, location);
         freeBox.setBoxStatus(Box.BoxStatus.OCCUPY);
         freeBox.setEmployee(employee);
@@ -72,8 +98,8 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public void deleteById(Long id) {
-        employeesRepository.deleteById(id);
+    public void deleteEmployeeById(Long id) {
+        employeesRepository.deleteEmployeeById(id);
     }
 
     public Employee getEmployeeById(Long id) {
@@ -97,5 +123,39 @@ public class EmployeeService {
                 .thenComparing(new BoxNumberSorter()));
 
         return employeesToSort;
+    }
+
+
+    public Box changeEmployeeBox(Integer actualLockerNumber, Integer actualBoxNumber,
+                                 Integer lockerNumber, Integer boxNumber,
+                                 Locker.Location location, Locker.DepartmentNumber departmentNumber,
+                                 Integer id) throws BoxNotAvailableException {
+        Employee employee = getEmployeeById((long) id);
+        Box newBox = boxesService.getBoxByParameters(lockerNumber, boxNumber, location, departmentNumber);
+        if (newBox.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
+            throw new BoxNotAvailableException("Szafka o numerze: " + lockerNumber + "/" + boxNumber
+                    + "jest niedostępna");
+        } else {
+            Box actualBox = employee.getBoxes().stream()
+                    .filter(b -> b.getLocker().getLockerNumber().equals(actualLockerNumber))
+                    .filter(b -> b.getBoxNumber().equals(actualBoxNumber))
+                    .findFirst().get();
+            boxesService.deleteEmployee(actualBox);
+
+            newBox.setEmployee(employee);
+            newBox.setBoxStatus(Box.BoxStatus.OCCUPY);
+
+            return boxesService.saveBox(newBox);
+        }
+    }
+
+    public Set<Box> dismissEmployeeById(Long id) {
+        Employee employee = getEmployeeById(id);
+        Set<Box> releasedBoxes = new HashSet<>();
+        for (Box box : employee.getBoxes()) {
+            Box releasedBox = boxesService.dismissEmployee(box);
+            releasedBoxes.add(releasedBox);
+        }
+        return releasedBoxes;
     }
 }

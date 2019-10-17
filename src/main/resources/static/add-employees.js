@@ -13,7 +13,7 @@ $("#button-add-employee").click(function () {
         department: department
     };
     $.ajax({
-        url: `http://localhost:8080/employees/${departmentNo}/${lockerNo}/${boxNo}`,
+        url: `http://localhost:8080/employees/create_employee/${departmentNo}/${lockerNo}/${boxNo}`,
         method: "post",
         data: JSON.stringify(employee),
         contentType: "application/json",

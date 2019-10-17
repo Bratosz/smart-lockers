@@ -16,15 +16,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.bratosz.smartlockers.date.CurrentDate;
 import pl.bratosz.smartlockers.exels.ExcelWriter;
-import pl.bratosz.smartlockers.exels.WriteInExcel;
+//import pl.bratosz.smartlockers.exels.WriteInExcel;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
 import pl.bratosz.smartlockers.service.EmployeeService;
+import pl.bratosz.smartlockers.service.FileService;
 import pl.bratosz.smartlockers.service.FileStorageService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/files")
 public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+
 
     @Autowired
     private FileStorageService fileStorageService;
@@ -41,7 +46,8 @@ public class FileController {
     private BoxesController boxesController;
     @Autowired
     private LockersController lockersController;
-
+    @Autowired
+    private FileService fileService;
 
     @PostMapping("/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
@@ -92,7 +98,7 @@ public class FileController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/import")
+    @PostMapping("/import_employees")
     public List<Employee> importEmployeesFromExcelFileToDB(@RequestParam("file") MultipartFile employeesFile) throws IOException, IllegalArgumentException {
         XSSFWorkbook workbook = new XSSFWorkbook(employeesFile.getInputStream());
         XSSFSheet worksheet = workbook.getSheetAt(0);
@@ -103,8 +109,8 @@ public class FileController {
 
             //creating instance of employee from row
             Employee employee = new Employee();
-            employee.setFirstName(row.getCell(1).getStringCellValue());
-            employee.setLastName(row.getCell(2).getStringCellValue());
+            employee.setFirstName(row.getCell(2).getStringCellValue());
+            employee.setLastName(row.getCell(1).getStringCellValue());
             employee.setDepartment(Department.valueOf(row.getCell(3).getStringCellValue()));
 
 
@@ -123,30 +129,48 @@ public class FileController {
     @PostMapping("/add_employees")
     public List<Employee> addNewEmployeesFromExcelFile(@RequestParam("file") MultipartFile newEmployeesFile) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(newEmployeesFile.getInputStream());
-        XSSFSheet worksheet = workbook.getSheetAt(0);
-
         List<Employee> employeeList = new LinkedList<>();
-        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
-            XSSFRow row = worksheet.getRow(i);
+        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            if (!(workbook.getSheetName(i).equals("METAL") || workbook.getSheetName(i).equals("JIT"))) {
+                continue;
+            }
+            XSSFSheet worksheet = workbook.getSheetAt(i);
+            for (int j = 1; j < worksheet.getPhysicalNumberOfRows(); j++) {
+                XSSFRow row = worksheet.getRow(j);
 
-            Employee employee = new Employee();
-            employee.setFirstName(row.getCell(2).getStringCellValue());
-            employee.setLastName(row.getCell(1).getStringCellValue());
-            employee.setDepartment(Department.valueOf(worksheet.getSheetName()));
+                Employee employee = new Employee();
+                employee.setFirstName(row.getCell(2).getStringCellValue());
+                employee.setLastName(row.getCell(1).getStringCellValue());
+                employee.setDepartment(Department.valueOf(worksheet.getSheetName()));
 
-            Locker.Location location = Locker.Location.valueOf(row.getCell(5).getStringCellValue());
+                Locker.Location location;
+                if (row.getCell(5).getStringCellValue().equals("stara")) {
+                    location = Locker.Location.OLDSIDE;
+                } else {
+                    location = Locker.Location.NEWSIDE;
+                }
 
-            //creating emploee and assign it to the next free box
-            Employee createdEmployee = employeeController.createEmployee(employee.getDepartment(), location, employee);
-
-            employeeList.add(createdEmployee);
+                //creating emploee and assign it to the next free box
+                Employee createdEmployee = employeeController.createEmployee(employee.getDepartment(), location, employee);
+                Box box = createdEmployee.getBoxes().stream().findFirst().get();
+                row.getCell(3).setCellValue(box.getLocker().getLockerNumber());
+                row.getCell(4).setCellValue(box.getBoxNumber());
+                row.getCell(5).setCellValue(box.getLocker().getDepartmentNumber().getNumber());
+                row.getCell(6).setCellValue(employee.getDepartment().getName());
+                employeeList.add(createdEmployee);
+            }
         }
-        WriteInExcel writeIn = new WriteInExcel(workbook);
-        writeIn.writeLockersAndDepNumbersToFile(employeeList);
+        CurrentDate date = new CurrentDate();
+        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + date.getDate()
+                + " pomiary" + ".xlsx");
+        workbook.write(fileOut);
+        fileOut.close();
+
+        workbook.close();
         return employeeList;
     }
 
-    @JsonView(Views.InternalForLockers.class)
+    @JsonView(Views.InternalForEmployees.class)
     @PostMapping("/dismiss_by_id")
     public List<Box> dismissEmployeesFromFileByID(@RequestParam("file") MultipartFile employeesToDelete) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(employeesToDelete.getInputStream());
@@ -166,7 +190,7 @@ public class FileController {
         return releasedBoxes;
     }
 
-    @PostMapping("/load_Lockers/{sheetToLoad}")
+    @PostMapping("/load_lockers/{sheetToLoad}")
     public void loadLockersFromExcelFile(@RequestParam("file") MultipartFile lockersToLoad,
                                          @PathVariable int sheetToLoad) throws IOException {
         sheetToLoad = sheetToLoad - 1;
@@ -194,15 +218,28 @@ public class FileController {
         XSSFSheet worksheet = workbook.getSheetAt(0);
 
         List<Employee> employeesToFile = new LinkedList<>();
+        String previousFirstName = "";
+        String previousLastName = "";
 
         for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
             XSSFRow row = worksheet.getRow(i);
-            String firstName = row.getCell(1).getStringCellValue();
-            String lastName = row.getCell(2).getStringCellValue();
+            String firstName = row.getCell(2).getStringCellValue();
+            String lastName = row.getCell(1).getStringCellValue();
+
+            if ((previousFirstName == firstName) && (previousLastName == lastName)) {
+                continue;
+            } else {
+                previousFirstName = firstName;
+                previousLastName = lastName;
+            }
 
             //get all employees with particular name
             List<Employee> employeesFromDB = employeeController.getEmployeesByFirstNameAndLastName(firstName, lastName);
             //add employees to final list
+            employeesFromDB.stream().forEach(employee -> employeesToFile.add(employee));
+
+            //checking reverse firstName and lastName
+            employeesFromDB = employeeController.getEmployeesByFirstNameAndLastName(lastName, firstName);
             employeesFromDB.stream().forEach(employee -> employeesToFile.add(employee));
         }
 
@@ -223,8 +260,6 @@ public class FileController {
 
         return sortedEmployees;
     }
-
-
 
 
 }

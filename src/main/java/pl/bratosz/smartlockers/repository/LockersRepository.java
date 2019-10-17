@@ -56,5 +56,8 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
                @Param("lockerNumber") Integer lockerNumber,
                @Param("boxNumber") Integer boxNumber);
 
+    Locker deleteLockerById(Long id);
+
+
 
 }

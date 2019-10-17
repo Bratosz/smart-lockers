@@ -76,9 +76,9 @@
         <form class="form-inline">
             <div class="form-group">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Nazwisko" aria-label="Nazwisko" aria-describedby="input-lastName">
+                    <input type="text" class="form-control" placeholder="Nazwisko" aria-label="Nazwisko" aria-describedby="input-lastName" id = "input-lastname">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" id="input-lastName">Szukaj</button>
+                        <button class="btn btn-outline-secondary" type="button" id="button-input-lastname">Szukaj</button>
                     </div>
                 </div>
             </div>
@@ -141,6 +141,7 @@
     <table class="table table-striped">
         <thead>
         <tr>
+            <th>ID</th>
             <th>Imię</th>
             <th>Nazwisko</th>
             <th>Szafa</th>
@@ -155,6 +156,7 @@
         </thead>
         <tbody id="table-rows">
         <tr id="row-template" style="display: none">
+            <td class="cell-id"></td>
             <td class="cell-first-name"></td>
             <td class="cell-last-name"></td>
             <td class="cell-locker"></td>

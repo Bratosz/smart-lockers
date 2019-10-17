@@ -25,6 +25,12 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
                                    @Param("location") Locker.Location location,
                                    @Param("boxStatus") Box.BoxStatus boxStatus);
 
+    @Query("select b from Box b join b.locker l where " +
+            "b.boxNumber = :boxNumber and " +
+            "l.lockerNumber = :lockerNumber and " +
+            "l.location = :location and " +
+            "l.departmentNumber = :departmentNumber ")
+    Box getBoxByParameters(Integer lockerNumber, Integer boxNumber, Locker.Location location, Locker.DepartmentNumber departmentNumber);
 
-
+    Box getBoxById(Long id);
 }

@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Entity
 public class Employee {
-    @JsonView(Views.InternalForEmployees.class)
+    @JsonView(Views.Public.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 

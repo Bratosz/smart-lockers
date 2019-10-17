@@ -6,8 +6,10 @@ import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
+import pl.bratosz.smartlockers.service.LockersService;
 
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ public class LockersController {
 
     private LockersRepository lockersRepository;
     private EmployeesRepository employeesRepository;
+    private LockersService lockersService;
 
     public LockersController(LockersRepository lockersRepository, EmployeesRepository employeesRepository) {
         this.lockersRepository = lockersRepository;
@@ -86,5 +89,10 @@ public class LockersController {
     @DeleteMapping("/{id}/")
     public void delete(@PathVariable long id) {
         lockersRepository.deleteById(id);
+    }
+
+    @DeleteMapping("/deleteLockerById/{id}")
+    public Locker deleteLockerByNumber(@PathVariable Long id) {
+        return lockersService.deleteLockerByNumber(id);
     }
 }

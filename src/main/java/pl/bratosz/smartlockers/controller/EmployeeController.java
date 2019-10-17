@@ -6,6 +6,7 @@ import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.service.EmployeeService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/employees")
@@ -30,12 +31,13 @@ public class EmployeeController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/{departmentNumber}/{lockerNumber}/{boxNumber}")
+    @PostMapping("/create_employee/{departmentNumber}/{lockerNumber}/{boxNumber}")
     public Employee createEmployee(@PathVariable Locker.DepartmentNumber departmentNumber,
-                                         @PathVariable Integer lockerNumber,
-                                         @PathVariable Integer boxNumber,
-                                         @RequestBody Employee employee) {
-        
+                                   @PathVariable Integer lockerNumber,
+                                   @PathVariable Integer boxNumber,
+                                   @RequestBody Employee employee) {
+
+
         return employeeService.createEmployee(departmentNumber, lockerNumber, boxNumber, employee);
 
     }
@@ -50,17 +52,41 @@ public class EmployeeController {
 
     @JsonView(Views.Public.class)
     @DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable Long id) {
-        employeeService.deleteById(id);
+    public void deleteEmployeeById(@PathVariable Long id) {
+        employeeService.deleteEmployeeById(id);
     }
 
+    @JsonView(Views.InternalForEmployees.class)
     @GetMapping("/find/{firstName}/{lastName}")
     public List<Employee> getEmployeesByFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName) {
         List<Employee> employeesByFirstNameAndLastName = employeeService.getEmployeesByFirstNameAndLastNameSorted(firstName, lastName);
         return employeesByFirstNameAndLastName;
     }
 
+    @JsonView(Views.InternalForEmployees.class)
+    @GetMapping("/find/{lastName}")
+    public List<Employee> getEmployeesByLastName(@PathVariable String lastName) {
+        lastName.toUpperCase();
+        return employeeService.getEmployeesByLastName(lastName);
+    }
+
+    @JsonView(Views.InternalForEmployees.class)
+    @PostMapping("/change_box/{actualLockerNumber}/{actualBoxNumber}/{lockerNumber}/{boxNumber}/{location}/{departmentNo}/{id}")
+    public Box changeEmployeeBox(@PathVariable Integer actualLockerNumber, @PathVariable Integer actualBoxNumber,
+            @PathVariable Integer lockerNumber, @PathVariable Integer boxNumber, @PathVariable Locker.Location location,
+            @PathVariable Locker.DepartmentNumber departmentNo, @PathVariable Integer id) {
+        return employeeService.changeEmployeeBox(actualLockerNumber, actualBoxNumber,
+                lockerNumber, boxNumber, location, departmentNo, id);
+
+    }
+
     public List<Employee> sortEmployeesByDepartmentLockerAndBox(List<Employee> employees) {
         return employeeService.sortEmployeesByDepartmentBoxAndLocker(employees);
+    }
+
+    @JsonView(Views.InternalForEmployees.class)
+    @PostMapping("/dismiss_employee/{id}")
+    public Set<Box> dismissEmployeeById(@PathVariable Long id) {
+        return employeeService.dismissEmployeeById(id);
     }
 }
