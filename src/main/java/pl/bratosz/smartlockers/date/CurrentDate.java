@@ -11,7 +11,7 @@ public class CurrentDate {
     }
 
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter
-            .ofPattern("dd-MM-yyyy");
+            .ofPattern("yyyy-MM-dd");
     LocalDateTime now = LocalDateTime.now();
 
     public String getDate() {

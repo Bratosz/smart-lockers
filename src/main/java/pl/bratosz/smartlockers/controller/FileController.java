@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import pl.bratosz.smartlockers.calculator.CalculateClothesValue;
 import pl.bratosz.smartlockers.date.CurrentDate;
 import pl.bratosz.smartlockers.exels.ExcelWriter;
 //import pl.bratosz.smartlockers.exels.WriteInExcel;
@@ -25,12 +26,15 @@ import pl.bratosz.smartlockers.service.EmployeeService;
 import pl.bratosz.smartlockers.service.FileService;
 import pl.bratosz.smartlockers.service.FileStorageService;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static pl.bratosz.smartlockers.exels.ExcelWriter.saveWorkbook;
 
 @RestController
 @RequestMapping("/files")
@@ -131,17 +135,21 @@ public class FileController {
         XSSFWorkbook workbook = new XSSFWorkbook(newEmployeesFile.getInputStream());
         List<Employee> employeeList = new LinkedList<>();
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-            if (!(workbook.getSheetName(i).equals("METAL") || workbook.getSheetName(i).equals("JIT"))) {
+            String sheetName = workbook.getSheetName(i).toUpperCase().trim();
+            if (!(sheetName.equals("METAL") || sheetName.equals("JIT"))) {
                 continue;
             }
             XSSFSheet worksheet = workbook.getSheetAt(i);
             for (int j = 1; j < worksheet.getPhysicalNumberOfRows(); j++) {
                 XSSFRow row = worksheet.getRow(j);
+                if (row.getCell(1).equals(null) || row.getCell(1).getStringCellValue().trim().length() == 0) {
+                    break;
+                }
 
                 Employee employee = new Employee();
-                employee.setFirstName(row.getCell(2).getStringCellValue());
-                employee.setLastName(row.getCell(1).getStringCellValue());
-                employee.setDepartment(Department.valueOf(worksheet.getSheetName()));
+                employee.setFirstName(row.getCell(2).getStringCellValue().trim());
+                employee.setLastName(row.getCell(1).getStringCellValue().trim());
+                employee.setDepartment(Department.valueOf(sheetName));
 
                 Locker.Location location;
                 if (row.getCell(5).getStringCellValue().equals("stara")) {
@@ -211,22 +219,51 @@ public class FileController {
         }
     }
 
+    @GetMapping("/calculate_clothes_value/{articleColumnNo}/{releaseDateColumnNo}/{resultColumnNo}")
+    public Float calculateClothesValueFromExcelFile(@PathVariable Integer articleColumnNo,
+                                                      @PathVariable Integer releaseDateColumnNo,
+                                                      @PathVariable Integer resultColumnNo,
+                                                      @RequestParam("file") MultipartFile clothesToCount) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(clothesToCount.getInputStream());
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        Float totalAmount = 0.0f;
+
+        for(int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
+            Row row = sheet.getRow(i);
+            String articleNumber = String.valueOf((int)row.getCell(articleColumnNo -1).getNumericCellValue());
+            Date releaseDate = row.getCell(releaseDateColumnNo - 1).getDateCellValue();
+
+            Integer clothValue = CalculateClothesValue.calculateValueForCloth(articleNumber, releaseDate);
+            row.createCell(resultColumnNo - 1).setCellValue(clothValue);
+            totalAmount += clothValue;
+        }
+        sheet.createRow(sheet.getPhysicalNumberOfRows()).createCell(resultColumnNo).setCellValue(totalAmount);
+        saveWorkbook(workbook);
+        return totalAmount;
+    }
+
     @JsonView(Views.InternalForEmployees.class)
     @GetMapping("/find_employees")
     public List<Employee> findEmployeesFromExcelFileAndGenerateExcelRaport(@RequestParam("file") MultipartFile employeesToFind) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(employeesToFind.getInputStream());
         XSSFSheet worksheet = workbook.getSheetAt(0);
 
+        int doubledEmployees = 0;
         List<Employee> employeesToFile = new LinkedList<>();
+        List<SimpleEmployee> omittedEmployees = new LinkedList<>();
         String previousFirstName = "";
         String previousLastName = "";
 
         for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+
             XSSFRow row = worksheet.getRow(i);
+            if (row.getCell(1).equals(null)) break;
             String firstName = row.getCell(2).getStringCellValue();
             String lastName = row.getCell(1).getStringCellValue();
 
+            //skip row if person doubles
             if ((previousFirstName == firstName) && (previousLastName == lastName)) {
+                doubledEmployees++;
                 continue;
             } else {
                 previousFirstName = firstName;
@@ -237,10 +274,10 @@ public class FileController {
             List<Employee> employeesFromDB = employeeController.getEmployeesByFirstNameAndLastName(firstName, lastName);
             //add employees to final list
             employeesFromDB.stream().forEach(employee -> employeesToFile.add(employee));
-
-            //checking reverse firstName and lastName
-            employeesFromDB = employeeController.getEmployeesByFirstNameAndLastName(lastName, firstName);
-            employeesFromDB.stream().forEach(employee -> employeesToFile.add(employee));
+            //if there is no employee then add it to list with omitted employees
+            if (employeesFromDB.size() == 0) {
+                omittedEmployees.add(new SimpleEmployee(firstName, lastName));
+            }
         }
 
         List<Employee> sortedEmployees = employeeController.sortEmployeesByDepartmentLockerAndBox(employeesToFile);
@@ -256,7 +293,19 @@ public class FileController {
 
         String sheetName = worksheet.getSheetName();
         ExcelWriter excelWriter = new ExcelWriter(columnHeaders, sortedEmployees, sheetName);
-        excelWriter.createExcelRaportWithEmployees();
+        XSSFWorkbook excelRaportWithEmployees = excelWriter.createExcelRaportWithEmployees();
+
+        XSSFSheet sheet = excelRaportWithEmployees.createSheet("Raport");
+        sheet.createRow(0).createCell(0).setCellValue("Podwójni:");
+        sheet.getRow(0).createCell(1).setCellValue(doubledEmployees);
+        sheet.createRow(1).createCell(0).setCellValue("Pominięci:");
+        for (int i = 2; i <= omittedEmployees.size() + 1; i++) {
+            Row myRow = sheet.createRow(i);
+            myRow.createCell(0).setCellValue(omittedEmployees.get(i - 2).getLastName());
+            myRow.createCell(1).setCellValue(omittedEmployees.get(i - 2).getFirstName());
+        }
+
+        saveWorkbook(excelRaportWithEmployees);
 
         return sortedEmployees;
     }

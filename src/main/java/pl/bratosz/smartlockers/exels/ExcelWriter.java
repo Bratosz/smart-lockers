@@ -24,7 +24,7 @@ public class ExcelWriter {
         this.sheetName = sheetName;
     }
 
-    public void createExcelRaportWithEmployees() throws IOException {
+    public XSSFWorkbook createExcelRaportWithEmployees() throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(sheetName);
 
@@ -61,7 +61,7 @@ public class ExcelWriter {
                 for (Box box : boxes) {
                     row.createCell(4).setCellValue(box.getLocker().getLockerNumber());
                     row.createCell(5).setCellValue(box.getBoxNumber());
-                    row.createCell(6).setCellValue(box.getLocker().getDepartmentNumber().toString());
+                    row.createCell(6).setCellValue(box.getLocker().getDepartmentNumber().getNumber());
                 }
             } else {
                 row.createCell(3).setCellValue("brak");
@@ -74,11 +74,14 @@ public class ExcelWriter {
         for(int i = 0; i < columns.size(); i++) {
             sheet.autoSizeColumn(i);
         }
+        return (XSSFWorkbook) workbook;
+    }
 
-        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + sheetName + ".xlsx");
+    public static void saveWorkbook(XSSFWorkbook workbook) throws IOException {
+        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + workbook.getSheetName(0)
+        + ".xlsx");
         workbook.write(fileOut);
         fileOut.close();
-
         workbook.close();
     }
 

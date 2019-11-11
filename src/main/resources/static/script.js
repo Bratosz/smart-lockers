@@ -26,6 +26,7 @@ function reloadTableRows() {
                         window.location.href = `edit-employee.html?id=${locker.boxes[j].id}`;
                     });
                     $("#table-rows").append($row);
+
                 }
             }
         }
@@ -47,11 +48,13 @@ $("#button-filter").click(function () {
             const $rowTemplate = $("#row-template");
             console.log($rowTemplate);
             console.log(lockers);
+            let counter = 0;
             for (let i = 0; i < lockers.length; i++) {
                 for (let j = 0; j < lockers[i].boxes.length; j++) {
                     const locker = lockers[i];
                     const $row = $rowTemplate.clone();
                     const employeeId = locker.boxes[j].employee.id;
+                    counter++;
                     $row.removeAttr("id");
                     $row.css("display", "table-row");
                     $row.find(".cell-id").text(employeeId);
@@ -63,13 +66,14 @@ $("#button-filter").click(function () {
                     $row.find(".cell-department").text(locker.department);
                     $row.find(".cell-location").text(locker.location);
                     $row.find(".cell-status").text(locker.boxes[j].boxStatus);
+                    $row.find(".cell-number").text(counter);
                     $row.find(".button-edit-employee").click(function () {
                         window.location.href = `edit-employee.html?id=${employeeId}`;
                     });
-
                     $("#table-rows").append($row);
                 }
             }
+
         }
     })
 });

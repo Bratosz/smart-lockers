@@ -6,6 +6,8 @@ import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
+import pl.bratosz.smartlockers.service.BoxesService;
+import pl.bratosz.smartlockers.service.EmployeeService;
 import pl.bratosz.smartlockers.service.LockersService;
 
 
@@ -20,12 +22,13 @@ import java.util.stream.Collectors;
 public class LockersController {
 
     private LockersRepository lockersRepository;
-    private EmployeesRepository employeesRepository;
     private LockersService lockersService;
+    private BoxesService boxesService;
 
-    public LockersController(LockersRepository lockersRepository, EmployeesRepository employeesRepository) {
+    public LockersController(LockersRepository lockersRepository, LockersService lockersService, BoxesService boxesService) {
         this.lockersRepository = lockersRepository;
-        this.employeesRepository = employeesRepository;
+        this.lockersService = lockersService;
+        this.boxesService = boxesService;
     }
 
     @JsonView(Views.InternalForLockers.class)
@@ -70,23 +73,12 @@ public class LockersController {
 
     @PostMapping
     public Locker create(@RequestBody Locker locker) {
-
-
-        List<Box> boxes = new LinkedList<>();
-        for (int i = 1; i <= locker.getCapacity(); i++) {
-            Employee employee = employeesRepository.save(new Employee("", "", null));
-            List<Employee> employees = new LinkedList<>();
-            employees.add(employee);
-            Box box = new Box(i, Box.BoxStatus.FREE, employee.getId());
-            box.setEmployee(employee);
-            box.setDismissedEmployees(employees);
-            boxes.add(box);
-        }
+        List<Box> boxes = boxesService.createBoxesForLocker(locker.getCapacity());
         locker.setBoxes(boxes);
         return lockersRepository.save(locker);
     }
 
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
         lockersRepository.deleteById(id);
     }

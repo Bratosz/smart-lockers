@@ -89,4 +89,9 @@ public class EmployeeController {
     public Set<Box> dismissEmployeeById(@PathVariable Long id) {
         return employeeService.dismissEmployeeById(id);
     }
+
+    @PostMapping("/change_last_name/{lastName}/{id}")
+    public Employee changeEmployeeLastName(@PathVariable String lastName, @PathVariable Long id) {
+        return employeeService.changeEmployeeLastName(lastName, id);
+    }
 }

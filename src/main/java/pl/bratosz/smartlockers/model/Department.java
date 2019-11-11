@@ -7,7 +7,8 @@ public enum Department {
     METAL("STRUCTURES"),
     JIT("JIT"),
     MANTRANS("MANTRANS"),
-    COMMON("WSPÓLNY");
+    COMMON("WSPÓLNY"),
+    NOTFOUND("Nie znaleziono pracownika");
 
     private String name;
 

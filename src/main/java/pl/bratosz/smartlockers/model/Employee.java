@@ -58,7 +58,6 @@ public class Employee {
     public void setBoxesOccupiedInPast(List<Box> boxesOccupiedInPast) {
         this.boxesOccupiedInPast = boxesOccupiedInPast;
     }
-
     public void setId(Long id) {
         this.id = id;
     }

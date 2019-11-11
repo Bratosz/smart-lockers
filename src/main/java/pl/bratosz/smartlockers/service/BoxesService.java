@@ -4,10 +4,12 @@ import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Department;
+import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -67,5 +69,20 @@ public class BoxesService {
 
     public Box getBoxById(Long id) {
         return boxesRepository.getBoxById(id);
+    }
+
+    public List<Box> createBoxesForLocker(int lockerCapacity) {
+        List<Box> boxes = new LinkedList<>();
+        for (int i = 1; i <= lockerCapacity; i++) {
+            Employee employee = new Employee("", "", null);
+            List<Employee> employees = new LinkedList<>();
+            employees.add(employee);
+
+            Box box = new Box(i, Box.BoxStatus.FREE, employee.getId());
+            box.setEmployee(employee);
+            box.setDismissedEmployees(employees);
+            boxes.add(box);
+        }
+        return boxes;
     }
 }

@@ -35,7 +35,7 @@ public class EmployeeService {
     }
 
     public Employee createEmployee(Locker.DepartmentNumber departmentNumber,
-                                   Integer lockerNumber, Integer boxNumber, Employee employee) {
+                                   Integer lockerNumber, Integer boxNumber, Employee employee) throws BoxNotAvailableException{
         Box box = lockersRepository.getBox(departmentNumber, lockerNumber, boxNumber);
         if (box.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
             throw new BoxNotAvailableException("Nie udało się dodać pracownika " +
@@ -71,7 +71,7 @@ public class EmployeeService {
 
         //change location if there is no free boxes
         try{boxesService.findNextFreeBox(department, departmentNumber, location);}
-        catch (Exception e) {
+        catch (BoxNotAvailableException e) {
             if (location.equals(Locker.Location.OLDSIDE)) {
                 location = Locker.Location.NEWSIDE;
             } else if (location.equals(Locker.Location.NEWSIDE)) {
@@ -99,6 +99,8 @@ public class EmployeeService {
     }
 
     public void deleteEmployeeById(Long id) {
+        Employee employeeById = employeesRepository.getEmployeeById(id);
+        employeeById.getBoxes().stream().forEach(b -> boxesService.deleteEmployee(b));
         employeesRepository.deleteEmployeeById(id);
     }
 
@@ -157,5 +159,16 @@ public class EmployeeService {
             releasedBoxes.add(releasedBox);
         }
         return releasedBoxes;
+    }
+
+    public Employee save(Employee employee) {
+        return employeesRepository.save(employee);
+    }
+
+
+    public Employee changeEmployeeLastName(String lastName, Long id) {
+        Employee employee = getEmployeeById(id);
+        employee.setLastName(lastName);
+        return employeesRepository.save(employee);
     }
 }
