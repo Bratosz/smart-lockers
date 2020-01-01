@@ -109,7 +109,7 @@ public class BoxesService {
         saveLabels(folderName, sheetName, labels);
     }
 
-    public void createLabels(String folderName, String sheetName, List<RawEmployee> employees) throws IOException {
+    public void createLabels(String folderName, String sheetName, List<LabelEmployee> employees) throws IOException {
         List<String> labels = createLabelsFromRawEmployees(employees);
         saveLabels(folderName, sheetName, labels);
     }
@@ -140,9 +140,9 @@ public class BoxesService {
         return labels;
     }
 
-    private List<String> createLabelsFromRawEmployees(List<RawEmployee> employees) {
+    private List<String> createLabelsFromRawEmployees(List<LabelEmployee> employees) {
         List<String> labels = new LinkedList<>();
-        for (RawEmployee emp : employees) {
+        for (LabelEmployee emp : employees) {
             labels.add(getLabelFromRawEmployee(emp));
         }
         return labels;
@@ -158,7 +158,7 @@ public class BoxesService {
         return createLabel(firstName, lastName, lockerNumber, boxNumber);
     }
 
-    private String getLabelFromRawEmployee(RawEmployee emp) {
+    private String getLabelFromRawEmployee(LabelEmployee emp) {
         String firstName = emp.getFirstName();
         String lastName = emp.getLastName();
         int lockerNumber = emp.getLockerNumber();

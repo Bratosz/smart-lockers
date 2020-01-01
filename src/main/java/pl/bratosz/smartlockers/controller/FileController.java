@@ -3,7 +3,6 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -347,14 +346,14 @@ public class FileController {
     }
 
     @PostMapping("/create_labels/{sheetIndex}/{folderName}/{sheetName}")
-    public List<RawEmployee> createLabels(@PathVariable int sheetIndex,
-                                          @PathVariable String folderName,
-                                          @PathVariable String sheetName,
-                                          @RequestParam("file") MultipartFile employeesToLoad) throws IOException {
+    public List<LabelEmployee> createLabels(@PathVariable int sheetIndex,
+                                            @PathVariable String folderName,
+                                            @PathVariable String sheetName,
+                                            @RequestParam("file") MultipartFile employeesToLoad) throws IOException {
         ExcelEmployeeReader employeeReader = new ExcelEmployeeReader();
-        List<RawEmployee> rawEmployees = employeeReader.loadRawEmployees(getSheetAtFromFile(sheetIndex, employeesToLoad));
-        boxesService.createLabels(folderName, sheetName, rawEmployees);
-        return rawEmployees;
+        List<LabelEmployee> labelEmployees = employeeReader.loadEmployees(getSheetAtFromFile(sheetIndex, employeesToLoad));
+        boxesService.createLabels(folderName, sheetName, labelEmployees);
+        return labelEmployees;
     }
 
     private XSSFSheet getSheetAtFromFile(int index, MultipartFile file) throws IOException {

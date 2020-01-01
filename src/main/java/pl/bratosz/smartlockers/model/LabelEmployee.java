@@ -1,6 +1,6 @@
 package pl.bratosz.smartlockers.model;
 
-public class RawEmployee {
+public class LabelEmployee {
     private String firstName;
     private String lastName;
     private int lockerNumber;
@@ -9,18 +9,18 @@ public class RawEmployee {
     private Department dep;
     private Locker.Location location;
 
-    public RawEmployee() {
+    public LabelEmployee() {
     }
 
-    public RawEmployee(String firstName, String lastName, int lockerNumber, int boxNumber) {
+    public LabelEmployee(String firstName, String lastName, int lockerNumber, int boxNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.lockerNumber = lockerNumber;
         this.boxNumber = boxNumber;
     }
 
-    public RawEmployee(String firstName, String lastName, int lockerNumber, int boxNumber,
-                       Locker.DepartmentNumber depNumber, Department dep, Locker.Location location) {
+    public LabelEmployee(String firstName, String lastName, int lockerNumber, int boxNumber,
+                         Locker.DepartmentNumber depNumber, Department dep, Locker.Location location) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.lockerNumber = lockerNumber;

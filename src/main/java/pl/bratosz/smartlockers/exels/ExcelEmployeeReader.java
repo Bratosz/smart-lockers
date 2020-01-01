@@ -3,9 +3,7 @@ package pl.bratosz.smartlockers.exels;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import pl.bratosz.smartlockers.model.Employee;
-import pl.bratosz.smartlockers.model.RawEmployee;
+import pl.bratosz.smartlockers.model.LabelEmployee;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,24 +13,38 @@ public class ExcelEmployeeReader {
     private int lastNameIndex;
     private int lockerNumberIndex;
     private int boxNumberIndex;
+    private List<LabelEmployee> employees;
+
+    public ExcelEmployeeReader() {
+        employees = new LinkedList<>();
+    }
 
 
-    public List<RawEmployee> loadRawEmployees(XSSFSheet sheet) {
-        List<RawEmployee> employees = new LinkedList<>();
-        assignColumns(sheet);
-        for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
-            Row row = sheet.getRow(i);
-            if (row.getCell(firstNameIndex).equals(null)) break;
-            RawEmployee emp = new RawEmployee(row.getCell(firstNameIndex).getStringCellValue(),
-                    row.getCell(lastNameIndex).getStringCellValue(),
-                    (int) row.getCell(lockerNumberIndex).getNumericCellValue(),
-                    (int) row.getCell(boxNumberIndex).getNumericCellValue());
-            employees.add(emp);
-        }
+    public List<LabelEmployee> loadEmployees(XSSFSheet sheet) {
+        assignColumnsToDataType(sheet);
+        loadEmployeesFromAllRows(sheet);
         return employees;
     }
 
-    private void assignColumns(XSSFSheet sheet) {
+    private void loadEmployeesFromAllRows(XSSFSheet sheet) {
+        for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
+            Row row = sheet.getRow(i);
+            if (row.getCell(firstNameIndex).equals(null)) {
+                break;
+            }
+            LabelEmployee emp = loadEmployeeFromRow(row);
+            employees.add(emp);
+        }
+    }
+
+    private LabelEmployee loadEmployeeFromRow(Row row) {
+       return new LabelEmployee(row.getCell(firstNameIndex).getStringCellValue(),
+                row.getCell(lastNameIndex).getStringCellValue(),
+                (int) row.getCell(lockerNumberIndex).getNumericCellValue(),
+                (int) row.getCell(boxNumberIndex).getNumericCellValue());
+    }
+
+    private void assignColumnsToDataType(XSSFSheet sheet) {
         XSSFRow row = sheet.getRow(0);
         for (int i = 0; i < row.getPhysicalNumberOfCells(); i++) {
             if (row.getCell(i).getStringCellValue().equals(null)) break;
