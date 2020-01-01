@@ -11,5 +11,5 @@ public class DepartmentNumberSorter implements Comparator<Employee> {
     public int compare(Employee o1, Employee o2) {
         return o1.getFirstLockerDepartmentNumber().getNumber()
                 - o2.getFirstLockerDepartmentNumber().getNumber();
-}
+    }
 }

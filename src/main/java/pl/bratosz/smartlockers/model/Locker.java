@@ -132,7 +132,8 @@ public class Locker {
         NEWSIDE("Nowa część"),
         MANTRANS("Mantrans"),
         NEWSIDEUPSTAIRS("Nowa część na piętrze"),
-        NEWJITSIDE("Nowa część na JIT");
+        NEWJITSIDE("Nowa część na JIT"),
+        DISABLED("Nieaktywna");
 
         private String name;
 

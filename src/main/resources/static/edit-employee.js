@@ -3,9 +3,9 @@ const boxId = url.searchParams.get("id");
 
 function reloadEmployee() {
     $.ajax({
-        url:`http://localhost:8080/lockers/boxes/${boxId}`,
+        url: `http://localhost:8080/lockers/boxes/${boxId}`,
         method: "get",
-        success: function(box) {
+        success: function (box) {
             console.log(box);
 
         }

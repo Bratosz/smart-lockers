@@ -3,6 +3,7 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -18,19 +19,18 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.bratosz.smartlockers.calculator.CalculateClothesValue;
 import pl.bratosz.smartlockers.date.CurrentDate;
+import pl.bratosz.smartlockers.exels.ExcelEmployeeReader;
 import pl.bratosz.smartlockers.exels.ExcelWriter;
-//import pl.bratosz.smartlockers.exels.WriteInExcel;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
+import pl.bratosz.smartlockers.service.BoxesService;
 import pl.bratosz.smartlockers.service.EmployeeService;
 import pl.bratosz.smartlockers.service.FileService;
 import pl.bratosz.smartlockers.service.FileStorageService;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,6 +52,10 @@ public class FileController {
     private LockersController lockersController;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private BoxesService boxesService;
 
     @PostMapping("/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
@@ -75,32 +79,6 @@ public class FileController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/downloadfile/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName,
-                                                 HttpServletRequest request) {
-        //Load file as Resource
-        Resource resource = fileStorageService.loadFileAsResource(fileName);
-
-        //Try to determine file's content type
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-            logger.info("Could not determine file type.");
-        }
-
-        //Fallback to the default content type if the type could not be determined
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
-                        + resource.getFilename() + "\"")
-                .body(resource);
-    }
-
     @JsonView(Views.InternalForEmployees.class)
     @PostMapping("/import_employees")
     public List<Employee> importEmployeesFromExcelFileToDB(@RequestParam("file") MultipartFile employeesFile) throws IOException, IllegalArgumentException {
@@ -119,7 +97,7 @@ public class FileController {
 
 
             //adding employee to box
-            Employee loadedEmployee = employeeController.createEmployee(
+            Employee loadedEmployee = employeeService.createEmployee(
                     Locker.DepartmentNumber.valueOf(row.getCell(4).getStringCellValue()),
                     (int) row.getCell(5).getNumericCellValue(),
                     (int) row.getCell(6).getNumericCellValue(),
@@ -198,6 +176,32 @@ public class FileController {
         return releasedBoxes;
     }
 
+    @GetMapping("/downloadfile/{fileName:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName,
+                                                 HttpServletRequest request) {
+        //Load file as Resource
+        Resource resource = fileStorageService.loadFileAsResource(fileName);
+
+        //Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            logger.info("Could not determine file type.");
+        }
+
+        //Fallback to the default content type if the type could not be determined
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                        + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
     @PostMapping("/load_lockers/{sheetToLoad}")
     public void loadLockersFromExcelFile(@RequestParam("file") MultipartFile lockersToLoad,
                                          @PathVariable int sheetToLoad) throws IOException {
@@ -221,16 +225,16 @@ public class FileController {
 
     @GetMapping("/calculate_clothes_value/{articleColumnNo}/{releaseDateColumnNo}/{resultColumnNo}")
     public Float calculateClothesValueFromExcelFile(@PathVariable Integer articleColumnNo,
-                                                      @PathVariable Integer releaseDateColumnNo,
-                                                      @PathVariable Integer resultColumnNo,
-                                                      @RequestParam("file") MultipartFile clothesToCount) throws IOException {
+                                                    @PathVariable Integer releaseDateColumnNo,
+                                                    @PathVariable Integer resultColumnNo,
+                                                    @RequestParam("file") MultipartFile clothesToCount) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(clothesToCount.getInputStream());
         XSSFSheet sheet = workbook.getSheetAt(0);
         Float totalAmount = 0.0f;
 
-        for(int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
+        for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
             Row row = sheet.getRow(i);
-            String articleNumber = String.valueOf((int)row.getCell(articleColumnNo -1).getNumericCellValue());
+            String articleNumber = String.valueOf((int) row.getCell(articleColumnNo - 1).getNumericCellValue());
             Date releaseDate = row.getCell(releaseDateColumnNo - 1).getDateCellValue();
 
             Integer clothValue = CalculateClothesValue.calculateValueForCloth(articleNumber, releaseDate);
@@ -240,6 +244,38 @@ public class FileController {
         sheet.createRow(sheet.getPhysicalNumberOfRows()).createCell(resultColumnNo).setCellValue(totalAmount);
         saveWorkbook(workbook);
         return totalAmount;
+    }
+
+    @JsonView(Views.InternalForBoxes.class)
+    @PostMapping("/change_boxes")
+    public List<Box> changeBoxesForEmployeesFromExcelFileAndCreateExcelRaport(@RequestParam("file")
+                                                                                      MultipartFile employeesToMove) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(employeesToMove.getInputStream());
+        XSSFSheet worksheet = workbook.getSheetAt(0);
+        List<Box> boxes = new LinkedList<>();
+
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+            Row row = worksheet.getRow(i);
+            int lockerNumber = ((int) row.getCell(3).getNumericCellValue());
+            int boxNumber = ((int) row.getCell(4).getNumericCellValue());
+            Locker.DepartmentNumber depNumber = Locker.DepartmentNumber.valueOf(row.getCell(5).getStringCellValue());
+            Department targetDepartment = Department.valueOf(row.getCell(10).getStringCellValue());
+            Locker.Location targetLocation = Locker.Location.valueOf(row.getCell(11).getStringCellValue());
+            Locker.DepartmentNumber targetDepNumber = Locker.DepartmentNumber.valueOf(row.getCell(12).getStringCellValue());
+
+            Box box = employeeService.changeEmployeeBoxOnNextFree(lockerNumber, boxNumber, depNumber,
+                    targetDepartment, targetLocation, targetDepNumber);
+
+            boxes.add(box);
+            row.getCell(7).setCellValue(box.getLocker().getLockerNumber());
+            row.getCell(8).setCellValue(box.getBoxNumber());
+
+        }
+        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + worksheet.getSheetName() + ".xlsx");
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
+        return boxes;
     }
 
     @JsonView(Views.InternalForEmployees.class)
@@ -308,6 +344,22 @@ public class FileController {
         saveWorkbook(excelRaportWithEmployees);
 
         return sortedEmployees;
+    }
+
+    @PostMapping("/create_labels/{sheetIndex}/{folderName}/{sheetName}")
+    public List<RawEmployee> createLabels(@PathVariable int sheetIndex,
+                                          @PathVariable String folderName,
+                                          @PathVariable String sheetName,
+                                          @RequestParam("file") MultipartFile employeesToLoad) throws IOException {
+        ExcelEmployeeReader employeeReader = new ExcelEmployeeReader();
+        List<RawEmployee> rawEmployees = employeeReader.loadRawEmployees(getSheetAtFromFile(sheetIndex, employeesToLoad));
+        boxesService.createLabels(folderName, sheetName, rawEmployees);
+        return rawEmployees;
+    }
+
+    private XSSFSheet getSheetAtFromFile(int index, MultipartFile file) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+        return workbook.getSheetAt(index);
     }
 
 

@@ -10,6 +10,7 @@ import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
 import pl.bratosz.smartlockers.service.BoxesService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +39,15 @@ public class BoxesController {
     @GetMapping("/{id}")
     public Box getBoxById(@PathVariable Long id) {
         return boxesService.getBoxById(id);
+    }
+
+    @PostMapping("/create_labels/{folderName}/{sheetName}/{depNumber}/{firstLocker}/{lastLocker}")
+    public void createLabels(@PathVariable String folderName,
+                             @PathVariable String sheetName,
+                             @PathVariable Locker.DepartmentNumber depNumber,
+                             @PathVariable int firstLocker,
+                             @PathVariable int lastLocker) throws IOException {
+        boxesService.createLabels(folderName, sheetName, depNumber, firstLocker, lastLocker);
     }
 
 

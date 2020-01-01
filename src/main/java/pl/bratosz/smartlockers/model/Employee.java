@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.hibernate.sql.Update;
+import pl.bratosz.smartlockers.validators.annotations.CorrectFirstName;
 
 import javax.persistence.*;
+import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,10 +18,10 @@ public class Employee {
     @JsonView(Views.Public.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
 
     @JsonView(Views.Public.class)
+    @CorrectFirstName
     private String firstName;
 
     @JsonView(Views.Public.class)
@@ -41,7 +43,7 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(String firstName, String lastName, Department department) {
+    public Employee(String firstName, String lastName, Department department) throws ConstraintViolationException {
         this.firstName = firstName;
         this.lastName = lastName;
         this.department = department;
@@ -58,6 +60,7 @@ public class Employee {
     public void setBoxesOccupiedInPast(List<Box> boxesOccupiedInPast) {
         this.boxesOccupiedInPast = boxesOccupiedInPast;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -95,7 +98,7 @@ public class Employee {
     }
 
     public int getFirstLockerNumber() {
-        if(getBoxes().size() == 1) {
+        if (getBoxes().size() == 1) {
             return getBoxes().stream().findFirst().get().getLocker().getLockerNumber();
         }
         return 0;

@@ -5,7 +5,7 @@ $("#button-add-locker").click(function () {
         method: "get",
         success: function (lockersQuantity) {
             const amount = $("#locker-amount-input").val();
-            for(let i = 0; i < amount; i++) {
+            for (let i = 0; i < amount; i++) {
                 const capacity = $("#pass-locker-capacity").val();
                 const department = $("#pass-locker-department").val();
                 const location = $("#pass-locker-location").val();

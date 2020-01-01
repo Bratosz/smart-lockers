@@ -9,8 +9,8 @@ function reloadTableRows() {
             console.log(lockers);
             for (let i = 0; i < lockers.length; i++) {
                 for (let j = 0; j < lockers[i].boxes.length; j++) {
-                const locker = lockers[i];
-                const $row = $rowTemplate.clone();
+                    const locker = lockers[i];
+                    const $row = $rowTemplate.clone();
                     $row.removeAttr("id");
                     $row.css("display", "table-row");
                     $row.find(".cell-id").text(locker.boxes[j].employee.id);
@@ -32,7 +32,6 @@ function reloadTableRows() {
         }
     });
 }
-
 
 
 $("#button-filter").click(function () {
@@ -83,7 +82,7 @@ $("#button-input-lastname").click(function () {
     $.ajax({
         url: `http://localhost:8080/employees/find/${lastname}`,
         method: "get",
-        success: function(employees){
+        success: function (employees) {
             $("#table-rows > tr:not(#row-template)").remove();
             const $rowTemplate = $("#row-template");
             console.log($rowTemplate);
@@ -115,7 +114,6 @@ $("#button-input-lastname").click(function () {
         }
     })
 });
-
 
 
 reloadTableRows();

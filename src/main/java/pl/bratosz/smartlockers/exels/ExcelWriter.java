@@ -24,6 +24,54 @@ public class ExcelWriter {
         this.sheetName = sheetName;
     }
 
+    public ExcelWriter() {
+    }
+
+    public XSSFWorkbook createLabels(List<String> labels, String sheetName) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet(sheetName);
+
+        int counter = 0;
+        int rowCounter = 0;
+        int boxCounter = 0;
+        Row row = null;
+
+        Font font = workbook.createFont();
+        font.setFontHeightInPoints((short) 16);
+        font.setFontName("Times New Roman");
+
+        CellStyle style = workbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setFont(font);
+
+        for (int i = 0; i < 3; i++) {
+            sheet.setColumnWidth(i, 9139);
+        }
+
+        for (int i = 0; i < labels.size(); i++) {
+            if (counter == 0) {
+                row = sheet.createRow(rowCounter++);
+                row.setHeight((short) 2098);
+            }
+            for (int j = 0; j < 3; j++) {
+                if (boxCounter >= labels.size()) {
+                    return workbook;
+                }
+                String label = labels.get(boxCounter++);
+                Cell cell = row.createCell(j);
+                cell.setCellValue(label);
+                cell.setCellStyle(style);
+
+                if (j == 2) {
+                    counter = 0;
+                }
+            }
+        }
+        return workbook;
+    }
+
+
     public XSSFWorkbook createExcelRaportWithEmployees() throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(sheetName);
@@ -71,7 +119,7 @@ public class ExcelWriter {
         }
 
         //Resize all columns to fit the content
-        for(int i = 0; i < columns.size(); i++) {
+        for (int i = 0; i < columns.size(); i++) {
             sheet.autoSizeColumn(i);
         }
         return (XSSFWorkbook) workbook;
@@ -79,12 +127,11 @@ public class ExcelWriter {
 
     public static void saveWorkbook(XSSFWorkbook workbook) throws IOException {
         FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + workbook.getSheetName(0)
-        + ".xlsx");
+                + ".xlsx");
         workbook.write(fileOut);
         fileOut.close();
         workbook.close();
     }
-
 
     public List<String> getColumns() {
         return columns;

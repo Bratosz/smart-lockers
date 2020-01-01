@@ -41,7 +41,7 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             @Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
             @Param("department") Department department,
             @Param("location") Locker.Location location,
-            @Param("boxStatus")Box.BoxStatus boxStatus);
+            @Param("boxStatus") Box.BoxStatus boxStatus);
 
     @Query("select count(l.departmentNumber) from Locker l where l.departmentNumber = :departmentNumber ")
     int getAmountOfLockersByDepartmentNumber(@Param("departmentNumber") Locker.DepartmentNumber departmentNumber);
@@ -58,6 +58,18 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
 
     Locker deleteLockerById(Long id);
 
+    @Query("select l from Locker l where l.lockerNumber = :lockerNumber " +
+            "and " +
+            "l.departmentNumber = :departmentNumber " +
+            "and " +
+            "l.location = :location ")
+    Locker getLockerByParameters(@Param("lockerNumber") Integer lockerNumber,
+                                 @Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
+                                 @Param("location") Locker.Location location);
 
-
+    @Query("select l from Locker l where l.departmentNumber = :depNumber " +
+            "and " +
+            "(l.lockerNumber between :firstLocker and :lastLocker) " +
+            "order by l.lockerNumber ")
+    List<Locker> getLockersFromRange(Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker);
 }

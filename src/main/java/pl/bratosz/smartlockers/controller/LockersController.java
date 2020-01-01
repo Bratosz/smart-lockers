@@ -45,17 +45,17 @@ public class LockersController {
                                     @PathVariable Box.BoxStatus boxStatus) {
         List<Locker> lockers = lockersRepository.filterAllByDepartmentNoAndDepartmentAndLocation(
                 departmentNo, department, location);
-        if(boxStatus.equals(Box.BoxStatus.UNDEFINED)){
+        if (boxStatus.equals(Box.BoxStatus.UNDEFINED)) {
             return lockers;
         }
-            for (Locker locker : lockers) {
-                List<Box> boxes = locker.getBoxes();
-                List<Box> filteredBoxes = boxes.stream()
-                        .filter(box -> box.getBoxStatus().equals(boxStatus))
-                        .collect(Collectors.toList());
-                locker.setBoxes(filteredBoxes);
-            }
-            return lockers;
+        for (Locker locker : lockers) {
+            List<Box> boxes = locker.getBoxes();
+            List<Box> filteredBoxes = boxes.stream()
+                    .filter(box -> box.getBoxStatus().equals(boxStatus))
+                    .collect(Collectors.toList());
+            locker.setBoxes(filteredBoxes);
+        }
+        return lockers;
     }
 
 
@@ -76,6 +76,13 @@ public class LockersController {
         List<Box> boxes = boxesService.createBoxesForLocker(locker.getCapacity());
         locker.setBoxes(boxes);
         return lockersRepository.save(locker);
+    }
+
+    @JsonView(Views.InternalForLockers.class)
+    @PostMapping("/change_location/{lockerNumber}/{departmentNumber}/{location}/{desiredLocation}")
+    public Locker changeLocation(@PathVariable Integer lockerNumber, @PathVariable Locker.DepartmentNumber departmentNumber,
+                                 @PathVariable Locker.Location location, @PathVariable Locker.Location desiredLocation) {
+        return lockersService.changeLocation(lockerNumber, departmentNumber, location, desiredLocation);
     }
 
     @DeleteMapping("/{id}")

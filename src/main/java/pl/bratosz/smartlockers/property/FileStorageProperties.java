@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class FileStorageProperties {
     private String uploadDir;
 
-    public String getUploadDir(){
+    public String getUploadDir() {
         return uploadDir;
     }
 
