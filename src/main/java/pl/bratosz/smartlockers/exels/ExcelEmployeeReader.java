@@ -14,37 +14,47 @@ public class ExcelEmployeeReader {
     private int lockerNumberIndex;
     private int boxNumberIndex;
     private List<LabelEmployee> employees;
+    private XSSFSheet sheet;
 
-    public ExcelEmployeeReader() {
+    public ExcelEmployeeReader(XSSFSheet sheet) {
+        this.sheet = sheet;
         employees = new LinkedList<>();
     }
 
-
-    public List<LabelEmployee> loadEmployees(XSSFSheet sheet) {
-        assignColumnsToDataType(sheet);
-        loadEmployeesFromAllRows(sheet);
+    public List<LabelEmployee> loadEmployees() {
+        assignColumnsToDataType();
+        loadEmployeesFromAllRows();
         return employees;
     }
 
-    private void loadEmployeesFromAllRows(XSSFSheet sheet) {
+    private void loadEmployeesFromAllRows() {
         for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
             Row row = sheet.getRow(i);
-            if (row.getCell(firstNameIndex).equals(null)) {
+            if(isRowEmpty(row)){
                 break;
             }
-            LabelEmployee emp = loadEmployeeFromRow(row);
-            employees.add(emp);
+
+            LabelEmployee employee = loadEmployeeFromRow(row);
+            employees.add(employee);
+        }
+    }
+
+    private boolean isRowEmpty(Row row) {
+        if (row.getCell(firstNameIndex).equals(null)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
     private LabelEmployee loadEmployeeFromRow(Row row) {
-       return new LabelEmployee(row.getCell(firstNameIndex).getStringCellValue(),
+        return new LabelEmployee(row.getCell(firstNameIndex).getStringCellValue(),
                 row.getCell(lastNameIndex).getStringCellValue(),
                 (int) row.getCell(lockerNumberIndex).getNumericCellValue(),
                 (int) row.getCell(boxNumberIndex).getNumericCellValue());
     }
 
-    private void assignColumnsToDataType(XSSFSheet sheet) {
+    private void assignColumnsToDataType() {
         XSSFRow row = sheet.getRow(0);
         for (int i = 0; i < row.getPhysicalNumberOfCells(); i++) {
             if (row.getCell(i).getStringCellValue().equals(null)) break;

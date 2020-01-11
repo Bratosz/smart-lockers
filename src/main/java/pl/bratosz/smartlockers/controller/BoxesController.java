@@ -47,7 +47,6 @@ public class BoxesController {
                              @PathVariable Locker.DepartmentNumber depNumber,
                              @PathVariable int firstLocker,
                              @PathVariable int lastLocker) throws IOException {
-        boxesService.createLabels(folderName, sheetName, depNumber, firstLocker, lastLocker);
     }
 
 

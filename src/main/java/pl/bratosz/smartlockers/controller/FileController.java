@@ -22,10 +22,7 @@ import pl.bratosz.smartlockers.exels.ExcelEmployeeReader;
 import pl.bratosz.smartlockers.exels.ExcelWriter;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
-import pl.bratosz.smartlockers.service.BoxesService;
-import pl.bratosz.smartlockers.service.EmployeeService;
-import pl.bratosz.smartlockers.service.FileService;
-import pl.bratosz.smartlockers.service.FileStorageService;
+import pl.bratosz.smartlockers.service.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileOutputStream;
@@ -55,6 +52,11 @@ public class FileController {
     private EmployeeService employeeService;
     @Autowired
     private BoxesService boxesService;
+    private LabelsService labelsService;
+
+    public FileController(LabelsService labelsService) {
+        this.labelsService = labelsService;
+    }
 
     @PostMapping("/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
@@ -350,10 +352,10 @@ public class FileController {
                                             @PathVariable String folderName,
                                             @PathVariable String sheetName,
                                             @RequestParam("file") MultipartFile employeesToLoad) throws IOException {
-        ExcelEmployeeReader employeeReader = new ExcelEmployeeReader();
-        List<LabelEmployee> labelEmployees = employeeReader.loadEmployees(getSheetAtFromFile(sheetIndex, employeesToLoad));
-        boxesService.createLabels(folderName, sheetName, labelEmployees);
-        return labelEmployees;
+        ExcelEmployeeReader employeeReader = new ExcelEmployeeReader(getSheetAtFromFile(sheetIndex, employeesToLoad));
+        List<LabelEmployee> loadedEmployees = employeeReader.loadEmployees();
+        labelsService.prepareLabelsAndSave(folderName, sheetName, loadedEmployees);
+        return loadedEmployees;
     }
 
     private XSSFSheet getSheetAtFromFile(int index, MultipartFile file) throws IOException {

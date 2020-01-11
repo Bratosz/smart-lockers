@@ -103,68 +103,8 @@ public class BoxesService {
         return boxes;
     }
 
-    public void createLabels(String folderName, String sheetName, Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker) throws IOException {
-        List<Box> boxes = boxesRepository.getBoxesByLockersRange(depNumber, firstLocker, lastLocker);
-        List<String> labels = createLabelsFromBoxes(boxes);
-        saveLabels(folderName, sheetName, labels);
-    }
-
-    public void createLabels(String folderName, String sheetName, List<LabelEmployee> employees) throws IOException {
-        List<String> labels = createLabelsFromRawEmployees(employees);
-        saveLabels(folderName, sheetName, labels);
-    }
-
-    private void saveLabels(String folderName, String sheetName, List<String> labels) throws IOException {
-        ExcelWriter writer = new ExcelWriter();
-        XSSFWorkbook labelsSS = writer.createLabels(labels, sheetName);
-        ExcelSave excelSave = new ExcelSave();
-        excelSave.save(labelsSS, folderName);
-    }
-
-    private String createLabel(String firstName, String lastName, int lockerNumber, int boxNumber) {
-        String fullBoxNumber = lockerNumber + "/" + boxNumber;
-        StringFormater sf = new StringFormater();
-
-        return "\n" + sf.capitalizeFirstLetter(lastName) + " "
-                + sf.capitalizeFirstLetter(firstName)
-                + "\n" + "                          " + "     " + fullBoxNumber;
-    }
-
-    private List<String> createLabelsFromBoxes(List<Box> boxes) {
-        List<String> labels = new LinkedList<>();
-        for (Box box : boxes) {
-            if (box.getBoxStatus() == Box.BoxStatus.OCCUPY) {
-                labels.add(getLabelFromBox(box));
-            }
-        }
-        return labels;
-    }
-
-    private List<String> createLabelsFromRawEmployees(List<LabelEmployee> employees) {
-        List<String> labels = new LinkedList<>();
-        for (LabelEmployee emp : employees) {
-            labels.add(getLabelFromRawEmployee(emp));
-        }
-        return labels;
-    }
-
-    private String getLabelFromBox(Box box) {
-        Employee emp = box.getEmployee();
-        String firstName = emp.getFirstName();
-        String lastName = emp.getLastName();
-        int lockerNumber = box.getLocker().getLockerNumber();
-        int boxNumber = box.getBoxNumber();
-
-        return createLabel(firstName, lastName, lockerNumber, boxNumber);
-    }
-
-    private String getLabelFromRawEmployee(LabelEmployee emp) {
-        String firstName = emp.getFirstName();
-        String lastName = emp.getLastName();
-        int lockerNumber = emp.getLockerNumber();
-        int boxNumber = emp.getBoxNumber();
-
-        return createLabel(firstName, lastName, lockerNumber, boxNumber);
+    public List<Box> getBoxesByLockersRange(Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker) {
+        return boxesRepository.getBoxesByLockersRange(depNumber, firstLocker, lastLocker);
     }
 }
 
