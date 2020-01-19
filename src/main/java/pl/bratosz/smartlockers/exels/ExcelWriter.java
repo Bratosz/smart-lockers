@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.exels;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import pl.bratosz.smartlockers.exels.format.Format;
 import pl.bratosz.smartlockers.model.Box;
@@ -30,53 +31,29 @@ public class ExcelWriter {
         labelsInColumn = parameters.getLabelsInColumn();
         sheetName = parameters.getSheetName();
         sheet = workbook.createSheet(sheetName);
+        setPrintParameters();
     }
 
-    public ExcelWriter(List<String> columns, List<Employee> sortedEmployees, String sheetName){
+    private void setPrintParameters() {
+        sheet.setMargin(Sheet.RightMargin, 0.0d);
+        sheet.setMargin(Sheet.LeftMargin, 0.0d);
+        sheet.setMargin(Sheet.BottomMargin, 0.0d);
+        sheet.setMargin(Sheet.TopMargin, 0.0d);
+        sheet.setFitToPage(true);
+    }
+
+    public ExcelWriter(List<String> columns, List<Employee> sortedEmployees, String sheetName) {
         this.columns = columns;
         this.employees = sortedEmployees;
         this.sheetName = sheetName;
     }
 
     public XSSFWorkbook createLabels(List<String> labels) {
-        int counter = 0;
-        int rowCounter = 0;
-        int boxCounter = 0;
-        Row row = null;
-
         createLabelsStyle();
         setColumnsAndRowsSize();
         createRequiredNumberOfRows(labels.size());
-//        writeLabelsInCells(labels);
-        for (int i = 0; i < labels.size(); i++) {
-            if (counter == 0) {
-                row = sheet.createRow(rowCounter++);
-            }
-            for (int j = 0; j < 3; j++) {
-                if (boxCounter >= labels.size()) {
-                    return workbook;
-                }
-                String label = labels.get(boxCounter++);
-                Cell cell = row.createCell(j);
-                cell.setCellValue(label);
-                cell.setCellStyle(cellStyle);
-                if (j == 2) {
-                    counter = 0;
-                }
-            }
-        }
+        writeLabelsInCells(labels);
         return workbook;
-    }
-
-    private void createRequiredNumberOfRows(int size) {
-        int numberOfRows = calculateNumberOfRows(size);
-        for(int i = 0; i < numberOfRows; i++) {
-            sheet.createRow(i);
-        }
-    }
-
-    private int calculateNumberOfRows(int numberOfLabels) {
-        return (int) Math.ceil(numberOfLabels/labelsInRow);
     }
 
     private void createLabelsStyle() {
@@ -93,6 +70,34 @@ public class ExcelWriter {
         setRowsHeight(pageHeight);
     }
 
+    private void createRequiredNumberOfRows(int size) {
+        int numberOfRows = calculateNumberOfRows(size);
+        for (int i = 0; i < numberOfRows; i++) {
+            sheet.createRow(i);
+        }
+    }
+
+    private void writeLabelsInCells(List<String> labels) {
+        int labelPointer = 0;
+        for (int i = 0; i < labels.size(); i++) {
+            Row row = sheet.getRow(i);
+            for (int j = 0; j < labelsInRow; j++) {
+                if (labelPointer >= labels.size()) {
+                    return;
+                }
+                String label = labels.get(labelPointer++);
+                Cell cell = row.createCell(j);
+                cell.setCellValue(label);
+                cell.setCellStyle(cellStyle);
+            }
+        }
+
+    }
+
+    private int calculateNumberOfRows(int numberOfLabels) {
+        return (int) Math.ceil((float)numberOfLabels / labelsInRow);
+    }
+
     private void createFont(LabelsSheetParameters parameters) {
         workbook = new XSSFWorkbook();
         font = workbook.createFont();
@@ -103,7 +108,10 @@ public class ExcelWriter {
     private void setColumnsWidth(int pageWidth) {
         int columnWidthInMM = calculateSingleColumnWidth(pageWidth);
         int columnWidthInPoints = (int) convertMillimetersToPointsForWidth(columnWidthInMM);
-        sheet.setDefaultColumnWidth(columnWidthInPoints);
+
+        for (int i = 0; i < labelsInRow; i++) {
+            sheet.setColumnWidth(i, columnWidthInPoints);
+        }
     }
 
     private void setRowsHeight(int height) {
@@ -112,20 +120,20 @@ public class ExcelWriter {
         sheet.setDefaultRowHeightInPoints(rowHeightInPoints);
     }
 
-    private float convertMillimetersToPointsForWidth(float width){
-        return width/2;
-    }
-
-    private float convertMillimetersToPointsForHeight(float height) {
-        return height*2.8316f;
+    private int calculateSingleColumnWidth(int pageWidth) {
+        return (pageWidth / labelsInRow);
     }
 
     private float calculateSingleRowHeight(float pageHeight) {
-        return pageHeight/labelsInColumn;
+        return pageHeight / labelsInColumn;
     }
 
-    private int calculateSingleColumnWidth(int pageWidth) {
-        return (pageWidth/labelsInRow);
+    private float convertMillimetersToPointsForWidth(float width) {
+        return width / 0.00765613f;
+    }
+
+    private float convertMillimetersToPointsForHeight(float height) {
+        return height / 0.35266666f;
     }
 
 
@@ -214,7 +222,6 @@ public class ExcelWriter {
     public void setSheetName(String sheetName) {
         this.sheetName = sheetName;
     }
-
 
 
 }

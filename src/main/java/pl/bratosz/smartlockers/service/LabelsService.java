@@ -20,23 +20,26 @@ public class LabelsService {
         this.boxesService = boxesService;
     }
 
-    public void prepareLabelsAndSave(String folderName, String sheetName, Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker) throws IOException {
+    public void prepareLabelsAndSave(String folderName, Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker) throws IOException {
         List<Box> boxes = boxesService.getBoxesByLockersRange(depNumber, firstLocker, lastLocker);
         List<String> labels = createLabelsFromBoxes(boxes);
-        createLabelsSpreadSheetAndSave(folderName, sheetName, labels);
+        createLabelsSpreadSheetAndSave(folderName, labels);
     }
 
-    public void prepareLabelsAndSave(String folderName, String sheetName, List<LabelEmployee> employees) throws IOException {
+    public String prepareLabelsAndSave(String folderName, List<LabelEmployee> employees) throws IOException {
         List<String> labels = createLabelsFromRawEmployees(employees);
-        createLabelsSpreadSheetAndSave(folderName, sheetName, labels);
+        String filename = createLabelsSpreadSheetAndSave(folderName, labels);
+        return filename;
     }
 
-    private void createLabelsSpreadSheetAndSave(String folderName, String sheetName, List<String> labels) throws IOException {
+    private String createLabelsSpreadSheetAndSave(String folderName, List<String> labels) throws IOException {
         LabelsSheetParameters parameters = new LabelsSheetParameters();
         ExcelWriter writer = new ExcelWriter(parameters);
         XSSFWorkbook labelsSS = writer.createLabels(labels);
+
         ExcelSave excelSave = new ExcelSave();
-        excelSave.save(labelsSS, folderName);
+        String fileName = excelSave.save(labelsSS, folderName);
+        return  fileName;
     }
 
     private List<String> createLabelsFromBoxes(List<Box> boxes) {

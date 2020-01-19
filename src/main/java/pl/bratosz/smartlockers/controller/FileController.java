@@ -177,32 +177,6 @@ public class FileController {
         return releasedBoxes;
     }
 
-    @GetMapping("/downloadfile/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName,
-                                                 HttpServletRequest request) {
-        //Load file as Resource
-        Resource resource = fileStorageService.loadFileAsResource(fileName);
-
-        //Try to determine file's content type
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-            logger.info("Could not determine file type.");
-        }
-
-        //Fallback to the default content type if the type could not be determined
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
-                        + resource.getFilename() + "\"")
-                .body(resource);
-    }
-
     @PostMapping("/load_lockers/{sheetToLoad}")
     public void loadLockersFromExcelFile(@RequestParam("file") MultipartFile lockersToLoad,
                                          @PathVariable int sheetToLoad) throws IOException {
@@ -347,15 +321,57 @@ public class FileController {
         return sortedEmployees;
     }
 
-    @PostMapping("/create_labels/{sheetIndex}/{folderName}/{sheetName}")
-    public List<LabelEmployee> createLabels(@PathVariable int sheetIndex,
-                                            @PathVariable String folderName,
-                                            @PathVariable String sheetName,
-                                            @RequestParam("file") MultipartFile employeesToLoad) throws IOException {
-        ExcelEmployeeReader employeeReader = new ExcelEmployeeReader(getSheetAtFromFile(sheetIndex, employeesToLoad));
+    @PostMapping("/create_labels")
+    public UploadFileResponse  createLabels(
+            @RequestParam("file") MultipartFile employeesToLoad) throws IOException {
+        int sheetIndex = 0;
+        String folderName = "Labels";
+
+        ExcelEmployeeReader employeeReader =
+                new ExcelEmployeeReader(getSheetAtFromFile(sheetIndex, employeesToLoad));
+
         List<LabelEmployee> loadedEmployees = employeeReader.loadEmployees();
-        labelsService.prepareLabelsAndSave(folderName, sheetName, loadedEmployees);
-        return loadedEmployees;
+        String fileName = labelsService.prepareLabelsAndSave(folderName, loadedEmployees);
+        String fileDownloadUri = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/files/download_labels/")
+                .path(fileName)
+                .toUriString();
+
+        return new UploadFileResponse(fileName, fileDownloadUri,
+                employeesToLoad.getContentType(),
+                employeesToLoad.getSize());
+
+    }
+
+    @GetMapping("/download_labels/{fileName.:}")
+    public ResponseEntity<Resource> downloadLabels(
+            @PathVariable String filename, HttpServletRequest request) {
+
+        Resource resource = fileStorageService.loadFileAsResource(filename);
+        String contentType = checkContentType(request, resource);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                        + resource.getFilename() + "\"")
+                .body(resource);
+
+    }
+
+    private String checkContentType(HttpServletRequest request, Resource resource) {
+
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            logger.info("Could not determine file type.");
+        }
+
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return contentType;
     }
 
     private XSSFSheet getSheetAtFromFile(int index, MultipartFile file) throws IOException {
