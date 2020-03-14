@@ -1,9 +1,11 @@
 package pl.bratosz.smartlockers.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.bratosz.smartlockers.model.Employee;
-import pl.bratosz.smartlockers.model.Locker;
+
 
 import java.util.List;
 
@@ -14,8 +16,9 @@ public interface EmployeesRepository extends JpaRepository<Employee, Long> {
 
     Employee getEmployeeById(Long id);
 
-    List<Employee> getEmployeesByLastName(String lastName);
+    @Query("select e from Employee e " +
+            "where e.lastName like %:lastName% ")
+    List<Employee> getEmployeesByLastName(@Param("lastName") String lastName);
 
-    Employee deleteEmployeeById(Long id);
-
+    Integer deleteEmployeeById(Long id);
 }

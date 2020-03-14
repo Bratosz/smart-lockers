@@ -2,13 +2,11 @@ package pl.bratosz.smartlockers.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import pl.bratosz.smartlockers.exception.InvalidEmployeeException;
 import pl.bratosz.smartlockers.exception.WrongIdException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.service.EmployeeService;
-import pl.bratosz.smartlockers.validators.EmployeeValidator;
-import sun.security.provider.certpath.OCSPResponse;
 
 import java.util.List;
 import java.util.Set;
@@ -57,8 +55,8 @@ public class EmployeeController {
 
     @JsonView(Views.Public.class)
     @DeleteMapping("/{id}")
-    public void deleteEmployeeById(@PathVariable Long id) {
-        employeeService.deleteEmployeeById(id);
+    public void deleteFromBoxEmployeeById(@PathVariable Long id) {
+        employeeService.deleteFromBoxEmployeeById(id);
     }
 
     @JsonView(Views.InternalForEmployees.class)
@@ -100,13 +98,35 @@ public class EmployeeController {
 
     @JsonView(Views.InternalForEmployees.class)
     @PostMapping("/dismiss_by_id/{id}")
-    public Set<Box> dismissEmployeeById(@PathVariable Long id) {
-        return employeeService.dismissEmployeeById(id);
+    public Set<Box> dismissById(@PathVariable Long id) {
+        return employeeService.dismissById(id);
     }
 
-    @PostMapping("/change_last_name_by_id/{lastName}/{id}")
-    public Employee changeEmployeeLastNameById(@PathVariable String lastName, @PathVariable Long id) {
-        return employeeService.changeEmployeeLastName(lastName, id);
+    @JsonView(Views.InternalForEmployees.class)
+    @PostMapping("/change_last_name_by_id/{id}")
+    public Employee changeEmployeeLastNameById(
+            @RequestBody Employee employee, @PathVariable Long id) {
+        return employeeService.changeEmployeeLastName(employee.getLastName(), id);
     }
 
+    @JsonView(Views.InternalForEmployees.class)
+    @PostMapping("/change_first_name_by_id/{id}")
+    public Employee changeEmployeeFirstNameById(
+            @RequestBody Employee employee, @PathVariable Long id) {
+        return employeeService.changeEmployeeFirstNameById(employee.getFirstName(), id);
+    }
+
+    @JsonView(Views.InternalForEmployees.class)
+    @PostMapping("/change_first_name_and_last_name_by_id/{id}")
+    public Employee changeEmployeeFirstAndLastNameById(
+            @RequestBody Employee employee, @PathVariable Long id) {
+        return employeeService.changeEmployeeFirstNameAndLastNameById(employee, id);
+    }
+
+    @JsonView(Views.InternalForEmployees.class)
+    @PostMapping("/change_department/{id}")
+    public Employee changeDepartment(
+            @RequestBody Employee employee, @PathVariable Long id) {
+        return employeeService.changeDepartment(employee.getDepartment(), id);
+    }
 }

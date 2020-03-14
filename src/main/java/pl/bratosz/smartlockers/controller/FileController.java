@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.bratosz.smartlockers.calculator.CalculateClothesValue;
-import pl.bratosz.smartlockers.date.CurrentDate;
-import pl.bratosz.smartlockers.exels.ExcelEmployeeReader;
+import pl.bratosz.smartlockers.date.CurrentDateForFiles;
 import pl.bratosz.smartlockers.exels.ExcelWriter;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
@@ -121,17 +120,22 @@ public class FileController {
             XSSFSheet worksheet = workbook.getSheetAt(i);
             for (int j = 1; j < worksheet.getPhysicalNumberOfRows(); j++) {
                 XSSFRow row = worksheet.getRow(j);
-                if (row.getCell(1).equals(null) || row.getCell(1).getStringCellValue().trim().length() == 0) {
-                    break;
+                if (row.getCell(1) == null || row.getCell(1).getStringCellValue().trim().length() == 0) {
+                    continue;
+                }
+                String departmentCellValue = row.getCell(5).getRawValue();
+                if(departmentCellValue.equals("385") || departmentCellValue.equals("384")){
+                    continue;
                 }
 
                 Employee employee = new Employee();
-                employee.setFirstName(row.getCell(2).getStringCellValue().trim());
-                employee.setLastName(row.getCell(1).getStringCellValue().trim());
+                employee.setFirstName(row.getCell(2).getStringCellValue().trim().toUpperCase());
+                employee.setLastName(row.getCell(1).getStringCellValue().trim().toUpperCase());
                 employee.setDepartment(Department.valueOf(sheetName));
 
                 Locker.Location location;
-                if (row.getCell(5).getStringCellValue().equals("stara")) {
+                departmentCellValue = row.getCell(5).getStringCellValue();
+                if (departmentCellValue.equals("stara")) {
                     location = Locker.Location.OLDSIDE;
                 } else {
                     location = Locker.Location.NEWSIDE;
@@ -147,7 +151,7 @@ public class FileController {
                 employeeList.add(createdEmployee);
             }
         }
-        CurrentDate date = new CurrentDate();
+        CurrentDateForFiles date = new CurrentDateForFiles();
         FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + date.getDate()
                 + " pomiary" + ".xlsx");
         workbook.write(fileOut);
@@ -268,9 +272,9 @@ public class FileController {
         for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
 
             XSSFRow row = worksheet.getRow(i);
-            if (row.getCell(1).equals(null)) break;
-            String firstName = row.getCell(2).getStringCellValue();
+            if (row.getCell(1) == null) continue;
             String lastName = row.getCell(1).getStringCellValue();
+            String firstName = row.getCell(2).getStringCellValue();
 
             //skip row if person doubles
             if ((previousFirstName == firstName) && (previousLastName == lastName)) {
@@ -319,29 +323,6 @@ public class FileController {
         saveWorkbook(excelRaportWithEmployees);
 
         return sortedEmployees;
-    }
-
-    @PostMapping("/create_labels")
-    public UploadFileResponse  createLabels(
-            @RequestParam("file") MultipartFile employeesToLoad) throws IOException {
-        int sheetIndex = 0;
-        String folderName = "Labels";
-
-        ExcelEmployeeReader employeeReader =
-                new ExcelEmployeeReader(getSheetAtFromFile(sheetIndex, employeesToLoad));
-
-        List<LabelEmployee> loadedEmployees = employeeReader.loadEmployees();
-        String fileName = labelsService.prepareLabelsAndSave(folderName, loadedEmployees);
-        String fileDownloadUri = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/files/download_labels/")
-                .path(fileName)
-                .toUriString();
-
-        return new UploadFileResponse(fileName, fileDownloadUri,
-                employeesToLoad.getContentType(),
-                employeesToLoad.getSize());
-
     }
 
     @GetMapping("/download_labels/{fileName.:}")

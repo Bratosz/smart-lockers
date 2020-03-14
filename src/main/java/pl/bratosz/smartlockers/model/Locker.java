@@ -16,7 +16,7 @@ public class Locker {
     private Long id;
 
     @JsonView(Views.Public.class)
-    private Integer lockerNumber;
+    private int lockerNumber;
 
     @JsonView(Views.Public.class)
     private Integer capacity;
@@ -42,7 +42,12 @@ public class Locker {
     public Locker() {
     }
 
-    public Locker(Integer lockerNumber, Integer capacity, Department department, DepartmentNumber departmentNumber, Location location) {
+    public Locker(
+            int lockerNumber,
+            Integer capacity,
+            Department department,
+            DepartmentNumber departmentNumber,
+            Location location) {
         this.lockerNumber = lockerNumber;
         this.capacity = capacity;
         this.department = department;
@@ -90,11 +95,11 @@ public class Locker {
         this.id = id;
     }
 
-    public Integer getLockerNumber() {
+    public int getLockerNumber() {
         return lockerNumber;
     }
 
-    public void setLockerNumber(Integer lockerNumber) {
+    public void setLockerNumber(int lockerNumber) {
         this.lockerNumber = lockerNumber;
     }
 

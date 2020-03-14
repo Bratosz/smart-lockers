@@ -1,15 +1,10 @@
 package pl.bratosz.smartlockers.model;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
-import org.hibernate.sql.Update;
-import pl.bratosz.smartlockers.validators.annotations.CorrectFirstName;
 
 import javax.persistence.*;
 import javax.validation.ConstraintViolationException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,7 +16,6 @@ public class Employee {
     private Long id;
 
     @JsonView(Views.Public.class)
-    @CorrectFirstName
     private String firstName;
 
     @JsonView(Views.Public.class)
@@ -31,7 +25,7 @@ public class Employee {
     @Enumerated(EnumType.STRING)
     private Department department;
 
-    @JsonView(Views.InternalForEmployees.class)
+    @JsonView({Views.InternalForEmployees.class, Views.InternalForClothes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private Set<Box> boxes;
 
@@ -40,7 +34,32 @@ public class Employee {
     private List<Box> boxesOccupiedInPast;
 
 
+    @JsonView(Views.InternalForEmployees.class)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private Set<RotationalCloth> rotationalClothing;
+
+    @JsonView(Views.InternalForEmployees.class)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private Set<EmployeeCloth> employeeClothing;
+
+
     public Employee() {
+    }
+
+    public Set<RotationalCloth> getRotationalClothing() {
+        return rotationalClothing;
+    }
+
+    public void setRotationalClothing(Set<RotationalCloth> rotationalClothing) {
+        this.rotationalClothing = rotationalClothing;
+    }
+
+    public Set<EmployeeCloth> getEmployeeClothing() {
+        return employeeClothing;
+    }
+
+    public void setEmployeeClothing(Set<EmployeeCloth> employeeClothing) {
+        this.employeeClothing = employeeClothing;
     }
 
     public Employee(String firstName, String lastName, Department department) throws ConstraintViolationException {
@@ -60,6 +79,8 @@ public class Employee {
     public void setBoxesOccupiedInPast(List<Box> boxesOccupiedInPast) {
         this.boxesOccupiedInPast = boxesOccupiedInPast;
     }
+
+
 
     public void setId(Long id) {
         this.id = id;
@@ -100,8 +121,8 @@ public class Employee {
     public int getFirstLockerNumber() {
         if (getBoxes().size() == 1) {
             return getBoxes().stream().findFirst().get().getLocker().getLockerNumber();
-        }
-        return 0;
+        } else
+            return 0;
     }
 
     public int getFirstBoxNumber() {
@@ -117,4 +138,17 @@ public class Employee {
         }
         return Locker.DepartmentNumber.DEP_000;
     }
+
+    public boolean isEmployeeHaveThisBox(int lockerNo, int boxNo) {
+        long count = boxes.stream()
+                .filter(b -> b.getLocker().getLockerNumber() == lockerNo)
+                .filter(b -> b.getBoxNumber() == boxNo)
+                .count();
+        if(count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

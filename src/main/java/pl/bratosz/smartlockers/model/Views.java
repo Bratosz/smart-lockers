@@ -17,4 +17,8 @@ public class Views {
     public static class InternalForBoxes extends Public {
 
     }
+
+    public static class InternalForClothes extends Public{
+
+    }
 }

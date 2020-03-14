@@ -48,6 +48,16 @@ public class BoxesController {
                              @PathVariable int firstLocker,
                              @PathVariable int lastLocker) throws IOException {
     }
+    @JsonView(Views.InternalForBoxes.class)
+    @PostMapping("/set_empty_box_employee")
+    public Box setEmptyBoxEmployee() {
+        return boxesService.setEmptyBoxEmployee();
+    }
+
+    @PostMapping("/set_actual_status")
+    public List<Box> setActualStatus(){
+        return boxesService.setActualBoxStatus();
+    }
 
 
 }

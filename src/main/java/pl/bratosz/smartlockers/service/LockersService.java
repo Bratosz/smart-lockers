@@ -2,6 +2,7 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Box;
+import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.repository.LockersRepository;
@@ -13,10 +14,13 @@ import java.util.List;
 public class LockersService {
     private LockersRepository lockersRepository;
     private EmployeeService employeeService;
+    private BoxesService boxesService;
 
-    public LockersService(LockersRepository lockersRepository, EmployeeService employeeService) {
+    public LockersService(
+            LockersRepository lockersRepository, EmployeeService employeeService, BoxesService boxesService) {
         this.lockersRepository = lockersRepository;
         this.employeeService = employeeService;
+        this.boxesService = boxesService;
     }
 
     public Locker deleteLockerByNumber(Long id) {
@@ -37,5 +41,18 @@ public class LockersService {
 
     public List<Locker> getLockersFromRange(Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker) {
         return lockersRepository.getLockersFromRange(depNumber, firstLocker, lastLocker);
+    }
+
+    public Locker createLocker(
+            int lockerNo,
+            int capacity,
+            Locker.DepartmentNumber depNo,
+            Department dep,
+            Locker.Location location) {
+        Locker locker = new Locker(
+                lockerNo, capacity, dep, depNo, location);
+        List<Box> boxes = boxesService.createBoxesForLocker(capacity);
+        locker.setBoxes(boxes);
+        return lockersRepository.save(locker);
     }
 }

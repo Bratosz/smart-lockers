@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import static pl.bratosz.smartlockers.model.Box.BoxStatus.*;
+
 @Service
 public class BoxesService {
 
@@ -28,7 +30,7 @@ public class BoxesService {
     }
 
     public Box findNextFreeBox(Department department, Locker.DepartmentNumber departmentNumber, Locker.Location location) throws BoxNotAvailableException {
-        Box.BoxStatus boxStatus = Box.BoxStatus.FREE;
+        Box.BoxStatus boxStatus = FREE;
         List<Box> boxes = boxesRepository.getBoxesByParameters(department, departmentNumber, location, boxStatus);
         if (boxes.size() == 0) {
             throw new BoxNotAvailableException();
@@ -39,7 +41,7 @@ public class BoxesService {
     public Box dismissEmployee(Box box) {
         box.getDismissedEmployees().add(box.getEmployee());
         box.setEmployee(employeesRepository.getEmployeeById(box.getEmptyBoxEmployeeNo()));
-        box.setBoxStatus(Box.BoxStatus.FREE);
+        box.setBoxStatus(FREE);
         return boxesRepository.save(box);
     }
 
@@ -47,14 +49,14 @@ public class BoxesService {
         Employee employee = box.getEmployee();
         employee.getBoxesOccupiedInPast().add(box);
         box.setEmployee(employeesRepository.getEmployeeById(box.getEmptyBoxEmployeeNo()));
-        box.setBoxStatus(Box.BoxStatus.FREE);
+        box.setBoxStatus(FREE);
         boxesRepository.save(box);
         return employee;
     }
 
     public Box setEmployee(Employee employee, Box box) {
         box.setEmployee(employee);
-        box.setBoxStatus(Box.BoxStatus.OCCUPY);
+        box.setBoxStatus(OCCUPY);
         return boxesRepository.save(box);
     }
 
@@ -73,7 +75,7 @@ public class BoxesService {
 
     public boolean isBoxFree(Integer lockerNo, Integer boxNo, Locker.Location location, Locker.DepartmentNumber departmentNumber) {
         Box box = boxesRepository.getBoxByParameters(lockerNo, boxNo, location, departmentNumber);
-        if (box.getBoxStatus().equals(Box.BoxStatus.FREE)) {
+        if (box.getBoxStatus().equals(FREE)) {
             return true;
         } else {
             return false;
@@ -95,7 +97,7 @@ public class BoxesService {
             List<Employee> employees = new LinkedList<>();
             employees.add(employee);
 
-            Box box = new Box(i, Box.BoxStatus.FREE, employee.getId());
+            Box box = new Box(i, FREE, employee.getId());
             box.setEmployee(employee);
             box.setDismissedEmployees(employees);
             boxes.add(box);
@@ -105,6 +107,45 @@ public class BoxesService {
 
     public List<Box> getBoxesByLockersRange(Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker) {
         return boxesRepository.getBoxesByLockersRange(depNumber, firstLocker, lastLocker);
+    }
+
+    public Box setEmptyBoxEmployee() {
+        for(int i = 3362; i<=3370; i++) {
+            Box boxById = boxesRepository.getBoxById((long) i);
+            Employee emptyEmployee = employeesRepository.save(new Employee("", "", null));
+            Long emptyEmployeeId = emptyEmployee.getId();
+            boxById.setEmptyBoxEmployeeNo(emptyEmployeeId);
+            boxesRepository.save(boxById);
+        }
+        return boxesRepository.getBoxById((long) 3370);
+    }
+
+    public List<Box> setActualBoxStatus() {
+        List<Box> boxes = boxesRepository.findAll();
+        List<Box> updatedBoxes = new LinkedList<>();
+
+        for(Box b : boxes) {
+            if(isEmployeePresent(b) && b.getBoxStatus().equals(FREE)) {
+                b.setBoxStatus(OCCUPY);
+                updatedBoxes.add(b);
+                boxesRepository.save(b);
+            } else if (!isEmployeePresent(b) && b.getBoxStatus().equals(OCCUPY)) {
+                b.setBoxStatus(FREE);
+                updatedBoxes.add(b);
+                boxesRepository.save(b);
+            }
+        }
+        return updatedBoxes;
+    }
+
+    private boolean isEmployeePresent(Box b) {
+        Employee employee = b.getEmployee();
+        String lastName = employee.getLastName();
+        if((lastName != null)
+                && (lastName.length() > 0)) {
+            return true;
+        }
+        return false;
     }
 }
 

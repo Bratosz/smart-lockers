@@ -5,14 +5,12 @@ import pl.bratosz.smartlockers.comparators.BoxNumberSorter;
 import pl.bratosz.smartlockers.comparators.DepartmentNumberSorter;
 import pl.bratosz.smartlockers.comparators.LockerNumberSorter;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
-import pl.bratosz.smartlockers.exception.InvalidEmployeeException;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
-import pl.bratosz.smartlockers.validators.EmployeeValidator;
 
 import java.util.*;
 
@@ -103,7 +101,7 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public void deleteEmployeeById(Long id) {
+    public void deleteFromBoxEmployeeById(Long id) {
         Employee employeeById = employeesRepository.getEmployeeById(id);
         employeeById.getBoxes().stream().forEach(b -> boxesService.releaseEmployeeFromBox(b));
         employeesRepository.deleteEmployeeById(id);
@@ -162,7 +160,7 @@ public class EmployeeService {
         return boxesService.releaseEmployeeFromBox(box);
     }
 
-    public Set<Box> dismissEmployeeById(Long id) {
+    public Set<Box> dismissById(Long id) {
         Employee employee = getEmployeeById(id);
         Set<Box> releasedBoxes = new HashSet<>();
         for (Box box : employee.getBoxes()) {
@@ -181,5 +179,50 @@ public class EmployeeService {
         Employee employee = getEmployeeById(id);
         employee.setLastName(lastName);
         return employeesRepository.save(employee);
+    }
+
+    public Employee changeEmployeeFirstNameById(String firstName, Long id) {
+        Employee employee = getEmployeeById(id);
+        employee.setFirstName(firstName);
+        return employeesRepository.save(employee);
+    }
+
+    public Integer deleteEmployeeById(Long id) {
+        return employeesRepository.deleteEmployeeById(id);
+    }
+
+
+    public Employee changeEmployeeFirstNameAndLastNameById(Employee updatedEmployee, Long id) {
+        Employee employee = getEmployeeById(id);
+        employee.setFirstName(updatedEmployee.getFirstName());
+        employee.setLastName(updatedEmployee.getLastName());
+        return employeesRepository.save(employee);
+    }
+
+    public Employee changeDepartment(Department department, Long id) {
+        Employee employee = getEmployeeById(id);
+        employee.setDepartment(department);
+        return employeesRepository.save(employee);
+    }
+
+    public Employee getEmployeeByFullNameAndFullBoxNumber(
+            String firstName, String lastName, int lockerNo, int boxNo) {
+        List<Employee> employees =
+                employeesRepository.getEmployeesByFirstNameAndLastName(firstName, lastName);
+        return filterEmployeesByFullBoxNumber(lockerNo, boxNo, employees);
+
+    }
+
+    private Employee filterEmployeesByFullBoxNumber(int lockerNo, int boxNo, List<Employee> employees) {
+        if(employees.size() == 1) {
+            return employees.get(0);
+        } else if (employees.size() > 1) {
+            for(Employee e : employees) {
+                if(e.isEmployeeHaveThisBox(lockerNo, boxNo)){
+                    return e;
+                }
+            }
+        }
+        return null;
     }
 }

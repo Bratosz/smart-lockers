@@ -60,16 +60,6 @@ public class LabelsService {
         return labels;
     }
 
-    private String getLabelFromBox(Box box) {
-        Employee emp = box.getEmployee();
-        String firstName = emp.getFirstName();
-        String lastName = emp.getLastName();
-        int lockerNumber = box.getLocker().getLockerNumber();
-        int boxNumber = box.getBoxNumber();
-
-        return createLabel(firstName, lastName, lockerNumber, boxNumber);
-    }
-
     private String getLabelFromRawEmployee(LabelEmployee emp) {
         String firstName = emp.getFirstName();
         String lastName = emp.getLastName();
@@ -78,6 +68,16 @@ public class LabelsService {
         String label = createLabel(firstName, lastName, lockerNumber, boxNumber);
 
         return label;
+    }
+
+    private String getLabelFromBox(Box box) {
+        Employee emp = box.getEmployee();
+        String firstName = emp.getFirstName();
+        String lastName = emp.getLastName();
+        int lockerNumber = box.getLocker().getLockerNumber();
+        int boxNumber = box.getBoxNumber();
+
+        return createLabel(firstName, lastName, lockerNumber, boxNumber);
     }
 
     private String createLabel(String firstName, String lastName, int lockerNumber, int boxNumber) {

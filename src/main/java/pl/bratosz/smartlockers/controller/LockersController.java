@@ -78,6 +78,17 @@ public class LockersController {
         return lockersRepository.save(locker);
     }
 
+    @PostMapping("/create/{lockerNo}/{capacity}/{depNo}/{dep}/{location}")
+        public Locker createLocker (
+        @PathVariable int lockerNo,
+        @PathVariable int capacity,
+        @PathVariable Locker.DepartmentNumber depNo,
+        @PathVariable Department dep,
+        @PathVariable Locker.Location location) {
+        return lockersService.createLocker(
+                lockerNo, capacity, depNo, dep, location);
+    }
+
     @JsonView(Views.InternalForLockers.class)
     @PostMapping("/change_location/{lockerNumber}/{departmentNumber}/{location}/{desiredLocation}")
     public Locker changeLocation(@PathVariable Integer lockerNumber, @PathVariable Locker.DepartmentNumber departmentNumber,

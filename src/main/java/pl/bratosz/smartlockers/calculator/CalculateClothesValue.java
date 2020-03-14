@@ -1,8 +1,5 @@
 package pl.bratosz.smartlockers.calculator;
 
-import pl.bratosz.smartlockers.date.CurrentDate;
-
-import java.time.LocalDate;
 import java.util.Date;
 
 public class CalculateClothesValue {

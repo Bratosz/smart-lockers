@@ -13,14 +13,14 @@ public class StringValidator {
     }
 
     public static boolean isStringContainLettersAndSpacesOnly(String s) {
-        Pattern p = Pattern.compile("[a-zA-Z]{2,}(\\s[a-zA-Z]{2,})*");
+        Pattern p = Pattern.compile("[\\p{IsAlphabetic}\\d]{2,}(\\s[\\p{IsAlphabetic}\\d]{2,})*");
         Matcher m = p.matcher(s);
 
         return m.matches();
     }
 
     public static boolean isStringContainLettersDashesAndSpacesOnly(String s) {
-        Pattern p = Pattern.compile("[a-zA-Z]{2,}(\\s-[a-zA-Z]{2,})*");
+        Pattern p = Pattern.compile("[\\p{IsAlphabetic}\\d]{2,}(\\s-[\\p{IsAlphabetic}\\d]{2,})*");
         Matcher m = p.matcher(s);
 
         return m.matches();

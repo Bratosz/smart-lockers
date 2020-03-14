@@ -15,6 +15,10 @@ import java.util.List;
 @Repository
 public interface BoxesRepository extends JpaRepository<Box, Long> {
 
+    @Override
+    @Query("select b from Box b join b.locker l order by l.lockerNumber, b.boxNumber ")
+    List<Box> findAll();
+
     @Query("select b from Box b join b.locker l where " +
             "b.boxStatus = :boxStatus and " +
             "(l.department = :department or :department is null) and " +
