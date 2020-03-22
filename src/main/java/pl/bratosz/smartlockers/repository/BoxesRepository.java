@@ -34,7 +34,7 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             "l.lockerNumber = :lockerNumber and " +
             "l.location = :location and " +
             "l.departmentNumber = :departmentNumber ")
-    Box getBoxByParameters(Integer lockerNumber, Integer boxNumber, Locker.Location location, Locker.DepartmentNumber departmentNumber);
+    Box getBox(Integer lockerNumber, Integer boxNumber, Locker.Location location, Locker.DepartmentNumber departmentNumber);
 
     Box getBoxById(Long id);
 
@@ -42,7 +42,7 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             "b.boxNumber = :boxNumber and " +
             "l.lockerNumber = :lockerNumber and " +
             "l.departmentNumber = :departmentNumber ")
-    Box getBoxByParameters(int lockerNumber, int boxNumber, Locker.DepartmentNumber departmentNumber);
+    Box getBox(int lockerNumber, int boxNumber, Locker.DepartmentNumber departmentNumber);
 
     @Query("select b from Box b join b.locker l where " +
             "l.departmentNumber = :depNumber " +

@@ -1,4 +1,4 @@
-package pl.bratosz.smartlockers.exels.format;
+package pl.bratosz.smartlockers.service.exels.format;
 
 public interface Format {
     int getWidth();

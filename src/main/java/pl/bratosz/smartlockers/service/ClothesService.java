@@ -1,81 +1,117 @@
 package pl.bratosz.smartlockers.service;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.bratosz.smartlockers.exels.ExcelClothesReader;
-import pl.bratosz.smartlockers.exels.LoadedRow;
+import pl.bratosz.smartlockers.date.CurrentDateForFiles;
+import pl.bratosz.smartlockers.date.FormatDate;
+import pl.bratosz.smartlockers.exception.NotReleasedClothException;
+import pl.bratosz.smartlockers.repository.RotationalClothesRepository;
+import pl.bratosz.smartlockers.service.exels.*;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.ClothesRepository;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.*;
 
 import static pl.bratosz.smartlockers.model.ClothType.EMPLOYEE;
 import static pl.bratosz.smartlockers.model.ClothType.ROTATIONAL;
+import static pl.bratosz.smartlockers.service.exels.ClothOperationType.*;
 
 @Service
 public class ClothesService {
     private EmployeeService employeeService;
     private ClothesRepository clothesRepository;
+    private RotationalClothesRepository rotationalClothesRepository;
 
     @Autowired
-    public ClothesService(EmployeeService employeeService, ClothesRepository clothesRepository) {
+    public ClothesService(EmployeeService employeeService, ClothesRepository clothesRepository,
+                          RotationalClothesRepository rotationalClothesRepository) {
         this.employeeService = employeeService;
         this.clothesRepository = clothesRepository;
+        this.rotationalClothesRepository = rotationalClothesRepository;
 
     }
 
-    public Set<Cloth> update(Sheet sheet) {
-        ExcelClothesReader clothesReader = ExcelClothesReader.create(sheet);
-        List<LoadedRow> loadedRows = clothesReader.loadRows();
-        Set<Cloth> clothes = loadClothes(loadedRows);
-        return clothes;
-
+    public List<Cloth> uploadClothesRotation(Sheet sheet, ClothOperationType clothOperationType) {
+        ExcelClothesReader clothesReader = ExcelClothesReader.create(sheet, clothOperationType);
+        List<RowForRotationUpdate> rowsForRotationUpdate = clothesReader.loadRows();
+        return loadClothesRotation(rowsForRotationUpdate);
     }
 
-    private Set<Cloth> loadClothes(List<LoadedRow> loadedRows) {
-        Set<Cloth> clothes = new HashSet<>();
-        for(LoadedRow row : loadedRows) {
+    public List<RotationalCloth> updateReleasedRotation(Sheet sheet, ClothOperationType clothOperationType) {
+        if (clothOperationType.equals(RELEASED_ROTATIONAL_CLOTHING_UPDATE)) {
+            ExcelClothesReader clothesReader = ExcelClothesReader.create(sheet, clothOperationType);
+            List<RowReleasedRotationalClothes> loadedRotationalClothing = clothesReader.loadRows();
+            return updateClothesRotation(loadedRotationalClothing);
+        }
+        return null;
+    }
+
+    private List<RotationalCloth> updateClothesRotation(List<RowReleasedRotationalClothes> clothRows) {
+        List<RotationalCloth> clothes = new LinkedList<>();
+        List<RotationalCloth> all = rotationalClothesRepository.findAll();
+        for (RowReleasedRotationalClothes row : clothRows) {
+            if (all.stream().anyMatch(r -> r.getId() == row.getBarCode())) {
+                RotationalCloth cloth = rotationalClothesRepository.getOne(row.getBarCode());
+                Employee employee = employeeService.getOneEmployee(row.getFirstName(), row.getLastName());
+                if (employee.getId() == 1) {
+                    continue;
+                }
+                cloth.setReleasedToEmployee(row.getReleaseDate());
+                cloth.setEmployee(employee);
+                clothes.add(cloth);
+            }
+        }
+        return clothesRepository.saveAll(clothes);
+    }
+
+
+    private List<Cloth> loadClothesRotation(List<RowForRotationUpdate> rowForRotationUpdate) {
+        List<Cloth> clothes = new LinkedList<>();
+        for (RowForRotationUpdate row : rowForRotationUpdate) {
             Cloth cloth = createCloth(row);
             clothes.add(cloth);
-            clothesRepository.save(cloth);
         }
-        return clothes;
+        return clothesRepository.saveAll(clothes);
+
     }
 
-    private Cloth createCloth(LoadedRow loadedRow) {
-        ClothType clothType = resolveClothType(loadedRow.getLockerNo());
-        if(clothType.equals(EMPLOYEE)) {
+    private Cloth createCloth(RowForRotationUpdate rowForRotationUpdate) {
+        ClothType clothType = resolveClothType(rowForRotationUpdate.getLockerNo());
+        if (clothType.equals(EMPLOYEE)) {
             Employee employee = employeeService.getEmployeeByFullNameAndFullBoxNumber(
-                    loadedRow.getFirstName(),
-                    loadedRow.getLastName(),
-                    loadedRow.getLockerNo(),
-                    loadedRow.getBoxNo()
+                    rowForRotationUpdate.getFirstName(),
+                    rowForRotationUpdate.getLastName(),
+                    rowForRotationUpdate.getLockerNo(),
+                    rowForRotationUpdate.getBoxNo()
             );
             return new EmployeeCloth(
-                    loadedRow.getBarCode(),
-                    loadedRow.getWashingDate(),
-                    loadedRow.getOrdinalNo(),
-                    loadedRow.getArticleNo(),
+                    rowForRotationUpdate.getBarCode(),
+                    rowForRotationUpdate.getWashingDate(),
+                    rowForRotationUpdate.getOrdinalNo(),
+                    rowForRotationUpdate.getArticleNo(),
                     employee
             );
         } else {
             return new RotationalCloth(
-                    loadedRow.getBarCode(),
-                    loadedRow.getWashingDate(),
-                    loadedRow.getOrdinalNo(),
-                    loadedRow.getArticleNo()
+                    rowForRotationUpdate.getBarCode(),
+                    rowForRotationUpdate.getWashingDate(),
+                    rowForRotationUpdate.getOrdinalNo(),
+                    rowForRotationUpdate.getArticleNo()
             );
         }
     }
 
     private ClothType resolveClothType(int lockerNo) {
-        if(lockerNo == 0) {
+        if (lockerNo == 0) {
             return ROTATIONAL;
         } else {
             return EMPLOYEE;
@@ -84,5 +120,32 @@ public class ClothesService {
 
     public Cloth getClothById(long id) {
         return clothesRepository.getClothById(id);
+    }
+
+    public List<RotationalCloth> getRotationalClothRaport() throws IOException {
+        List<RotationalCloth> rotationalClothes = rotationalClothesRepository.getReleasedRotationalClothes();
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Rotacja do zwrócenia");
+        Row row;
+        for (int i = 0; i < rotationalClothes.size(); i++) {
+            row = sheet.createRow(i);
+            RotationalCloth cloth = rotationalClothes.get(i);
+            Employee emp = cloth.getEmployee();
+            row.createCell(0).setCellValue(emp.getId());
+            row.createCell(1).setCellValue(emp.getFirstName());
+            row.createCell(2).setCellValue(emp.getLastName());
+            row.createCell(3).setCellValue(emp.getFirstLockerNumber());
+            row.createCell(4).setCellValue(emp.getFirstBoxNumber());
+            row.createCell(5).setCellValue(emp.getDepartment().getName());
+            row.createCell(6).setCellValue(cloth.getId());
+            row.createCell(7).setCellValue(cloth.getName().getName());
+            row.createCell(8).setCellValue(cloth.getArticleNo());
+            row.createCell(9).setCellValue(FormatDate.getDate(cloth.getReleasedToEmployee()));
+        }
+        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/rotacja_do_zwrotu.xlsx");
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
+        return rotationalClothes;
     }
 }

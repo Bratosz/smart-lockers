@@ -1,16 +1,11 @@
 package pl.bratosz.smartlockers.service;
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
-import pl.bratosz.smartlockers.exels.ExcelSave;
-import pl.bratosz.smartlockers.exels.ExcelWriter;
-import pl.bratosz.smartlockers.formaters.StringFormater;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,17 +59,17 @@ public class BoxesService {
         return boxesRepository.findAll();
     }
 
-    public Box getBoxByParameters(Integer lockerNumber, Integer boxNumber, Locker.Location location,
-                                  Locker.DepartmentNumber departmentNumber) {
-        return boxesRepository.getBoxByParameters(lockerNumber, boxNumber, location, departmentNumber);
+    public Box getBox(Integer lockerNumber, Integer boxNumber, Locker.Location location,
+                      Locker.DepartmentNumber departmentNumber) {
+        return boxesRepository.getBox(lockerNumber, boxNumber, location, departmentNumber);
     }
 
-    public Box getBoxByParameters(int lockerNumber, int boxNumber, Locker.DepartmentNumber departmentNumber) {
-        return boxesRepository.getBoxByParameters(lockerNumber, boxNumber, departmentNumber);
+    public Box getBox(int lockerNumber, int boxNumber, Locker.DepartmentNumber departmentNumber) {
+        return boxesRepository.getBox(lockerNumber, boxNumber, departmentNumber);
     }
 
     public boolean isBoxFree(Integer lockerNo, Integer boxNo, Locker.Location location, Locker.DepartmentNumber departmentNumber) {
-        Box box = boxesRepository.getBoxByParameters(lockerNo, boxNo, location, departmentNumber);
+        Box box = boxesRepository.getBox(lockerNo, boxNo, location, departmentNumber);
         if (box.getBoxStatus().equals(FREE)) {
             return true;
         } else {

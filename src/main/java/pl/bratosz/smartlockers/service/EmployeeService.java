@@ -48,7 +48,6 @@ public class EmployeeService {
         String firstName = employee.getFirstName().toUpperCase();
         Department department = employee.getDepartment();
 
-
         Employee correctedEmployee = new Employee(firstName, lastName, department);
 
         box.setEmployee(correctedEmployee);
@@ -111,7 +110,7 @@ public class EmployeeService {
         return employeesRepository.getEmployeeById(id);
     }
 
-    public List<Employee> getEmployeesByFirstNameAndLastNameSorted(String firstName, String lastName) {
+    public List<Employee> getByFirstNameAndLastName(String firstName, String lastName) {
         List<Employee> filteredEmployees = new LinkedList<>();
         List<Employee> employees = employeesRepository.getEmployeesByFirstNameAndLastName(firstName, lastName);
         for (Employee employee : employees) {
@@ -143,7 +142,7 @@ public class EmployeeService {
     public Box changeEmployeeBox(int lockerNumber, int boxNumber, Locker.DepartmentNumber departmentNumber,
                                  Integer targetLockerNumber, Integer targetBoxNumber,
                                  Locker.DepartmentNumber targetDepartmentNumber) throws BoxNotAvailableException {
-        Box newBox = boxesService.getBoxByParameters(targetLockerNumber, targetBoxNumber, targetDepartmentNumber);
+        Box newBox = boxesService.getBox(targetLockerNumber, targetBoxNumber, targetDepartmentNumber);
 
         if (newBox.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
             throw new BoxNotAvailableException("Szafka o numerze: " + targetLockerNumber + "/" + targetBoxNumber
@@ -156,7 +155,7 @@ public class EmployeeService {
 
     private Employee removeEmployeeFromBox(int lockerNumber, int boxNumber,
                                            Locker.DepartmentNumber departmentNumber) {
-        Box box = boxesService.getBoxByParameters(lockerNumber, boxNumber, departmentNumber);
+        Box box = boxesService.getBox(lockerNumber, boxNumber, departmentNumber);
         return boxesService.releaseEmployeeFromBox(box);
     }
 
@@ -224,5 +223,14 @@ public class EmployeeService {
             }
         }
         return null;
+    }
+
+    public Employee getOneEmployee(String firstName, String lastName) {
+        List<Employee> employees = getByFirstNameAndLastName(firstName, lastName);
+        if(employees.size() == 1) {
+            return employees.get(0);
+        } else {
+            return employeesRepository.getEmployeeById((long)1);
+        }
     }
 }

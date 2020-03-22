@@ -2,7 +2,6 @@ package pl.bratosz.smartlockers.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.exception.WrongIdException;
 import pl.bratosz.smartlockers.model.*;
@@ -62,7 +61,7 @@ public class EmployeeController {
     @JsonView(Views.InternalForEmployees.class)
     @GetMapping("/find/{firstName}/{lastName}")
     public List<Employee> getEmployeesByFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName) {
-        List<Employee> employeesByFirstNameAndLastName = employeeService.getEmployeesByFirstNameAndLastNameSorted(firstName, lastName);
+        List<Employee> employeesByFirstNameAndLastName = employeeService.getByFirstNameAndLastName(firstName, lastName);
         return employeesByFirstNameAndLastName;
     }
 

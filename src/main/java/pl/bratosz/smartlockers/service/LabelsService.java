@@ -2,9 +2,9 @@ package pl.bratosz.smartlockers.service;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import pl.bratosz.smartlockers.exels.ExcelSave;
-import pl.bratosz.smartlockers.exels.ExcelWriter;
-import pl.bratosz.smartlockers.exels.LabelsSheetParameters;
+import pl.bratosz.smartlockers.service.exels.ExcelSave;
+import pl.bratosz.smartlockers.service.exels.ExcelWriter;
+import pl.bratosz.smartlockers.service.exels.LabelsSheetParameters;
 import pl.bratosz.smartlockers.formaters.StringFormater;
 import pl.bratosz.smartlockers.model.*;
 

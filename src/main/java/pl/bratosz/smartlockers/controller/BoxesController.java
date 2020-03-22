@@ -3,19 +3,16 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Box;
-import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.model.Views;
-import pl.bratosz.smartlockers.repository.BoxesRepository;
-import pl.bratosz.smartlockers.repository.LockersRepository;
 import pl.bratosz.smartlockers.service.BoxesService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+
+import static pl.bratosz.smartlockers.model.Locker.*;
 
 @RestController
-@RequestMapping("/lockers/boxes")
+@RequestMapping("/boxes")
 public class BoxesController {
 
     private BoxesService boxesService;
@@ -44,7 +41,7 @@ public class BoxesController {
     @PostMapping("/create_labels/{folderName}/{sheetName}/{depNumber}/{firstLocker}/{lastLocker}")
     public void createLabels(@PathVariable String folderName,
                              @PathVariable String sheetName,
-                             @PathVariable Locker.DepartmentNumber depNumber,
+                             @PathVariable DepartmentNumber depNumber,
                              @PathVariable int firstLocker,
                              @PathVariable int lastLocker) throws IOException {
     }
@@ -57,6 +54,14 @@ public class BoxesController {
     @PostMapping("/set_actual_status")
     public List<Box> setActualStatus(){
         return boxesService.setActualBoxStatus();
+    }
+
+    @JsonView(Views.InternalForBoxes.class)
+    @GetMapping("/get_box/{lockerNumber}/{boxNumber}/{departmentNumber}")
+    public Box getBox(@PathVariable int lockerNumber,
+                      @PathVariable int boxNumber,
+                      @PathVariable DepartmentNumber departmentNumber) {
+        return boxesService.getBox(lockerNumber, boxNumber, departmentNumber);
     }
 
 

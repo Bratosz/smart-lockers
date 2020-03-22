@@ -1,9 +1,7 @@
-package pl.bratosz.smartlockers.exels;
+package pl.bratosz.smartlockers.service.exels;
 
-import pl.bratosz.smartlockers.exels.format.A4;
-import pl.bratosz.smartlockers.exels.format.Format;
-
-import java.util.Date;
+import pl.bratosz.smartlockers.service.exels.format.A4;
+import pl.bratosz.smartlockers.service.exels.format.Format;
 
 public class LabelsSheetParameters {
     private int fontSize;

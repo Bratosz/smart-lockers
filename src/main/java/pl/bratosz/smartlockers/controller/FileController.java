@@ -18,10 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.bratosz.smartlockers.calculator.CalculateClothesValue;
 import pl.bratosz.smartlockers.date.CurrentDateForFiles;
-import pl.bratosz.smartlockers.exels.ExcelWriter;
+import pl.bratosz.smartlockers.date.FormatDate;
+import pl.bratosz.smartlockers.service.exels.ExcelWriter;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
 import pl.bratosz.smartlockers.service.*;
+import sun.util.calendar.BaseCalendar;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileOutputStream;
@@ -29,7 +31,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static pl.bratosz.smartlockers.exels.ExcelWriter.saveWorkbook;
+import static pl.bratosz.smartlockers.service.exels.ExcelWriter.saveWorkbook;
 
 @RestController
 @RequestMapping("/files")
@@ -180,6 +182,67 @@ public class FileController {
         }
         return releasedBoxes;
     }
+
+    @PostMapping("/reformat")
+    public void reformat(@RequestParam("file") MultipartFile file) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+        XSSFSheet sheetToLoad = workbook.getSheetAt(0);
+        Row row;
+        List<EmployeeRow> employees = new LinkedList<>();
+        int counter;
+        XSSFSheet sheet = workbook.createSheet();
+        for(int i = 1; i < sheetToLoad.getPhysicalNumberOfRows(); i++){
+            long[] barCodes = new long[5];
+            String firstName;
+            String lastName;
+            Date date;
+            counter = 0;
+            row = sheetToLoad.getRow(i);
+            if(row.getCell(0) == null){continue;}
+            lastName = row.getCell(0).getStringCellValue().toUpperCase().trim();
+            firstName = row.getCell(1).getStringCellValue().toUpperCase().trim();
+            date = row.getCell(7).getDateCellValue();
+            final String stringDate = FormatDate.getDate(date);
+            int j = 2;
+            while(j < 7) {
+                if(row.getCell(j) == null || row.getCell(j).getStringCellValue().length() < 2) {
+                    j++;
+                    continue;}
+                barCodes[counter] =  Long.parseLong(row.getCell(j).getStringCellValue().substring(1));
+                j++;
+                counter++;
+            }
+            for(int k = 0; k < counter; k++) { employees.add(new EmployeeRow(firstName, lastName, barCodes[k], stringDate));
+            }
+        }
+        for(int i = 0; i < employees.size(); i++){
+            XSSFRow createdRow = sheet.createRow(i);
+            EmployeeRow employeeRow = employees.get(i);
+            createdRow.createCell(0).setCellValue(employeeRow.lastName);
+            createdRow.createCell(1).setCellValue(employeeRow.firstName);
+            createdRow.createCell(2).setCellValue(employeeRow.barCode);
+            createdRow.createCell(3).setCellValue(employeeRow.releaseDate);
+        }
+        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/rotacja.xlsx");
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
+    }
+
+    class EmployeeRow {
+        String firstName;
+        String lastName;
+        long barCode;
+        String releaseDate;
+
+        public EmployeeRow(String firstName, String lastName, long barCode, String date) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.barCode = barCode;
+            this.releaseDate = date;
+        }
+    }
+
 
     @PostMapping("/load_lockers/{sheetToLoad}")
     public void loadLockersFromExcelFile(@RequestParam("file") MultipartFile lockersToLoad,
