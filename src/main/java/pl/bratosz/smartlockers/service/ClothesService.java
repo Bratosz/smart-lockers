@@ -93,20 +93,9 @@ public class ClothesService {
                     rowForRotationUpdate.getLockerNo(),
                     rowForRotationUpdate.getBoxNo()
             );
-            return new EmployeeCloth(
-                    rowForRotationUpdate.getBarCode(),
-                    rowForRotationUpdate.getWashingDate(),
-                    rowForRotationUpdate.getOrdinalNo(),
-                    rowForRotationUpdate.getArticleNo(),
-                    employee
-            );
+            return new EmployeeCloth();
         } else {
-            return new RotationalCloth(
-                    rowForRotationUpdate.getBarCode(),
-                    rowForRotationUpdate.getWashingDate(),
-                    rowForRotationUpdate.getOrdinalNo(),
-                    rowForRotationUpdate.getArticleNo()
-            );
+            return new RotationalCloth();
         }
     }
 
@@ -140,7 +129,7 @@ public class ClothesService {
             row.createCell(6).setCellValue(cloth.getId());
             row.createCell(7).setCellValue(cloth.getName().getName());
             row.createCell(8).setCellValue(cloth.getArticleNo());
-            row.createCell(9).setCellValue(FormatDate.getDate(cloth.getReleasedToEmployee()));
+//            row.createCell(9).setCellValue(FormatDate.getDate(cloth.getReleasedToEmployee()));
         }
         FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/rotacja_do_zwrotu.xlsx");
         workbook.write(fileOut);

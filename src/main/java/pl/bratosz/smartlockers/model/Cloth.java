@@ -18,7 +18,16 @@ public abstract class Cloth {
     protected ClothName name;
 
     @JsonView(Public.class)
+    protected Size size;
+
+    @JsonView(Public.class)
+    protected Date assignment;
+
+    @JsonView(Public.class)
     protected Date lastWashing;
+
+    @JsonView(Public.class)
+    protected Date release;
 
     @JsonView(Public.class)
     protected int ordinalNo;
@@ -26,17 +35,17 @@ public abstract class Cloth {
     @JsonView(Public.class)
     protected int articleNo;
 
-    @JsonView(Public.class)
-    protected Date releasedToEmployee;
-
     public Cloth(){}
 
-    public Cloth(long id, Date lastWashing, int ordinalNo, int articleNo) {
+    public Cloth(long id, Size size, Date assignment, Date lastWashing, Date release, int ordinalNo, int articleNo) {
         this.id = id;
-        name = ClothName.getByArticleNo(articleNo);
+        this.size = size;
+        this.assignment = assignment;
         this.lastWashing = lastWashing;
+        this.release = release;
         this.ordinalNo = ordinalNo;
         this.articleNo = articleNo;
+        name = ClothName.getByArticleNo(articleNo);
     }
 
     public long getId() {
@@ -71,19 +80,35 @@ public abstract class Cloth {
         this.articleNo = articleNo;
     }
 
-    public Date getReleasedToEmployee() {
-        return releasedToEmployee;
-    }
-
-    public void setReleasedToEmployee(Date releasedToEmployee) {
-        this.releasedToEmployee = releasedToEmployee;
-    }
-
     public ClothName getName() {
         return name;
     }
 
     public void setName(ClothName name) {
         this.name = name;
+    }
+
+    public Size getSize() {
+        return size;
+    }
+
+    public void setSize(Size size) {
+        this.size = size;
+    }
+
+    public Date getAssignment() {
+        return assignment;
+    }
+
+    public void setAssignment(Date assignment) {
+        this.assignment = assignment;
+    }
+
+    public Date getRelease() {
+        return release;
+    }
+
+    public void setRelease(Date release) {
+        this.release = release;
     }
 }

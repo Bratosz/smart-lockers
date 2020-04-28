@@ -13,6 +13,9 @@ import static pl.bratosz.smartlockers.model.Views.*;
 
 @Entity
 public class RotationalCloth extends Cloth {
+    @JsonView(Public.class)
+    private Date releasedToEmployee;
+
     @JsonView(InternalForClothes.class)
     @ManyToOne(cascade = CascadeType.ALL)
     private Employee employee;
@@ -23,8 +26,8 @@ public class RotationalCloth extends Cloth {
     public RotationalCloth() {
     }
 
-    public RotationalCloth(long id, Date lastWashing, int ordinalNo, int articleNo) {
-        super(id, lastWashing, ordinalNo, articleNo);
+    public RotationalCloth(long id, Size size, Date assignment, Date lastWashing, Date release, int ordinalNo, int articleNo) {
+        super(id, size, assignment, lastWashing, release, ordinalNo, articleNo);
         isReturned = true;
     }
 
@@ -38,7 +41,6 @@ public class RotationalCloth extends Cloth {
         }
     }
 
-    @Override
     public void setReleasedToEmployee(Date date) {
         this.releasedToEmployee = date;
         setReturned(isClothReturned());

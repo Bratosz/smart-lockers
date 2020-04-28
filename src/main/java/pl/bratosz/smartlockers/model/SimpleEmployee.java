@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.model;
 
+
 public class SimpleEmployee {
     private String firstName;
     private String lastName;

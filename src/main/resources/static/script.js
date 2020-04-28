@@ -26,7 +26,6 @@ function reloadTableRows() {
                         window.location.href = `edit-employee.html?id=${locker.boxes[j].id}`;
                     });
                     $("#table-rows").append($row);
-
                 }
             }
         }
