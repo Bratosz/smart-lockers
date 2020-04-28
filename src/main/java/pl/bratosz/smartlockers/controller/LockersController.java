@@ -34,7 +34,15 @@ public class LockersController {
     @JsonView(Views.InternalForLockers.class)
     @GetMapping
     public List<Locker> getAll() {
-        return lockersRepository.findAll();
+        List<Locker> lockers = lockersRepository.findAll();
+        return lockers.subList(0,50);
+    }
+
+    @JsonView(Views.InternalForLockers.class)
+    @GetMapping("/getLockersByDepartment")
+    public List<Locker> getLockersByDepartment(Locker.DepartmentNumber depNo) {
+        List<Locker> lockers = lockersRepository.findAllByDepartment(depNo);
+        return lockers;
     }
 
     @JsonView(Views.InternalForLockers.class)
@@ -46,7 +54,7 @@ public class LockersController {
         List<Locker> lockers = lockersRepository.filterAllByDepartmentNoAndDepartmentAndLocation(
                 departmentNo, department, location);
         if (boxStatus.equals(Box.BoxStatus.UNDEFINED)) {
-            return lockers;
+            return lockers.subList(0,50);
         }
         for (Locker locker : lockers) {
             List<Box> boxes = locker.getBoxes();
@@ -55,7 +63,7 @@ public class LockersController {
                     .collect(Collectors.toList());
             locker.setBoxes(filteredBoxes);
         }
-        return lockers;
+        return lockers.subList(0,50);
     }
 
 

@@ -26,6 +26,7 @@ import pl.bratosz.smartlockers.service.*;
 import sun.util.calendar.BaseCalendar;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -265,6 +266,38 @@ public class FileController {
         }
     }
 
+    @JsonView(Views.InternalForLockers.class)
+    @GetMapping("/getAllLockersToExcel/{depNo}")
+    public List<Locker> getAllLockersToExcel(@PathVariable Locker.DepartmentNumber depNo) throws IOException {
+        XSSFWorkbook wb = new XSSFWorkbook();
+        XSSFSheet sheet = wb.createSheet("Pracownicy");
+        List<Locker> all = lockersController.getLockersByDepartment(depNo);
+        XSSFRow row = sheet.createRow(0);
+        row.createCell(0).setCellValue("Imię");
+        row.createCell(1).setCellValue("Nazwisko");
+        row.createCell(2).setCellValue("Szafa");
+        row.createCell(3).setCellValue("Box");
+        int rowCounter = 1;
+        for(int i = 0; i < all.size(); i++) {
+            List<Box> boxes = all.get(i).getBoxes();
+            for(int j = 0; j < boxes.size(); j++) {
+                if(boxes.get(j).getBoxStatus() == Box.BoxStatus.FREE){
+                    continue;
+                }
+                row = sheet.createRow(rowCounter++);
+                row.createCell(0).setCellValue(boxes.get(j).getEmployee().getFirstName());
+                row.createCell(1).setCellValue(boxes.get(j).getEmployee().getLastName());
+                row.createCell(2).setCellValue(all.get(i).getLockerNumber());
+                row.createCell(3).setCellValue(boxes.get(j).getBoxNumber());
+            }
+        }
+        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/KLS/raports/" + sheet.getSheetName() + ".xlsx");
+        wb.write(fileOut);
+        fileOut.close();
+        wb.close();
+        return all;
+
+    }
     @GetMapping("/calculate_clothes_value/{articleColumnNo}/{releaseDateColumnNo}/{resultColumnNo}")
     public Float calculateClothesValueFromExcelFile(@PathVariable Integer articleColumnNo,
                                                     @PathVariable Integer releaseDateColumnNo,

@@ -18,6 +18,11 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
     List<Locker> findAll();
 
     @Query("select l from Locker l where " +
+            "l.departmentNumber = :depNo " +
+            "order by l.lockerNumber")
+    List<Locker> findAllByDepartment(Locker.DepartmentNumber depNo);
+
+    @Query("select l from Locker l where " +
             "(l.departmentNumber = :departmentNumber or :departmentNumber is null) " +
             "and " +
             "(l.department = :department or :department is null) " +
