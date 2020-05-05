@@ -35,6 +35,10 @@ public class LockersController {
     @GetMapping
     public List<Locker> getAll() {
         List<Locker> lockers = lockersRepository.findAll();
+        if(lockers.size() < 50) {
+            return lockers;
+        } else {
+        }
         return lockers.subList(0,50);
     }
 
@@ -69,7 +73,7 @@ public class LockersController {
 
     @GetMapping("/quantity/{departmentNo}")
     public int getLockersQuantity(@PathVariable Locker.DepartmentNumber departmentNo) {
-        return lockersRepository.getAmountOfLockersByDepartmentNumber(departmentNo);
+         return lockersRepository.getAmountOfLockersByDepartmentNumber(departmentNo);
     }
 
 //    @RequestMapping(
@@ -80,6 +84,7 @@ public class LockersController {
 //    (@PathVariable long fooid, @PathVariable long barid)
 
     @PostMapping
+    @JsonView(Views.InternalForLockers.class)
     public Locker create(@RequestBody Locker locker) {
         List<Box> boxes = boxesService.createBoxesForLocker(locker.getCapacity());
         locker.setBoxes(boxes);

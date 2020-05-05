@@ -1,5 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import pl.bratosz.smartlockers.converters.DepartmentConverter;
 
@@ -11,7 +13,6 @@ public enum Department {
     NOTFOUND("Nie znaleziono pracownika");
 
     private String name;
-
 
     Department(String name) {
         this.name = name;

@@ -1,5 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ExchangeType {
     CHANGE_SIZE("Zmiana rozmiaru"),
     FOR_A_NEW_ONE("Wymiana na nowe"),
@@ -11,6 +13,7 @@ public enum ExchangeType {
         this.name = name;
     }
 
+    @JsonValue
     public String getName() {
         return name;
     }

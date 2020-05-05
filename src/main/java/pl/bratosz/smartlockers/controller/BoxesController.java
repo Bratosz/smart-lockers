@@ -3,11 +3,14 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Box;
+import pl.bratosz.smartlockers.model.Employee;
+import pl.bratosz.smartlockers.model.EmployeeCloth;
 import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.service.BoxesService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import static pl.bratosz.smartlockers.model.Locker.*;
 
@@ -63,6 +66,4 @@ public class BoxesController {
                       @PathVariable DepartmentNumber departmentNumber) {
         return boxesService.getBox(lockerNumber, boxNumber, departmentNumber);
     }
-
-
 }

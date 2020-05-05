@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 import static pl.bratosz.smartlockers.model.Views.*;
 
@@ -15,9 +16,11 @@ public abstract class Cloth {
     @Id protected long id;
 
     @JsonView(Public.class)
+    @Enumerated(EnumType.STRING)
     protected ClothName name;
 
     @JsonView(Public.class)
+    @Enumerated(EnumType.STRING)
     protected Size size;
 
     @JsonView(Public.class)
@@ -27,7 +30,7 @@ public abstract class Cloth {
     protected Date lastWashing;
 
     @JsonView(Public.class)
-    protected Date release;
+    protected Date releaseDate;
 
     @JsonView(Public.class)
     protected int ordinalNo;
@@ -37,14 +40,14 @@ public abstract class Cloth {
 
     public Cloth(){}
 
-    public Cloth(long id, Size size, Date assignment, Date lastWashing, Date release, int ordinalNo, int articleNo) {
+    public Cloth(long id, Date assignment, Date lastWashing, Date releaseDate, int ordinalNo, int articleNo, Size size) {
         this.id = id;
-        this.size = size;
         this.assignment = assignment;
         this.lastWashing = lastWashing;
-        this.release = release;
+        this.releaseDate = releaseDate;
         this.ordinalNo = ordinalNo;
         this.articleNo = articleNo;
+        this.size = size;
         name = ClothName.getByArticleNo(articleNo);
     }
 
@@ -56,12 +59,36 @@ public abstract class Cloth {
         this.id = id;
     }
 
+    public ClothName getName() {
+        return name;
+    }
+
+    public void setName(ClothName name) {
+        this.name = name;
+    }
+
+    public Date getAssignment() {
+        return assignment;
+    }
+
+    public void setAssignment(Date assignment) {
+        this.assignment = assignment;
+    }
+
     public Date getLastWashing() {
         return lastWashing;
     }
 
     public void setLastWashing(Date lastWashing) {
         this.lastWashing = lastWashing;
+    }
+
+    public Date getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
     public int getOrdinalNo() {
@@ -76,18 +103,6 @@ public abstract class Cloth {
         return articleNo;
     }
 
-    public void setArticleNo(int articleNo) {
-        this.articleNo = articleNo;
-    }
-
-    public ClothName getName() {
-        return name;
-    }
-
-    public void setName(ClothName name) {
-        this.name = name;
-    }
-
     public Size getSize() {
         return size;
     }
@@ -96,19 +111,20 @@ public abstract class Cloth {
         this.size = size;
     }
 
-    public Date getAssignment() {
-        return assignment;
+    public void setArticleNo(int articleNo) {
+        this.articleNo = articleNo;
     }
 
-    public void setAssignment(Date assignment) {
-        this.assignment = assignment;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cloth cloth = (Cloth) o;
+        return getId() == cloth.getId();
     }
 
-    public Date getRelease() {
-        return release;
-    }
-
-    public void setRelease(Date release) {
-        this.release = release;
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

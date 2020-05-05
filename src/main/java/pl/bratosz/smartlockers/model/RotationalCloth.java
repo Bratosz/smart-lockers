@@ -26,9 +26,13 @@ public class RotationalCloth extends Cloth {
     public RotationalCloth() {
     }
 
-    public RotationalCloth(long id, Size size, Date assignment, Date lastWashing, Date release, int ordinalNo, int articleNo) {
-        super(id, size, assignment, lastWashing, release, ordinalNo, articleNo);
-        isReturned = true;
+    public RotationalCloth(long id, Date assignment, Date lastWashing, Date release,
+                           int ordinalNo, int articleNo, Date releasedToEmployee,
+                           Employee employee, boolean isReturned, Size size) {
+        super(id, assignment, lastWashing, release, ordinalNo, articleNo, size);
+        this.releasedToEmployee = releasedToEmployee;
+        this.employee = employee;
+        this.isReturned = isReturned;
     }
 
     @Override

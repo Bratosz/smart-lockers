@@ -25,6 +25,9 @@ function reloadTableRows() {
                     $row.find(".button-edit-employee").click(function () {
                         window.location.href = `edit-employee.html?id=${locker.boxes[j].id}`;
                     });
+                    $row.find(".button-view-employee").click(function () {
+                        window.location.href = `view-employee.html?id=${locker.boxes[j].id}`;
+                    });
                     $("#table-rows").append($row);
                 }
             }
@@ -68,6 +71,9 @@ $("#button-filter").click(function () {
                     $row.find(".button-edit-employee").click(function () {
                         window.location.href = `edit-employee.html?id=${employeeId}`;
                     });
+                    $row.find(".button-view-employee").click(function () {
+                        window.location.href = `view-employee.html?id=${locker.boxes[j].id}`;
+                    });
                     $("#table-rows").append($row);
                 }
             }
@@ -75,6 +81,7 @@ $("#button-filter").click(function () {
         }
     })
 });
+
 
 $("#button-input-lastname").click(function () {
     const lastname = $("#input-lastname").val();
@@ -105,6 +112,10 @@ $("#button-input-lastname").click(function () {
                     $row.find(".cell-status").text(box.boxStatus);
                     $row.find(".button-edit-employee").click(function () {
                         window.location.href = "edit-employee.html";
+                        employee.id
+                    });
+                    $row.find(".button-view-employee").click(function () {
+                        window.location.href = `view-employee.html?id=${locker.boxes[j].id}`;
                     });
 
                     $("#table-rows").append($row);

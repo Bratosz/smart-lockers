@@ -8,6 +8,7 @@ import pl.bratosz.smartlockers.repository.EmployeesRepository;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static pl.bratosz.smartlockers.model.Box.BoxStatus.*;
 

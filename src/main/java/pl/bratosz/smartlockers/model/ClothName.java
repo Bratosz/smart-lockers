@@ -1,7 +1,11 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.HashMap;
 import java.util.Map;
+
 
 public enum ClothName {
     TROUSERS_FEMININE_GRAY_NEW_MAGNA("SPODNIE DAMSKIE-NOWE-MAGNA SZARE", 1051),
@@ -68,6 +72,7 @@ public enum ClothName {
         return articlesByNumbers.get(articleNo);
     }
 
+    @JsonValue
     public String getName() {
         return name;
     }

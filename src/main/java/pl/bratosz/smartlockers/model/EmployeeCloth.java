@@ -23,14 +23,21 @@ public class EmployeeCloth extends Cloth {
 
     public EmployeeCloth(){}
 
-    public EmployeeCloth(long id, Size size, Date assignment, Date lastWashing, Date release,
-                         int ordinalNo, int articleNo, Employee employee,
-                         boolean acceptedForExchange, ExchangeStatus exchangeStatus) {
-        super(id, size, assignment, lastWashing, release, ordinalNo, articleNo);
+    public EmployeeCloth(long id, Date assignment, Date lastWashing, Date release, int ordinalNo,
+                         int articleNo, Employee employee, boolean acceptedForExchange,
+                         ExchangeStatus exchangeStatus, Size size) {
+        super(id, assignment, lastWashing, release, ordinalNo, articleNo, size);
         this.employee = employee;
         this.acceptedForExchange = acceptedForExchange;
         this.exchangeStatus = exchangeStatus;
     }
+
+    public EmployeeCloth(long id, Date assignment, Date lastWashing, Date release,
+                         int ordinalNo, int articleNo, Size size) {
+        super(id, assignment, lastWashing, release, ordinalNo, articleNo, size);
+        acceptedForExchange = false;
+    }
+
 
     public Employee getEmployee() {
         return employee;

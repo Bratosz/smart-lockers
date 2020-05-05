@@ -1,6 +1,8 @@
 package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
@@ -127,32 +129,27 @@ public class Locker {
             this.number = number;
         }
 
-        public int getNumber() {
+        public int getNumber(){
             return number;
         }
     }
 
     public enum Location {
-        OLDSIDE("Stara część"),
-        NEWSIDE("Nowa część"),
+        OLDSIDE("Stara hala"),
+        NEWSIDE("Nowa hala"),
         MANTRANS("Mantrans"),
-        NEWSIDEUPSTAIRS("Nowa część na piętrze"),
-        NEWJITSIDE("Nowa część na JIT"),
+        NEWSIDEUPSTAIRS("Nowa hala na piętrze"),
+        NEWJITSIDE("Nowa hala na JITcie"),
         DISABLED("Nieaktywna");
 
         private String name;
 
-        @JsonCreator
-        public static Location forValue(String value) {
-            if (value.equals("null")) {
-                return null;
-            } else {
-                return Location.valueOf(value);
-            }
-        }
-
         Location(String name) {
             this.name = name;
+        }
+
+        public String getName() {
+            return  name;
         }
     }
 }

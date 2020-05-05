@@ -38,9 +38,9 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private Set<RotationalCloth> rotationalClothing;
 
-    @JsonView(Views.InternalForEmployees.class)
+    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private Set<EmployeeCloth> employeeClothing;
+    private Set<EmployeeCloth> clothing;
 
 
     public Employee() {
@@ -54,12 +54,12 @@ public class Employee {
         this.rotationalClothing = rotationalClothing;
     }
 
-    public Set<EmployeeCloth> getEmployeeClothing() {
-        return employeeClothing;
+    public Set<EmployeeCloth> getClothing() {
+        return clothing;
     }
 
-    public void setEmployeeClothing(Set<EmployeeCloth> employeeClothing) {
-        this.employeeClothing = employeeClothing;
+    public void setClothing(Set<EmployeeCloth> clothing) {
+        this.clothing = clothing;
     }
 
     public Employee(String firstName, String lastName, Department department) throws ConstraintViolationException {

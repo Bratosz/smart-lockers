@@ -1,6 +1,12 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public enum Size {
+    SIZE_ZERO("0"),
     SIZE_34("34"),
     SIZE_36("36"),
     SIZE_38("38"),
@@ -23,18 +29,36 @@ public enum Size {
     SIZE_M("M"),
     SIZE_L("L"),
     SIZE_XL("XL"),
-    SIZE_XXL("2XL"),
-    SIZE_XXXL("3XL"),
-    SIZE_XXXXL("4XL"),
-    SIZE_XXXXXL("5XL"),
-    SIZE_XXXXXXL("6XL");
+    SIZE_XXL("XXL"),
+    SIZE_2XL("2XL"),
+    SIZE_XXXL("XXXL"),
+    SIZE_3XL("3XL"),
+    SIZE_XXXXL("XXXXL"),
+    SIZE_4XL("4XL"),
+    SIZE_XXXXXL("XXXXXL"),
+    SIZE_5XL("5XL"),
+    SIZE_XXXXXXL("XXXXXXL"),
+    SIZE_6XL("6XL");
 
     private final String name;
+    private static final Map<String, Size>
+            sizesByNames = new HashMap<>();
+
+    static {
+        for(Size size : Size.values()) {
+            sizesByNames.put(size.name, size);
+        }
+    }
 
     Size(String name) {
         this.name = name;
     }
 
+    public static Size getSizeByName(String name) {
+        return sizesByNames.get(name);
+    }
+
+    @JsonValue
     public String getName() {
         return name;
     }
