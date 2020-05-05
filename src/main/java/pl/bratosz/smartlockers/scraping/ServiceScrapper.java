@@ -81,7 +81,11 @@ public class ServiceScrapper {
     }
 
     private String getLogin(Locker.DepartmentNumber departmentNumber) {
-        return "";
+        return "" +
+                "" +
+                "" +
+                "" +
+                "";
     }
 
     private Connection.Response logIn(String login, String password) {
