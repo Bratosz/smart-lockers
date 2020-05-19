@@ -45,10 +45,11 @@ public class ScrapingService {
     }
 
     private void compareAndUpdateClothes(Set<EmployeeCloth> actualClothes, Employee employee) {
+        Set<EmployeeCloth> newClothes = new HashSet<>();
         if(currentClothes.isEmpty()) {
             for(EmployeeCloth cloth : actualClothes){
                 cloth.setEmployee(employee);
-                clothesRepository.save(cloth);
+                newClothes.add(cloth);
             }
         } else {
             for(EmployeeCloth cloth : currentClothes) {
@@ -59,7 +60,7 @@ public class ScrapingService {
                 for(EmployeeCloth actualCloth : actualClothes) {
                     if(!currentClothes.contains(actualCloth)) {
                         actualCloth.setEmployee(employee);
-                        clothesRepository.save(actualCloth);
+                        newClothes.add(actualCloth);
                     } else if(actualCloth.equals(cloth)) {
                         cloth.setLastWashing(actualCloth.getLastWashing());
                     }
@@ -67,5 +68,6 @@ public class ScrapingService {
                 clothesRepository.flush();
             }
         }
+        clothesRepository.saveAll(newClothes);
     }
 }
