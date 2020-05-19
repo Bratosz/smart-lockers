@@ -8,6 +8,7 @@ import pl.bratosz.smartlockers.repository.ClothesRepository;
 import pl.bratosz.smartlockers.scraping.ServiceScrapper;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
 public class ScrapingService {
     private BoxesRepository boxesRepository;
     private ClothesRepository clothesRepository;
+    private Set<EmployeeCloth> currentClothes;
 
     @Autowired
     public ScrapingService(BoxesRepository boxesRepository, ClothesRepository clothesRepository) {
@@ -28,49 +30,42 @@ public class ScrapingService {
         Box box = boxesRepository.getBoxById(boxId);
         Locker.DepartmentNumber departmentNumber = box.getLocker().getDepartmentNumber();
         Employee employee = box.getEmployee();
-        Set<EmployeeCloth> currentClothes = employee.getClothing();
+        currentClothes = employee.getClothing();
         ServiceScrapper scrapper = new ServiceScrapper(departmentNumber);
         scrapper.findByLockerAndBox(box.getLocker().getLockerNumber(),
                                     box.getBoxNumber());
         if(employee.getLastName().equals(
                 scrapper.getEmployeeLastName().toUpperCase())) {
             Set<EmployeeCloth> actualClothes = scrapper.getClothes();
-            Set<EmployeeCloth> employeeNewClothes =
-                    compareAndUpdateClothes(currentClothes, actualClothes);
-                for(EmployeeCloth cloth : employeeNewClothes) {
-                    cloth.setEmployee(employee);
-                    clothesRepository.save(cloth);
-                }
-                return box;
+            compareAndUpdateClothes(actualClothes, employee);
+            return box;
         } else {
             throw new IOException("Last names are different!");
         }
     }
 
-    private Set<EmployeeCloth> compareAndUpdateClothes(
-            Set<EmployeeCloth> currentClothes, Set<EmployeeCloth> actualClothes) {
+    private void compareAndUpdateClothes(Set<EmployeeCloth> actualClothes, Employee employee) {
         if(currentClothes.isEmpty()) {
-            return actualClothes;
+            for(EmployeeCloth cloth : actualClothes){
+                cloth.setEmployee(employee);
+                clothesRepository.save(cloth);
+            }
         } else {
             for(EmployeeCloth cloth : currentClothes) {
-                boolean isFound = false;
-                EmployeeCloth clothToDelete = null;
-                for (Iterator<EmployeeCloth> it = actualClothes.iterator(); it.hasNext(); ) {
-                  EmployeeCloth  actualCloth = it.next();
-                    if (actualCloth.equals(cloth)) {
-                        clothToDelete = actualCloth;
+                if(!actualClothes.contains(cloth)) {
+                    cloth.setActive(false);
+                    continue;
+                }
+                for(EmployeeCloth actualCloth : actualClothes) {
+                    if(!currentClothes.contains(actualCloth)) {
+                        actualCloth.setEmployee(employee);
+                        clothesRepository.save(actualCloth);
+                    } else if(actualCloth.equals(cloth)) {
                         cloth.setLastWashing(actualCloth.getLastWashing());
-                        isFound = true;
                     }
                 }
-                if (isFound) {
-                    actualClothes.remove(clothToDelete);
-                } else {
-                    clothesRepository.delete(cloth);
-                }
+                clothesRepository.flush();
             }
-            clothesRepository.saveAll(currentClothes);
-            return actualClothes;
         }
     }
 }

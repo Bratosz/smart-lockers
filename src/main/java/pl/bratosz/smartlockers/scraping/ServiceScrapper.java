@@ -74,18 +74,14 @@ public class ServiceScrapper {
 
     private String getPassword(Locker.DepartmentNumber departmentNumber) {
         if(departmentNumber.equals(Locker.DepartmentNumber.DEP_384)) {
-            return "";
+            return "384LEAR#1";
         } else {
             return "";
         }
     }
 
     private String getLogin(Locker.DepartmentNumber departmentNumber) {
-        return "" +
-                "" +
-                "" +
-                "" +
-                "";
+        return "LEAR";
     }
 
     private Connection.Response logIn(String login, String password) {

@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
@@ -38,7 +39,18 @@ public abstract class Cloth {
     @JsonView(Public.class)
     protected int articleNo;
 
+    @JsonView(Public.class)
+    protected boolean isActive;
+
     public Cloth(){}
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 
     public Cloth(long id, Date assignment, Date lastWashing, Date releaseDate, int ordinalNo, int articleNo, Size size) {
         this.id = id;
@@ -49,6 +61,7 @@ public abstract class Cloth {
         this.articleNo = articleNo;
         this.size = size;
         name = ClothName.getByArticleNo(articleNo);
+        isActive = true;
     }
 
     public long getId() {

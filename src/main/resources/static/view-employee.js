@@ -27,23 +27,44 @@ function reloadEmployee() {
 }
 
 $("#refresh-button").click(function () {
+    const table = $("#table-of-cloths-with-head > tbody > tr");
+    for(let i = 1; i < table.length; i++) {
+        table[i].remove();
+    }
+    console.log(table.length);
     $.ajax({
         url: `http://localhost:8080/scrap/update-clothes/${boxId}`,
         method: "get",
         success: function (box) {
-            displayClothes(box);
+            reloadClothes(box.id);
         }
     })
 });
 
+function reloadClothes(boxId) {
+    $.ajax({
+        url: `http://localhost:8080/boxes/${boxId}`,
+        method: "get",
+        success: function(box) {
+            displayClothes(box);
+        }
+    });
+}
+
 function displayClothes(box) {
-    $("#table-of-clothes > tr:not(#row-template)").remove();
+    $("#table-of-cloths > tr:not(#row-template)").remove();
     const $rowTemplate = $("#row-template");
     console.log($rowTemplate);
     const clothes = box.employee.clothing;
     console.log(clothes);
+    clothes.sort(function (a, b) {
+        return a.articleNo - b.articleNo || a.ordinalNo - b.ordinalNo;
+    });
     for(let i = 0; i < clothes.length; i++) {
         const cloth = clothes[i];
+        if(cloth.isActive == false) {
+            continue;
+        }
         const $row = $rowTemplate.clone();
         $row.css("display", "table-row");
         $row.find(".cell-ordinal-number").text(cloth.ordinalNo);
