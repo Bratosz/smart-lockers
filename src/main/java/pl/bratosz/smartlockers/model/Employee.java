@@ -42,6 +42,9 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private Set<EmployeeCloth> clothing;
 
+    @JsonView(Views.InternalForEmployees.class)
+    @OneToMany
+    private Set<EmployeeCloth> decommitedClothing;
 
     public Employee() {
     }

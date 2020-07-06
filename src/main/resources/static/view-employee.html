@@ -6,101 +6,257 @@
     <title>Smart Lockers - pracownik</title>
     <script src="jquery-3.3.1.min.js"></script>
     <script src="view-employee.js" defer></script>
-    <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-          crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+    <!--<link rel="stylesheet"-->
+    <!--href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"-->
+    <!--integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"-->
+    <!--crossorigin="anonymous">-->
     <!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"-->
     <!--integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"-->
     <!--crossorigin="anonymous"></script>-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-            crossorigin="anonymous"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"-->
+    <!--integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"-->
+    <!--crossorigin="anonymous"></script>-->
 
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-            crossorigin="anonymous"></script>
+    <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"-->
+    <!--integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"-->
+    <!--crossorigin="anonymous"></script>-->
 </head>
 <body>
-<div class="container">
-    <div class="row mx-lg-n5">
-        <div class="col-lg-2">
-            <img src="kls_logo.jpg" class="img-fluid" alt="Responsive image">
-        </div>
-        <div class="col-lg-6"></div>
-        <div class="col py-3 px-lg-2">
-            <h3>Username</h3>
-        </div>
-        <div class="col py-3 px-lg-2">
-            <button type="button" class="btn btn-secondary">Wyloguj</button>
-        </div>
+<header>
+    <div class="header-element" id="logo">
+        <img src="kls_logo.jpg">
     </div>
-    <br>
-
-    <!--Nav bar-->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
-                aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarText">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="index.html">Wyszukaj <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="add-lockers.html">Dodaj szafki <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="add-employees.html">Dodaj pracowników <span
-                            class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="orders.html">Zamówienia </a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="create-labels.html">Etykiety <span class="sr-only">(current)</span></a>
-                </li>
-            </ul>
-            <span class="navbar-text"></span>
-        </div>
-    </nav>
-
-    <br>
-
-    <div id="employee" style="font-size: 30px; display: inline-block; width: 800px;"></div>
-    <div style="display: inline-block ">
-        <button id="refresh-button">Odśwież</button>
+    <div class="header-element" id="col-size-6"></div>
+    <div class="header-element" id="user-info">
+        <h3>Serwisant</h3>
     </div>
-    <div id="clothing">
-        <table id="table-of-cloths-with-head" class="table table-striped">
-        <thead>
-        <th>Lp</th>
-        <th>Artykuł</th>
-        <th>Nazwa artykułu</th>
-        <th>Rozmiar</th>
-        <th>Data przypisania</th>
-        <th>Kod kreskowy</th>
-        <th>Data wydania</th>
-        <th>W praniu</th>
-        </thead>
-        <tbody id="table-of-cloths">
-        <tr id="row-template" style="display: none">
-            <td class="cell-ordinal-number"></td>
-            <td class="cell-article-number"></td>
-            <td class="cell-article-name"></td>
-            <td class="cell-size"></td>
-            <td class="cell-assignment-date"></td>
-            <td class="cell-id-bar-code"></td>
-            <td class="cell-release-date"></td>
-            <td class="cell-washing-date"></td>
-        </tr>
-        </tbody>
+    <div class="header-element" id="button-logout">
+        <button type="button">Wyloguj</button>
+    </div>
+</header>
+<div class="gap"></div>
+
+<!--Nav bar-->
+<nav id="top-nav">
+    <ul class="menu">
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">Wyszukaj</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="add-lockers.html">Dodaj szafki</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="add-employees.html">Dodaj pracowników</span></a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="create-labels.html">Etykiety</a>
+        </li>
+    </ul>
+</nav>
+<div class="gap-vertical-20"></div>
+
+<main>
+    <div class="gap-vertical-20"></div>
+    <div id="employee" style="font-size: 30px;"></div>
+    <div class="container-table">
+        <table id="table-of-clothes">
+            <thead>
+            <th>Lp</th>
+            <th>Artykuł</th>
+            <th>Nazwa artykułu</th>
+            <th>Rozmiar</th>
+            <th>Data przypisania</th>
+            <th>Kod kreskowy</th>
+            <th>Data wydania</th>
+            <th>W praniu</th>
+            <th>\\</th>
+            </thead>
+            <tbody id="table-of-clothes-body">
+            <tr id="row-template" style="display: none">
+                <td class="cell-ordinal-number"></td>
+                <td class="cell-article-number"></td>
+                <td class="cell-article-name"></td>
+                <td class="cell-size"></td>
+                <td class="cell-assignment-date"></td>
+                <td class="cell-id-bar-code"></td>
+                <td class="cell-release-date"></td>
+                <td class="cell-washing-date"></td>
+                <td><input type="checkbox" class="cloth-check-box"/></td>
+            </tr>
+            <!--<tr>-->
+                <!--<td class="cell-ordinal-number">1</td>-->
+                <!--<td class="cell-article-number">2</td>-->
+                <!--<td class="cell-article-name">T-TSHIRT CZARNY DŁ. RĘKAW</td>-->
+                <!--<td class="cell-size">XL</td>-->
+                <!--<td class="cell-assignment-date">11-11-2011</td>-->
+                <!--<td class="cell-id-bar-code">1000100688367</td>-->
+                <!--<td class="cell-release-date">11-11-1111</td>-->
+                <!--<td class="cell-washing-date">11-11-1111</td>-->
+                <!--<td><input type="checkbox" class="cloth-check-box"/></td>-->
+            <!--</tr>-->
+            </tbody>
         </table>
     </div>
 
+    <div class="gap-vertical-20"></div>
 
+    <div>
+        <div class="side-menu"><span>Przyjęcie odzieży: </span></div>
+        <div class="side-menu">
+            <input class="bar-code-input" type="number" />
+            <input class="bar-code-input" type="number" />
+            <input class="bar-code-input" type="number" />
+            <input class="bar-code-input" type="number" />
+            <input class="bar-code-input" type="number" />
+        </div>
+    </div>
+    <div>
+        <div class="side-menu"><span>Zamówienie odzieży: </span></div>
+        <div class="side-menu">
+            <select id="exchange-type" class="form-control">
+                <option value="FOR_A_NEW_ONE">Wymiana na nowe</option>
+                <option value="CHANGE_SIZE">Zmiana rozmiaru</option>
+                <option value="CHANGE_ARTICLE">Zmiana artykułu</option>
+                <option value="NEW_ARTICLE">Nowy artykuł</option>
+            </select>
+        </div>
+        <div class="side-menu">
+            <select id="select-cloth-type">
+                <option value="SHIRT">Koszulka</option>
+                <option value="TROUSERS">Spodnie</option>
+                <option value="SWEATSHIRT">Bluza</option>
+                <option value="APRON">Fartuch</option>
+                <option value="JACKET">Kurtka</option>
+            </select>
+        </div>
+        <div class="side-menu">
+            <button id="button-confirm-order">Zamów</button>
+        </div>
+        <div class="side-menu">
+            <button id="refresh-button">Odśwież</button>
+        </div>
+        <div>
+            <p>Wybierz koszulkę: </p>
+            <div class="cloth-list">
+                <input type="radio" id="shirt-1" name="shirt" value="5116">
+                 <label for="shirt-1">T-shirt męski niebieski</label>
+                <br/>
+                <input type="radio" id="shirt-2" name="shirt" value="5115">
+                <label for="shirt-2">T-shirt damski niebieski</label>
+                <br/>
+                <input type="radio" id="shirt-3" name="shirt" value="5073">
+                <label for="shirt-3">Polo niebieskie</label>
+            </div>
+            <div class="cloth-list">
+                <input type="radio" id="shirt-4" name="shirt" value="1828">
+                <label for="shirt-4">T-shirt męski melanż </label>
+                <br/>
+                <input type="radio" id="shirt-5" name="shirt" value="5099">
+                <label for="shirt-5">T-shirt damski melanż</label>
+                <br/>
+                <input type="radio" id="shirt-6" name="shirt" value="5074">
+                <label for="shirt-6">Polo szare</label>
+            </div>
+            <div class="cloth-list">
+                <input type="radio" id="shirt-7" name="shirt" value="5012">
+                <label for="shirt-7">T-shirt czarny </label>
+                <br/>
+                <input type="radio" id="shirt-8" name="shirt" value="5077">
+                <label for="shirt-8">T-shirt czarny dł. rękaw</label>
+                <br/>
+                <input type="radio" id="shirt-9" name="shirt" value="5071">
+                <label for="shirt-9">Polo czarne</label>
+            </div>
+            <div class="cloth-list">
+                <input type="radio" id="shirt-10" name="shirt" value="5016">
+                <label for="shirt-10">T-shirt żółty </label>
+                <br/>
+                <input type="radio" id="shirt-11" name="shirt" value="5064">
+                <label for="shirt-11">Polo żółte</label>
+                <br/>
+                <input type="radio" id="shirt-12" name="shirt" value="5071">
+                <label for="shirt-12">T-shirt brązowy</label>
+            </div>
+            <div class="cloth-list">
+                <input type="radio" id="shirt-13" name="shirt" value="5014">
+                <label for="shirt-13">T-shirt czerwony</label>
+                <br/>
+                <input type="radio" id="shirt-14" name="shirt" value="5072">
+                <label for="shirt-14">Polo czerwone</label>
+                <br/>
+                <input type="radio" id="shirt-15" name="shirt" value="5070">
+                <label for="shirt-15">Polo białe</label>
+            </div>
+        </div>
+        <div>
+            <div class="side-menu"><p>Wybierz rozmiar:</p></div>
+            <div class="side-menu">
+                <select id="select-shirt-size">
+                    <option value="XS">XS</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                    <option value="2XL">2XL</option>
+                    <option value="3XL">3XL</option>
+                    <option value="4XL">4XL</option>
+                    <option value="5XL">5XL</option>
+                </select>
+            </div>
+        </div>
 
-</div>
+        <div class="gap-vertical-20"></div>
+
+        <div>
+            <p>Wybierz spodnie: </p>
+            <div class="cloth-list">
+                <input type="radio" id="trousers-1" name="trousers" value="1052">
+                <label for="trousers-1">Spodnie szare męskie</label>
+                <br/>
+                <input type="radio" id="trousers-2" name="trousers" value="1051">
+                <label for="trousers-2">Spodnie szare damskie</label>
+                <br/>
+                <input type="radio" id="trousers-3" name="trousers" value="1351">
+                <label for="trousers-3">Ogrodniczki szare</label>
+            </div>
+            <div class="cloth-list">
+                <input type="radio" id="trousers-4" name="trousers" value="1345">
+                <label for="trousers-4">Ogrodniczki czarne</label>
+                <br/>
+                <input type="radio" id="trousers-5" name="trousers" value="5595">
+                <label for="trousers-5">Spodnie spawalnicze do pasa</label>
+                <br/>
+                <input type="radio" id="trousers-6" name="trousers" value="6595">
+                <label for="trousers-6">Ogrodniczki spawalnicze</label>
+            </div>
+        </div>
+        <div>
+            <div class="side-menu"><p>Wybierz rozmiar:</p></div>
+            <div class="side-menu">
+                <select id="select-trousers-size">
+                    <option value="34">34</option>
+                    <option value="36">36</option>
+                    <option value="38">38</option>
+                    <option value="40">40</option>
+                    <option value="42">42</option>
+                    <option value="44">44</option>
+                    <option value="46">46</option>
+                    <option value="48">48</option>
+                    <option value="50">50</option>
+                    <option value="52">52</option>
+                    <option value="54">54</option>
+                    <option value="56">56</option>
+                    <option value="58">58</option>
+                    <option value="60">60</option>
+                    <option value="62">62</option>
+                    <option value="64">64</option>
+                    <option value="66">66</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+</main>
 </body>
 </html>

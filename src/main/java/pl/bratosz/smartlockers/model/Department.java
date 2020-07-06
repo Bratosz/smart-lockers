@@ -5,20 +5,21 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import pl.bratosz.smartlockers.converters.DepartmentConverter;
 
-public enum Department {
-    METAL("STRUCTURES"),
-    JIT("JIT"),
-    MANTRANS("MANTRANS"),
-    COMMON("WSPÓLNY"),
-    NOTFOUND("Nie znaleziono pracownika");
+import javax.persistence.*;
+import java.util.Set;
+
+@Entity
+public class Department {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     private String name;
 
-    Department(String name) {
-        this.name = name;
-    }
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private Set<Employee> employees;
 
-    public String getName() {
-        return name;
-    }
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private Set<Locker> lockers;
 }

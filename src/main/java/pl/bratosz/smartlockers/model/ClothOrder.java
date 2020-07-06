@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
+import java.util.Set;
 
 @Entity
-public class ExchangeStatus {
+public class ClothOrder {
 
     @Id
     private long id;
@@ -23,12 +24,13 @@ public class ExchangeStatus {
     @JsonView(Views.Public.class)
     private ClothName name;
 
-    @OneToOne
-    private EmployeeCloth employeeCloth;
+    @JsonView(Views.Public.class)
+    @OneToMany
+    private Set<EmployeeCloth> employeeClothes;
 
-    public ExchangeStatus(){}
+    public ClothOrder(){}
 
-    public ExchangeStatus(long id, ExchangeType exchangeType, Size size, int articleNo) {
+    public ClothOrder(long id, ExchangeType exchangeType, Size size, int articleNo) {
         this.id = id;
         this.exchangeType = exchangeType;
         this.size = size;
@@ -76,11 +78,11 @@ public class ExchangeStatus {
         this.name = name;
     }
 
-    public EmployeeCloth getEmployeeCloth() {
-        return employeeCloth;
+    public Set<EmployeeCloth> getEmployeeClothes() {
+        return employeeClothes;
     }
 
-    public void setEmployeeCloth(EmployeeCloth employeeCloth) {
-        this.employeeCloth = employeeCloth;
+    public void setEmployeeClothes(Set<EmployeeCloth> employeeClothes) {
+        this.employeeClothes = employeeClothes;
     }
 }

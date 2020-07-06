@@ -17,24 +17,19 @@ public class EmployeeCloth extends Cloth {
     @JsonView(Views.Public.class)
     private boolean acceptedForExchange;
 
-    @JsonView(Views.Public.class)
-    @OneToOne
-    private ExchangeStatus exchangeStatus;
 
     public EmployeeCloth(){}
 
     public EmployeeCloth(long id, Date assignment, Date lastWashing, Date release, int ordinalNo,
-                         int articleNo, Employee employee, boolean acceptedForExchange,
-                         ExchangeStatus exchangeStatus, Size size) {
-        super(id, assignment, lastWashing, release, ordinalNo, articleNo, size);
+                         Article article, Employee employee, boolean acceptedForExchange, Size size) {
+        super(id, assignment, lastWashing, release, ordinalNo, article, size);
         this.employee = employee;
         this.acceptedForExchange = acceptedForExchange;
-        this.exchangeStatus = exchangeStatus;
     }
 
     public EmployeeCloth(long id, Date assignment, Date lastWashing, Date release,
-                         int ordinalNo, int articleNo, Size size) {
-        super(id, assignment, lastWashing, release, ordinalNo, articleNo, size);
+                         int ordinalNo, Article article, Size size) {
+        super(id, assignment, lastWashing, release, ordinalNo, article, size);
         acceptedForExchange = false;
     }
 
@@ -53,13 +48,5 @@ public class EmployeeCloth extends Cloth {
 
     public void setAcceptedForExchange(boolean acceptedForExchange) {
         this.acceptedForExchange = acceptedForExchange;
-    }
-
-    public ExchangeStatus getExchangeStatus() {
-        return exchangeStatus;
-    }
-
-    public void setExchangeStatus(ExchangeStatus exchangeStatus) {
-        this.exchangeStatus = exchangeStatus;
     }
 }

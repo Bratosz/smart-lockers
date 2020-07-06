@@ -27,7 +27,7 @@ function reloadEmployee() {
 }
 
 $("#refresh-button").click(function () {
-    const table = $("#table-of-cloths-with-head > tbody > tr");
+    const table = $("#table-of-clothes > tbody > tr");
     for(let i = 1; i < table.length; i++) {
         table[i].remove();
     }
@@ -52,7 +52,7 @@ function reloadClothes(boxId) {
 }
 
 function displayClothes(box) {
-    $("#table-of-cloths > tr:not(#row-template)").remove();
+    $("#table-of-clothes-body > tr:not(#row-template)").remove();
     const $rowTemplate = $("#row-template");
     console.log($rowTemplate);
     const clothes = box.employee.clothing;
@@ -75,9 +75,20 @@ function displayClothes(box) {
         $row.find(".cell-id-bar-code").text(cloth.id);
         $row.find(".cell-release-date").text(cloth.releaseDate.substring(0,10));
         $row.find(".cell-washing-date").text(cloth.lastWashing.substring(0,10));
-        $("#table-of-cloths").append($row);
+        $("#table-of-clothes-body").append($row);
     }
 
 }
+
+// var rows = $( client_table.$('input[type="checkbox"]').map(function () {
+//     return $(this).closest('tr');
+// } ) );
+
+$('#button-confirm-order').click(function () {
+    $('#table-of-clothes-body').find('input[type="checkbox"]:checked').each(function () {
+        let row = $(this).closest('tr').find('.cell-id-bar-code').text();
+        console.log(row);
+    });
+});
 
 reloadEmployee();

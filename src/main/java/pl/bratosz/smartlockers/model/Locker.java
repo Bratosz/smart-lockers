@@ -24,15 +24,11 @@ public class Locker {
     private Integer capacity;
 
     @JsonView(Views.Public.class)
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Department department;
 
     @JsonView(Views.Public.class)
-    @Enumerated(EnumType.STRING)
-    private DepartmentNumber departmentNumber;
-
-    @JsonView(Views.Public.class)
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Location location;
 
     @JsonView(Views.InternalForLockers.class)
@@ -40,21 +36,21 @@ public class Locker {
     @JoinColumn(name = "locker_id")
     private List<Box> boxes;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Plant plant;
 
     public Locker() {
     }
 
-    public Locker(
-            int lockerNumber,
-            Integer capacity,
-            Department department,
-            DepartmentNumber departmentNumber,
-            Location location) {
+    public Locker(int lockerNumber, Integer capacity,
+                  Department department, Location location,
+                  List<Box> boxes, Plant plant) {
         this.lockerNumber = lockerNumber;
         this.capacity = capacity;
         this.department = department;
-        this.departmentNumber = departmentNumber;
         this.location = location;
+        this.boxes = boxes;
+        this.plant = plant;
     }
 
     public List<Box> getBoxes() {
@@ -71,14 +67,6 @@ public class Locker {
 
     public void setDepartment(Department department) {
         this.department = department;
-    }
-
-    public DepartmentNumber getDepartmentNumber() {
-        return departmentNumber;
-    }
-
-    public void setDepartmentNumber(DepartmentNumber departmentNumber) {
-        this.departmentNumber = departmentNumber;
     }
 
     public Location getLocation() {
@@ -117,39 +105,11 @@ public class Locker {
         return boxes.stream().filter(x -> x.getBoxNumber() == boxNumber).findFirst();
     }
 
-    public enum DepartmentNumber {
-        DEP_384(384),
-        DEP_385(385),
-        DEP_386(386),
-        DEP_000(0);
-
-        private int number;
-
-        DepartmentNumber(int number) {
-            this.number = number;
-        }
-
-        public int getNumber(){
-            return number;
-        }
+    public Plant getPlant() {
+        return plant;
     }
 
-    public enum Location {
-        OLDSIDE("Stara hala"),
-        NEWSIDE("Nowa hala"),
-        MANTRANS("Mantrans"),
-        NEWSIDEUPSTAIRS("Nowa hala na piętrze"),
-        NEWJITSIDE("Nowa hala na JITcie"),
-        DISABLED("Nieaktywna");
-
-        private String name;
-
-        Location(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return  name;
-        }
+    public void setPlant(Plant plant) {
+        this.plant = plant;
     }
 }

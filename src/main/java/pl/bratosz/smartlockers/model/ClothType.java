@@ -1,6 +1,22 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ClothType {
-    EMPLOYEE,
-    ROTATIONAL,
+    SHIRT("Koszulka"),
+    TROUSERS("Spodnie"),
+    SWEATSHIRT("Bluza"),
+    APRON("Fartuch"),
+    JACKET("Kurtka");
+
+    private final String name;
+
+    ClothType(String name) {
+        this.name = name;
+    }
+
+    @JsonValue
+    public String getName() {
+        return name;
+    }
 }

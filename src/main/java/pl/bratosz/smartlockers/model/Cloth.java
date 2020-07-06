@@ -18,10 +18,6 @@ public abstract class Cloth {
 
     @JsonView(Public.class)
     @Enumerated(EnumType.STRING)
-    protected ClothName name;
-
-    @JsonView(Public.class)
-    @Enumerated(EnumType.STRING)
     protected Size size;
 
     @JsonView(Public.class)
@@ -37,7 +33,7 @@ public abstract class Cloth {
     protected int ordinalNo;
 
     @JsonView(Public.class)
-    protected int articleNo;
+    protected Article article;
 
     @JsonView(Public.class)
     protected boolean isActive;
@@ -52,15 +48,15 @@ public abstract class Cloth {
         isActive = active;
     }
 
-    public Cloth(long id, Date assignment, Date lastWashing, Date releaseDate, int ordinalNo, int articleNo, Size size) {
+    public Cloth(long id, Date assignment, Date lastWashing,
+                 Date releaseDate, int ordinalNo, Article article, Size size) {
         this.id = id;
         this.assignment = assignment;
         this.lastWashing = lastWashing;
         this.releaseDate = releaseDate;
         this.ordinalNo = ordinalNo;
-        this.articleNo = articleNo;
+        this.article = article;
         this.size = size;
-        name = ClothName.getByArticleNo(articleNo);
         isActive = true;
     }
 
@@ -70,14 +66,6 @@ public abstract class Cloth {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public ClothName getName() {
-        return name;
-    }
-
-    public void setName(ClothName name) {
-        this.name = name;
     }
 
     public Date getAssignment() {
@@ -112,8 +100,8 @@ public abstract class Cloth {
         this.ordinalNo = ordinalNo;
     }
 
-    public int getArticleNo() {
-        return articleNo;
+    public Article getArticle() {
+        return article;
     }
 
     public Size getSize() {
@@ -124,8 +112,8 @@ public abstract class Cloth {
         this.size = size;
     }
 
-    public void setArticleNo(int articleNo) {
-        this.articleNo = articleNo;
+    public void setArticleNo(Article article) {
+        this.article = article;
     }
 
     @Override
