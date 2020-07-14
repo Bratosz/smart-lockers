@@ -3,18 +3,12 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.*;
-import pl.bratosz.smartlockers.repository.BoxesRepository;
-import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
 import pl.bratosz.smartlockers.service.BoxesService;
-import pl.bratosz.smartlockers.service.EmployeeService;
 import pl.bratosz.smartlockers.service.LockersService;
 
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,7 +39,7 @@ public class LockersController {
     @JsonView(Views.InternalForLockers.class)
     @GetMapping("/getLockersByDepartment")
     public List<Locker> getLockersByDepartment(Locker.DepartmentNumber depNo) {
-        List<Locker> lockers = lockersRepository.findAllByDepartment(depNo);
+        List<Locker> lockers = lockersRepository.findAllByPlantNumber(depNo);
         return lockers;
     }
 
@@ -55,7 +49,7 @@ public class LockersController {
                                     @PathVariable Department department,
                                     @PathVariable Locker.Location location,
                                     @PathVariable Box.BoxStatus boxStatus) {
-        List<Locker> lockers = lockersRepository.filterAllByDepartmentNoAndDepartmentAndLocation(
+        List<Locker> lockers = lockersRepository.filterAllByPlantNumberAndDepartmentAndLocation(
                 departmentNo, department, location);
         if (boxStatus.equals(Box.BoxStatus.UNDEFINED)) {
             return lockers.subList(0,50);
@@ -73,7 +67,7 @@ public class LockersController {
 
     @GetMapping("/quantity/{departmentNo}")
     public int getLockersQuantity(@PathVariable Locker.DepartmentNumber departmentNo) {
-         return lockersRepository.getAmountOfLockersByDepartmentNumber(departmentNo);
+         return lockersRepository.getAmountOfLockersByPlantNumber(departmentNo);
     }
 
 //    @RequestMapping(

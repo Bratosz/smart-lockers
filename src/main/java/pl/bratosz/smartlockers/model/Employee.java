@@ -22,7 +22,6 @@ public class Employee {
     private String lastName;
 
     @JsonView(Views.Public.class)
-    @Enumerated(EnumType.STRING)
     private Department department;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForClothes.class})
@@ -129,17 +128,17 @@ public class Employee {
     }
 
     public int getFirstBoxNumber() {
-        if (getBoxes().size() == 1) {
+        if (getBoxes().size() >= 1) {
             return getBoxes().stream().findFirst().get().getBoxNumber();
         }
         return 0;
     }
 
-    public Locker.DepartmentNumber getFirstLockerDepartmentNumber() {
-        if (getBoxes().size() == 1) {
-            return getBoxes().stream().findFirst().get().getLocker().getDepartmentNumber();
+    public int getFirstLockerPlantNumber() {
+        if (getBoxes().size() >= 1) {
+            return getBoxes().stream().findFirst().get().getLocker().getPlant().getPlantNumber();
         }
-        return Locker.DepartmentNumber.DEP_000;
+        return 0;
     }
 
     public boolean isEmployeeHaveThisBox(int lockerNo, int boxNo) {

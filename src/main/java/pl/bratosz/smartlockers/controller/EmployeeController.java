@@ -34,18 +34,18 @@ public class EmployeeController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/create_employee/{departmentNumber}/{lockerNumber}/{boxNumber}")
-    public ResponseEntity<String> createEmployee(@PathVariable Locker.DepartmentNumber departmentNumber,
-                                                 @PathVariable Integer lockerNumber,
-                                                 @PathVariable Integer boxNumber,
+    @PostMapping("/create_employee/{plantNumber}/{lockerNumber}/{boxNumber}")
+    public ResponseEntity<String> createEmployee(@PathVariable int plantNumber,
+                                                 @PathVariable int lockerNumber,
+                                                 @PathVariable int boxNumber,
                                                  @RequestBody Employee employee) throws RuntimeException {
-        employeeService.createEmployee(departmentNumber, lockerNumber, boxNumber, employee);
+        employeeService.createEmployee(plantNumber, lockerNumber, boxNumber, employee);
         return ResponseEntity.ok("Employee added successfully!");
 
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("add/{department}/{departmentNumber}/{location}")
+    @PostMapping("add/{department}/{plantNumber}/{location}")
     public Employee createEmployee(@PathVariable Department department,
                                    @PathVariable Locker.Location location,
                                    @RequestBody Employee employee) {

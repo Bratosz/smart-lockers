@@ -25,9 +25,9 @@ public class BoxesService {
         this.employeesRepository = employeesRepository;
     }
 
-    public Box findNextFreeBox(Department department, Locker.DepartmentNumber departmentNumber, Locker.Location location) throws BoxNotAvailableException {
+    public Box findNextFreeBox(Department department, int plantNumber, Location location) throws BoxNotAvailableException {
         Box.BoxStatus boxStatus = FREE;
-        List<Box> boxes = boxesRepository.getBoxesByParameters(department, departmentNumber, location, boxStatus);
+        List<Box> boxes = boxesRepository.getBoxesByParameters(department, plantNumber, location, boxStatus);
         if (boxes.size() == 0) {
             throw new BoxNotAvailableException();
         }
@@ -60,17 +60,17 @@ public class BoxesService {
         return boxesRepository.findAll();
     }
 
-    public Box getBox(Integer lockerNumber, Integer boxNumber, Locker.Location location,
-                      Locker.DepartmentNumber departmentNumber) {
-        return boxesRepository.getBox(lockerNumber, boxNumber, location, departmentNumber);
+    public Box getBox(int lockerNumber, int boxNumber, Location location,
+                      int plantNumber) {
+        return boxesRepository.getBox(lockerNumber, boxNumber, location, plantNumber);
     }
 
-    public Box getBox(int lockerNumber, int boxNumber, Locker.DepartmentNumber departmentNumber) {
-        return boxesRepository.getBox(lockerNumber, boxNumber, departmentNumber);
+    public Box getBox(int lockerNumber, int boxNumber, int plantNumber) {
+        return boxesRepository.getBox(lockerNumber, boxNumber, plantNumber);
     }
 
-    public boolean isBoxFree(Integer lockerNo, Integer boxNo, Locker.Location location, Locker.DepartmentNumber departmentNumber) {
-        Box box = boxesRepository.getBox(lockerNo, boxNo, location, departmentNumber);
+    public boolean isBoxFree(int lockerNo, int boxNo, Location location, int plantNumber) {
+        Box box = boxesRepository.getBox(lockerNo, boxNo, location, plantNumber);
         if (box.getBoxStatus().equals(FREE)) {
             return true;
         } else {
@@ -101,8 +101,8 @@ public class BoxesService {
         return boxes;
     }
 
-    public List<Box> getBoxesByLockersRange(Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker) {
-        return boxesRepository.getBoxesByLockersRange(depNumber, firstLocker, lastLocker);
+    public List<Box> getBoxesByLockersRange(int plantNumber, int firstLocker, int lastLocker) {
+        return boxesRepository.getBoxesByLockersRange(plantNumber, firstLocker, lastLocker);
     }
 
     public Box setEmptyBoxEmployee() {

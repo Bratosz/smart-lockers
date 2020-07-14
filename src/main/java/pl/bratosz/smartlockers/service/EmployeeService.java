@@ -5,10 +5,7 @@ import pl.bratosz.smartlockers.comparators.BoxNumberSorter;
 import pl.bratosz.smartlockers.comparators.DepartmentNumberSorter;
 import pl.bratosz.smartlockers.comparators.LockerNumberSorter;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
-import pl.bratosz.smartlockers.model.Box;
-import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.Employee;
-import pl.bratosz.smartlockers.model.Locker;
+import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.repository.LockersRepository;
 
@@ -34,9 +31,9 @@ public class EmployeeService {
         return employeesRepository.getEmployeesByLastName(lastName);
     }
 
-    public Employee createEmployee(Locker.DepartmentNumber departmentNumber,
-                                   Integer lockerNumber, Integer boxNumber, Employee employee) throws BoxNotAvailableException {
-        Box box = lockersRepository.getBox(departmentNumber, lockerNumber, boxNumber);
+    public Employee createEmployee(int plantNumber,
+                                   int lockerNumber, int boxNumber, Employee employee) throws BoxNotAvailableException {
+        Box box = lockersRepository.getBox(plantNumber, lockerNumber, boxNumber);
         if (box.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
             throw new BoxNotAvailableException("Nie udało się dodać pracownika " +
                     employee.getFirstName() + " " + employee.getLastName()
@@ -61,35 +58,35 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public Employee createEmployeeAndAssignToBox(Department department, Locker.Location location, Employee employee) {
-        Locker.DepartmentNumber departmentNumber;
+    public Employee createEmployeeAndAssignToBox(Department department, Location location, Employee employee) {
+        int plantNumber;
         //chosing department number by location and department
         if (department.equals(Department.METAL) || (department.equals(Department.JIT) && location.equals(Locker.Location.OLDSIDE))) {
-            departmentNumber = Locker.DepartmentNumber.DEP_384;
+            plantNumber = Locker.DepartmentNumber.DEP_384;
         } else {
-            departmentNumber = Locker.DepartmentNumber.DEP_385;
+            plantNumber = Locker.DepartmentNumber.DEP_385;
         }
 
         //change location if there is no free boxes
         try {
-            boxesService.findNextFreeBox(department, departmentNumber, location);
+            boxesService.findNextFreeBox(department, plantNumber, location);
         } catch (BoxNotAvailableException e) {
             if (location.equals(Locker.Location.OLDSIDE)) {
                 location = Locker.Location.NEWSIDE;
             } else if (location.equals(Locker.Location.NEWSIDE)) {
                 location = Locker.Location.OLDSIDE;
             } else if (department.equals(Department.JIT) && location.equals(Locker.Location.OLDSIDE)) {
-                departmentNumber = Locker.DepartmentNumber.DEP_385;
+                plantNumber = Locker.DepartmentNumber.DEP_385;
                 location = Locker.Location.NEWSIDEUPSTAIRS;
 
-                if (boxesService.findNextFreeBox(department, departmentNumber, location).equals(null)) {
-                    departmentNumber = Locker.DepartmentNumber.DEP_384;
+                if (boxesService.findNextFreeBox(department, plantNumber, location).equals(null)) {
+                    plantNumber = Locker.DepartmentNumber.DEP_384;
                     location = Locker.Location.NEWSIDE;
                 }
             }
         }
 
-        Box freeBox = boxesService.findNextFreeBox(department, departmentNumber, location);
+        Box freeBox = boxesService.findNextFreeBox(department, plantNumber, location);
         freeBox.setBoxStatus(Box.BoxStatus.OCCUPY);
         freeBox.setEmployee(employee);
 

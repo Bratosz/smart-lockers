@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Department;
+import pl.bratosz.smartlockers.model.Location;
 import pl.bratosz.smartlockers.model.Locker;
 
 import java.util.List;
@@ -18,23 +19,23 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
     List<Locker> findAll();
 
     @Query("select l from Locker l where " +
-            "l.departmentNumber = :depNo " +
+            "l.plantNumber = :plantNumber " +
             "order by l.lockerNumber")
-    List<Locker> findAllByDepartment(Locker.DepartmentNumber depNo);
+    List<Locker> findAllByPlantNumber(int plantNumber);
 
     @Query("select l from Locker l where " +
-            "(l.departmentNumber = :departmentNumber or :departmentNumber is null) " +
+            "(l.plantNumber = :plantNumber or :plantNumber is null) " +
             "and " +
             "(l.department = :department or :department is null) " +
             "and " +
             "(l.location = :location or :location is null) order by l.lockerNumber ")
-    List<Locker> filterAllByDepartmentNoAndDepartmentAndLocation(
-            @Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
+    List<Locker> filterAllByPlantNumberAndDepartmentAndLocation(
+            @Param("plantNumber") int plantNumber,
             @Param("department") Department department,
-            @Param("location") Locker.Location location);
+            @Param("location") Location location);
 
     @Query("select l from Locker l join l.boxes b where " +
-            "(l.departmentNumber = :departmentNumber or :departmentNumber is null) " +
+            "(l.plantNumber = :plantNumber or :plantNumber is null) " +
             "and " +
             "(l.department = :department or :department is null) " +
             "and " +
@@ -42,22 +43,22 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             "and " +
             "(b.boxStatus = :boxStatus or :boxStatus is null) " +
             "order by l.lockerNumber, b.boxNumber ")
-    List<Locker> filterAllByDepartmentNoAndDepartmentAndLocationAndStatus(
-            @Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
+    List<Locker> filterAllByPlantNumberAndDepartmentAndLocationAndStatus(
+            @Param("plantNumber") int plantNumber,
             @Param("department") Department department,
-            @Param("location") Locker.Location location,
+            @Param("location") Location location,
             @Param("boxStatus") Box.BoxStatus boxStatus);
 
-    @Query("select count(l.departmentNumber) from Locker l where l.departmentNumber = :departmentNumber ")
-    int getAmountOfLockersByDepartmentNumber(@Param("departmentNumber") Locker.DepartmentNumber departmentNumber);
+    @Query("select count(l.plantNumber) from Locker l where l.plantNumber = :plantNumber ")
+    int getAmountOfLockersByPlantNumber(@Param("plantNumber") int plantNumber);
 
     @Query("select b from Locker l join l.boxes b " +
             "where l.lockerNumber = :lockerNumber " +
             "and " +
-            "l.departmentNumber = :departmentNumber " +
+            "l.plantNumber = :plantNumber " +
             "and " +
             "b.boxNumber = :boxNumber ")
-    Box getBox(@Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
+    Box getBox(@Param("plantNumber") int plantNumber,
                @Param("lockerNumber") Integer lockerNumber,
                @Param("boxNumber") Integer boxNumber);
 
@@ -65,16 +66,16 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
 
     @Query("select l from Locker l where l.lockerNumber = :lockerNumber " +
             "and " +
-            "l.departmentNumber = :departmentNumber " +
+            "l.plantNumber = :plantNumber " +
             "and " +
             "l.location = :location ")
     Locker getLockerByParameters(@Param("lockerNumber") Integer lockerNumber,
-                                 @Param("departmentNumber") Locker.DepartmentNumber departmentNumber,
-                                 @Param("location") Locker.Location location);
+                                 @Param("plantNumber") int plantNumber,
+                                 @Param("location") Location location);
 
-    @Query("select l from Locker l where l.departmentNumber = :depNumber " +
+    @Query("select l from Locker l where l.plantNumber = :plantNumber " +
             "and " +
             "(l.lockerNumber between :firstLocker and :lastLocker) " +
             "order by l.lockerNumber ")
-    List<Locker> getLockersFromRange(Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker);
+    List<Locker> getLockersFromRange(int plantNumber, int firstLocker, int lastLocker);
 }

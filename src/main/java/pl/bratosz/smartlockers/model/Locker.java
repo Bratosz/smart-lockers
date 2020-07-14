@@ -39,6 +39,8 @@ public class Locker {
     @ManyToOne(cascade = CascadeType.ALL)
     private Plant plant;
 
+    private int plantNumber;
+
     public Locker() {
     }
 
@@ -51,6 +53,7 @@ public class Locker {
         this.location = location;
         this.boxes = boxes;
         this.plant = plant;
+        plantNumber = plant.getPlantNumber();
     }
 
     public List<Box> getBoxes() {
@@ -111,5 +114,13 @@ public class Locker {
 
     public void setPlant(Plant plant) {
         this.plant = plant;
+    }
+
+    public int getPlantNumber() {
+        return plantNumber;
+    }
+
+    public void setPlantNumber(int plantNumber) {
+        this.plantNumber = plantNumber;
     }
 }

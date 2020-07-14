@@ -41,10 +41,10 @@ public class BoxesController {
         return boxesService.getBoxById(id);
     }
 
-    @PostMapping("/create_labels/{folderName}/{sheetName}/{depNumber}/{firstLocker}/{lastLocker}")
+    @PostMapping("/create_labels/{folderName}/{sheetName}/{plantNumber}/{firstLocker}/{lastLocker}")
     public void createLabels(@PathVariable String folderName,
                              @PathVariable String sheetName,
-                             @PathVariable DepartmentNumber depNumber,
+                             @PathVariable int plantNumber,
                              @PathVariable int firstLocker,
                              @PathVariable int lastLocker) throws IOException {
     }
@@ -60,10 +60,10 @@ public class BoxesController {
     }
 
     @JsonView(Views.InternalForBoxes.class)
-    @GetMapping("/get_box/{lockerNumber}/{boxNumber}/{departmentNumber}")
+    @GetMapping("/get_box/{lockerNumber}/{boxNumber}/{plantNumber}")
     public Box getBox(@PathVariable int lockerNumber,
                       @PathVariable int boxNumber,
-                      @PathVariable DepartmentNumber departmentNumber) {
-        return boxesService.getBox(lockerNumber, boxNumber, departmentNumber);
+                      @PathVariable int plantNumber) {
+        return boxesService.getBox(lockerNumber, boxNumber, plantNumber);
     }
 }
