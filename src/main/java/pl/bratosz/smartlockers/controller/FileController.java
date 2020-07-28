@@ -23,10 +23,8 @@ import pl.bratosz.smartlockers.service.exels.ExcelWriter;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.payload.UploadFileResponse;
 import pl.bratosz.smartlockers.service.*;
-import sun.util.calendar.BaseCalendar;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -39,24 +37,42 @@ import static pl.bratosz.smartlockers.service.exels.ExcelWriter.saveWorkbook;
 public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
-
-    @Autowired
     private FileStorageService fileStorageService;
-    @Autowired
-    private EmployeeController employeeController;
-    @Autowired
-    private BoxesController boxesController;
-    @Autowired
-    private LockersController lockersController;
-    @Autowired
-    private FileService fileService;
-    @Autowired
     private EmployeeService employeeService;
-    @Autowired
     private BoxesService boxesService;
+    private LockerService lockerService;
+    private FileService fileService;
     private LabelsService labelsService;
+    private DepartmentService departmentService;
+    private PlantService plantService;
+    private ClientService clientService;
+    private LocationService locationService;
 
-    public FileController(LabelsService labelsService) {
+    public FileController(FileStorageService fileStorageService, EmployeeService employeeService,
+                          BoxesService boxesService, LockerService lockerService, FileService fileService,
+                          LabelsService labelsService, DepartmentService departmentService, PlantService plantService,
+                          ClientService clientService, LocationService locationService) {
+        this.fileStorageService = fileStorageService;
+        this.employeeService = employeeService;
+        this.boxesService = boxesService;
+        this.lockerService = lockerService;
+        this.fileService = fileService;
+        this.labelsService = labelsService;
+        this.departmentService = departmentService;
+        this.plantService = plantService;
+        this.clientService = clientService;
+        this.locationService = locationService;
+    }
+
+    @Autowired
+    public FileController(FileStorageService fileStorageService, EmployeeService employeeService,
+                          BoxesService boxesService, LockerService lockerService,
+                          FileService fileService, LabelsService labelsService) {
+        this.fileStorageService = fileStorageService;
+        this.employeeService = employeeService;
+        this.boxesService = boxesService;
+        this.lockerService = lockerService;
+        this.fileService = fileService;
         this.labelsService = labelsService;
     }
 
@@ -96,12 +112,14 @@ public class FileController {
             Employee employee = new Employee();
             employee.setFirstName(row.getCell(2).getStringCellValue());
             employee.setLastName(row.getCell(1).getStringCellValue());
-            employee.setDepartment(Department.valueOf(row.getCell(3).getStringCellValue()));
+            Department department = departmentService.getByNameAndPlantNumber(row.getCell(3).getStringCellValue(),
+                    (int) row.getCell(7).getNumericCellValue());
+            employee.setDepartment(department);
 
 
             //adding employee to box
             Employee loadedEmployee = employeeService.createEmployee(
-                    Locker.DepartmentNumber.valueOf(row.getCell(4).getStringCellValue()),
+                    (int) row.getCell(4).getNumericCellValue(),
                     (int) row.getCell(5).getNumericCellValue(),
                     (int) row.getCell(6).getNumericCellValue(),
                     employee);
@@ -111,52 +129,57 @@ public class FileController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/add_employees")
-    public List<Employee> addNewEmployeesFromExcelFile(@RequestParam("file") MultipartFile newEmployeesFile) throws IOException {
+    @PostMapping("/add_employees/{plantNumber}")
+    public List<Employee> addNewEmployeesFromExcelFile(
+            @PathVariable int plantNumber,
+            @RequestParam("file") MultipartFile newEmployeesFile) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(newEmployeesFile.getInputStream());
         List<Employee> employeeList = new LinkedList<>();
+        Client client = clientService.getByPlantNumber(plantNumber);
+        Set<Plant> plants = client.getPlants();
+
+
+        Set<Department> departments = plantService.getDepartments(plantNumber);
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-            String sheetName = workbook.getSheetName(i).toUpperCase().trim();
-            if (!(sheetName.equals("METAL") || sheetName.equals("JIT"))) {
-                continue;
-            }
-            XSSFSheet worksheet = workbook.getSheetAt(i);
-            for (int j = 1; j < worksheet.getPhysicalNumberOfRows(); j++) {
-                XSSFRow row = worksheet.getRow(j);
-                if (row.getCell(1) == null || row.getCell(1).getStringCellValue().trim().length() == 0) {
-                    continue;
-                }
-                String departmentCellValue = row.getCell(5).getRawValue();
-                if(departmentCellValue.equals("385") || departmentCellValue.equals("384")){
-                    continue;
-                }
+            String departmentFromSheetName = workbook.getSheetName(i).toUpperCase().trim();
+            Department department = departmentService.getByNameAndPlantNumber(departmentFromSheetName, plantNumber);
+            if (plantService.containsDepartment(departmentFromSheetName, plantNumber)) {
+                XSSFSheet worksheet = workbook.getSheetAt(i);
+                for (int j = 1; j < worksheet.getPhysicalNumberOfRows(); j++) {
+                    XSSFRow row = worksheet.getRow(j);
+                    if (row.getCell(1) == null || row.getCell(1).getStringCellValue().trim().length() == 0) {
+                        continue;
+                    }
+                    Integer plantNumberCell = Integer.parseInt(row.getCell(5).getStringCellValue());
+                    Set<Integer> plantNumbers = plantService.getAllPlantNumbersOfClient(plantNumber);
+                    if (plantNumbers.contains(plantNumberCell)) {
+                        continue;
+                    }
 
-                Employee employee = new Employee();
-                employee.setFirstName(row.getCell(2).getStringCellValue().trim().toUpperCase());
-                employee.setLastName(row.getCell(1).getStringCellValue().trim().toUpperCase());
-                employee.setDepartment(Department.valueOf(sheetName));
+                    Employee employee = new Employee();
+                    employee.setFirstName(row.getCell(2).getStringCellValue().trim().toUpperCase());
+                    employee.setLastName(row.getCell(1).getStringCellValue().trim().toUpperCase());
+                    employee.setDepartment(department);
 
-                Locker.Location location;
-                departmentCellValue = row.getCell(5).getStringCellValue();
-                if (departmentCellValue.equals("stara")) {
-                    location = Locker.Location.OLDSIDE;
-                } else {
-                    location = Locker.Location.NEWSIDE;
+                    String locationName = row.getCell(5).getStringCellValue();
+                    Location location = locationService.getByNameAndPlantNumber(locationName, plantNumberCell);
+
+                    //creating emploee and assign it to the next free box
+                    Employee createdEmployee = employeeService.createEmployeeAndAssignToBox(
+                            plantNumberCell, department, location, employee);
+                    Box box = createdEmployee.getBoxes().stream().findFirst().get();
+                    row.getCell(3).setCellValue(box.getLocker().getLockerNumber());
+                    row.getCell(4).setCellValue(box.getBoxNumber());
+                    row.getCell(5).setCellValue(box.getLocker().getPlant().getPlantNumber());
+                    row.getCell(6).setCellValue(employee.getDepartment().getName());
+                    employeeList.add(createdEmployee);
                 }
-
-                //creating emploee and assign it to the next free box
-                Employee createdEmployee = employeeController.createEmployee(employee.getDepartment(), location, employee);
-                Box box = createdEmployee.getBoxes().stream().findFirst().get();
-                row.getCell(3).setCellValue(box.getLocker().getLockerNumber());
-                row.getCell(4).setCellValue(box.getBoxNumber());
-                row.getCell(5).setCellValue(box.getLocker().getDepartmentNumber().getNumber());
-                row.getCell(6).setCellValue(employee.getDepartment().getName());
-                employeeList.add(createdEmployee);
             }
         }
         CurrentDateForFiles date = new CurrentDateForFiles();
-        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + date.getDate()
-                + " pomiary" + ".xlsx");
+        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/KLS/raports/" +
+                date.getDate() + "/" + date.getDate()
+                + "_pomiary.xlsx");
         workbook.write(fileOut);
         fileOut.close();
 
@@ -175,10 +198,10 @@ public class FileController {
             long id = (long) sheet.getRow(i).getCell(0).getNumericCellValue();
 
             //Adding employee to raport list of deleted employees
-            Employee employee = employeeController.getEmployeeById(id);
+            Employee employee = employeeService.getEmployeeById(id);
             Set<Box> boxes = employee.getBoxes();
             for (Box box : boxes) {
-                releasedBoxes.add(boxesController.dismissEmployeeByBox(box));
+                releasedBoxes.add(boxesService.dismissEmployee(box));
             }
         }
         return releasedBoxes;
@@ -192,31 +215,35 @@ public class FileController {
         List<EmployeeRow> employees = new LinkedList<>();
         int counter;
         XSSFSheet sheet = workbook.createSheet();
-        for(int i = 1; i < sheetToLoad.getPhysicalNumberOfRows(); i++){
+        for (int i = 1; i < sheetToLoad.getPhysicalNumberOfRows(); i++) {
             long[] barCodes = new long[5];
             String firstName;
             String lastName;
             Date date;
             counter = 0;
             row = sheetToLoad.getRow(i);
-            if(row.getCell(0) == null){continue;}
+            if (row.getCell(0) == null) {
+                continue;
+            }
             lastName = row.getCell(0).getStringCellValue().toUpperCase().trim();
             firstName = row.getCell(1).getStringCellValue().toUpperCase().trim();
             date = row.getCell(7).getDateCellValue();
             final String stringDate = FormatDate.getDate(date);
             int j = 2;
-            while(j < 7) {
-                if(row.getCell(j) == null || row.getCell(j).getStringCellValue().length() < 2) {
+            while (j < 7) {
+                if (row.getCell(j) == null || row.getCell(j).getStringCellValue().length() < 2) {
                     j++;
-                    continue;}
-                barCodes[counter] =  Long.parseLong(row.getCell(j).getStringCellValue().substring(1));
+                    continue;
+                }
+                barCodes[counter] = Long.parseLong(row.getCell(j).getStringCellValue().substring(1));
                 j++;
                 counter++;
             }
-            for(int k = 0; k < counter; k++) { employees.add(new EmployeeRow(firstName, lastName, barCodes[k], stringDate));
+            for (int k = 0; k < counter; k++) {
+                employees.add(new EmployeeRow(firstName, lastName, barCodes[k], stringDate));
             }
         }
-        for(int i = 0; i < employees.size(); i++){
+        for (int i = 0; i < employees.size(); i++) {
             XSSFRow createdRow = sheet.createRow(i);
             EmployeeRow employeeRow = employees.get(i);
             createdRow.createCell(0).setCellValue(employeeRow.lastName);
@@ -254,34 +281,36 @@ public class FileController {
 
         for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
             Row row = sheet.getRow(i);
+            int plantNumber = (int) row.getCell(3).getNumericCellValue();
 
             Locker locker = new Locker();
             locker.setLockerNumber((int) row.getCell(1).getNumericCellValue());
             locker.setCapacity((int) row.getCell(2).getNumericCellValue());
-            locker.setDepartmentNumber(Locker.DepartmentNumber.valueOf(row.getCell(3).getStringCellValue()));
-            locker.setDepartment(Department.valueOf(row.getCell(4).getStringCellValue()));
-            locker.setLocation(Locker.Location.valueOf(row.getCell(5).getStringCellValue()));
+            locker.setPlant(plantService.getByNumber(plantNumber));
+            locker.setDepartment(departmentService.getByNameAndPlantNumber(row.getCell(4).getStringCellValue(), plantNumber));
+            locker.setLocation(locationService.getByNameAndPlantNumber(
+                    row.getCell(5).getStringCellValue(), locker.getPlant().getPlantNumber()));
 
-            lockersController.create(locker);
+            lockerService.create(locker);
         }
     }
 
     @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/getAllLockersToExcel/{depNo}")
-    public List<Locker> getAllLockersToExcel(@PathVariable Locker.DepartmentNumber depNo) throws IOException {
+    @GetMapping("/getAllLockersToExcel/{plantNumber}")
+    public List<Locker> getAllLockersToExcel(@PathVariable int plantNumber) throws IOException {
         XSSFWorkbook wb = new XSSFWorkbook();
         XSSFSheet sheet = wb.createSheet("Pracownicy");
-        List<Locker> all = lockersController.getLockersByDepartment(depNo);
+        List<Locker> all = lockerService.getLockersByPlantNumber(plantNumber);
         XSSFRow row = sheet.createRow(0);
         row.createCell(0).setCellValue("Imię");
         row.createCell(1).setCellValue("Nazwisko");
         row.createCell(2).setCellValue("Szafa");
         row.createCell(3).setCellValue("Box");
         int rowCounter = 1;
-        for(int i = 0; i < all.size(); i++) {
+        for (int i = 0; i < all.size(); i++) {
             List<Box> boxes = all.get(i).getBoxes();
-            for(int j = 0; j < boxes.size(); j++) {
-                if(boxes.get(j).getBoxStatus() == Box.BoxStatus.FREE){
+            for (int j = 0; j < boxes.size(); j++) {
+                if (boxes.get(j).getBoxStatus() == Box.BoxStatus.FREE) {
                     continue;
                 }
                 row = sheet.createRow(rowCounter++);
@@ -298,6 +327,7 @@ public class FileController {
         return all;
 
     }
+
     @GetMapping("/calculate_clothes_value/{articleColumnNo}/{releaseDateColumnNo}/{resultColumnNo}")
     public Float calculateClothesValueFromExcelFile(@PathVariable Integer articleColumnNo,
                                                     @PathVariable Integer releaseDateColumnNo,
@@ -319,38 +349,6 @@ public class FileController {
         sheet.createRow(sheet.getPhysicalNumberOfRows()).createCell(resultColumnNo).setCellValue(totalAmount);
         saveWorkbook(workbook);
         return totalAmount;
-    }
-
-    @JsonView(Views.InternalForBoxes.class)
-    @PostMapping("/change_boxes")
-    public List<Box> changeBoxesForEmployeesFromExcelFileAndCreateExcelRaport(@RequestParam("file")
-                                                                                      MultipartFile employeesToMove) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook(employeesToMove.getInputStream());
-        XSSFSheet worksheet = workbook.getSheetAt(0);
-        List<Box> boxes = new LinkedList<>();
-
-        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
-            Row row = worksheet.getRow(i);
-            int lockerNumber = ((int) row.getCell(3).getNumericCellValue());
-            int boxNumber = ((int) row.getCell(4).getNumericCellValue());
-            Locker.DepartmentNumber depNumber = Locker.DepartmentNumber.valueOf(row.getCell(5).getStringCellValue());
-            Department targetDepartment = Department.valueOf(row.getCell(10).getStringCellValue());
-            Locker.Location targetLocation = Locker.Location.valueOf(row.getCell(11).getStringCellValue());
-            Locker.DepartmentNumber targetDepNumber = Locker.DepartmentNumber.valueOf(row.getCell(12).getStringCellValue());
-
-            Box box = employeeService.changeEmployeeBoxOnNextFree(lockerNumber, boxNumber, depNumber,
-                    targetDepartment, targetLocation, targetDepNumber);
-
-            boxes.add(box);
-            row.getCell(7).setCellValue(box.getLocker().getLockerNumber());
-            row.getCell(8).setCellValue(box.getBoxNumber());
-
-        }
-        FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/" + worksheet.getSheetName() + ".xlsx");
-        workbook.write(fileOut);
-        fileOut.close();
-        workbook.close();
-        return boxes;
     }
 
     @JsonView(Views.InternalForEmployees.class)
@@ -382,7 +380,7 @@ public class FileController {
             }
 
             //get all employees with particular name
-            List<Employee> employeesFromDB = employeeController.getEmployeesByFirstNameAndLastName(firstName, lastName);
+            List<Employee> employeesFromDB = employeeService.getByFirstNameAndLastName(firstName, lastName);
             //add employees to final list
             employeesFromDB.stream().forEach(employee -> employeesToFile.add(employee));
             //if there is no employee then add it to list with omitted employees
@@ -391,9 +389,7 @@ public class FileController {
             }
         }
 
-        List<Employee> sortedEmployees = employeeController.sortEmployeesByDepartmentLockerAndBox(employeesToFile);
-        employeeController.sortEmployeesByDepartmentLockerAndBox(sortedEmployees);
-
+        List<Employee> sortedEmployees = employeeService.sortByPlantBoxAndLocker(employeesToFile);
 
         List<String> columnHeaders = new LinkedList<>();
         Row row = worksheet.getRow(0);
@@ -445,7 +441,7 @@ public class FileController {
             logger.info("Could not determine file type.");
         }
 
-        if(contentType == null) {
+        if (contentType == null) {
             contentType = "application/octet-stream";
         }
         return contentType;

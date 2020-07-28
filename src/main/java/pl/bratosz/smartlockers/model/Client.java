@@ -16,7 +16,7 @@ public class Client {
     @JsonView(Views.Public.class)
     private String name;
 
-    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private Set<Plant> plants;
 
     Client() {

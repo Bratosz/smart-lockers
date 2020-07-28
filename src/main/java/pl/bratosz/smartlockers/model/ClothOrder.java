@@ -19,10 +19,8 @@ public class ClothOrder {
     @JsonView(Views.Public.class)
     private Size size;
 
-    private int articleNo;
-
     @JsonView(Views.Public.class)
-    private ClothName name;
+    private Article article;
 
     @JsonView(Views.Public.class)
     @OneToMany
@@ -30,12 +28,11 @@ public class ClothOrder {
 
     public ClothOrder(){}
 
-    public ClothOrder(long id, ExchangeType exchangeType, Size size, int articleNo) {
+    public ClothOrder(long id, ExchangeType exchangeType, Size size, Article article) {
         this.id = id;
         this.exchangeType = exchangeType;
         this.size = size;
-        this.articleNo = articleNo;
-        name = ClothName.getByArticleNo(articleNo);
+        this.article = article;
     }
 
     public long getId() {
@@ -62,20 +59,12 @@ public class ClothOrder {
         this.size = size;
     }
 
-    public int getArticleNo() {
-        return articleNo;
+    public Article getArticle() {
+        return article;
     }
 
-    public void setArticleNo(int articleNo) {
-        this.articleNo = articleNo;
-    }
-
-    public ClothName getName() {
-        return name;
-    }
-
-    public void setName(ClothName name) {
-        this.name = name;
+    public void setArticle(Article article) {
+        this.article = article;
     }
 
     public Set<EmployeeCloth> getEmployeeClothes() {

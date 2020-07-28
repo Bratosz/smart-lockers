@@ -33,6 +33,7 @@ public abstract class Cloth {
     protected int ordinalNo;
 
     @JsonView(Public.class)
+    @ManyToOne(cascade = CascadeType.ALL)
     protected Article article;
 
     @JsonView(Public.class)

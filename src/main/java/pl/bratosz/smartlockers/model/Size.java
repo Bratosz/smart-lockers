@@ -55,7 +55,11 @@ public enum Size {
     }
 
     public static Size getSizeByName(String name) {
-        return sizesByNames.get(name);
+        if(sizesByNames.containsKey(name)) {
+            return sizesByNames.get(name);
+        } else {
+            return SIZE_ZERO;
+        }
     }
 
     @JsonValue

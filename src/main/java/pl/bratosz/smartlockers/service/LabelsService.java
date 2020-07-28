@@ -4,6 +4,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.service.exels.ExcelSave;
 import pl.bratosz.smartlockers.service.exels.ExcelWriter;
+import pl.bratosz.smartlockers.service.exels.LabelEmployee;
 import pl.bratosz.smartlockers.service.exels.LabelsSheetParameters;
 import pl.bratosz.smartlockers.formaters.StringFormater;
 import pl.bratosz.smartlockers.model.*;
@@ -20,8 +21,8 @@ public class LabelsService {
         this.boxesService = boxesService;
     }
 
-    public void prepareLabelsAndSave(String folderName, Locker.DepartmentNumber depNumber, int firstLocker, int lastLocker) throws IOException {
-        List<Box> boxes = boxesService.getBoxesByLockersRange(depNumber, firstLocker, lastLocker);
+    public void prepareLabelsAndSave(String folderName, int plantNumber, int firstLocker, int lastLocker) throws IOException {
+        List<Box> boxes = boxesService.getBoxesByLockersRange(plantNumber, firstLocker, lastLocker);
         List<String> labels = createLabelsFromBoxes(boxes);
         createLabelsSpreadSheetAndSave(folderName, labels);
     }

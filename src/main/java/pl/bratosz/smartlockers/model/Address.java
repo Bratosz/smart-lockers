@@ -1,9 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Address {
@@ -19,6 +17,9 @@ public class Address {
     private int streetNumber;
 
     private String postalCode;
+
+    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
+    private Set<Plant> plants;
 
     public Address() {
     }
@@ -69,5 +70,13 @@ public class Address {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public Set<Plant> getPlants() {
+        return plants;
+    }
+
+    public void setPlants(Set<Plant> plants) {
+        this.plants = plants;
     }
 }

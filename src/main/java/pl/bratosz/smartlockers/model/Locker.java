@@ -39,21 +39,18 @@ public class Locker {
     @ManyToOne(cascade = CascadeType.ALL)
     private Plant plant;
 
-    private int plantNumber;
-
     public Locker() {
     }
 
-    public Locker(int lockerNumber, Integer capacity,
+    public Locker(int lockerNumber, int capacity, Plant plant,
                   Department department, Location location,
-                  List<Box> boxes, Plant plant) {
+                  List<Box> boxes) {
         this.lockerNumber = lockerNumber;
         this.capacity = capacity;
+        this.plant = plant;
         this.department = department;
         this.location = location;
         this.boxes = boxes;
-        this.plant = plant;
-        plantNumber = plant.getPlantNumber();
     }
 
     public List<Box> getBoxes() {
@@ -114,13 +111,5 @@ public class Locker {
 
     public void setPlant(Plant plant) {
         this.plant = plant;
-    }
-
-    public int getPlantNumber() {
-        return plantNumber;
-    }
-
-    public void setPlantNumber(int plantNumber) {
-        this.plantNumber = plantNumber;
     }
 }

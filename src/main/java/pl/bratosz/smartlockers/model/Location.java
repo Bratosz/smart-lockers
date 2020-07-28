@@ -15,6 +15,13 @@ public class Location {
     @ManyToOne(cascade = CascadeType.ALL)
     private Plant plant;
 
+    @ManyToMany
+    @JoinTable(
+            name = "departments",
+            joinColumns = @JoinColumn(name = "location_id"),
+            inverseJoinColumns = @JoinColumn(name = "department_id"))
+    private Set<Department> departments;
+
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private Set<Locker> lockers;
 

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.LockersRepository;
 import pl.bratosz.smartlockers.service.BoxesService;
-import pl.bratosz.smartlockers.service.LockersService;
+import pl.bratosz.smartlockers.service.LockerService;
 
 
 import java.util.List;
@@ -16,12 +16,12 @@ import java.util.stream.Collectors;
 public class LockersController {
 
     private LockersRepository lockersRepository;
-    private LockersService lockersService;
+    private LockerService lockerService;
     private BoxesService boxesService;
 
-    public LockersController(LockersRepository lockersRepository, LockersService lockersService, BoxesService boxesService) {
+    public LockersController(LockersRepository lockersRepository, LockerService lockerService, BoxesService boxesService) {
         this.lockersRepository = lockersRepository;
-        this.lockersService = lockersService;
+        this.lockerService = lockerService;
         this.boxesService = boxesService;
     }
 
@@ -37,20 +37,19 @@ public class LockersController {
     }
 
     @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/getLockersByDepartment")
-    public List<Locker> getLockersByDepartment(Locker.DepartmentNumber depNo) {
-        List<Locker> lockers = lockersRepository.findAllByPlantNumber(depNo);
-        return lockers;
+    @GetMapping("/getLockersByDepartment/{plantNumber}")
+    public List<Locker> getLockersByPlantNumber(int plantNumber) {
+        return lockerService.getLockersByPlantNumber(plantNumber);
     }
 
     @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/filter/{departmentNo}/{department}/{location}/{boxStatus}")
-    public List<Locker> getFiltered(@PathVariable Locker.DepartmentNumber departmentNo,
+    @GetMapping("/filter/{plantNumber}/{department}/{location}/{boxStatus}")
+    public List<Locker> getFiltered(@PathVariable int plantNumber,
                                     @PathVariable Department department,
-                                    @PathVariable Locker.Location location,
+                                    @PathVariable Location location,
                                     @PathVariable Box.BoxStatus boxStatus) {
         List<Locker> lockers = lockersRepository.filterAllByPlantNumberAndDepartmentAndLocation(
-                departmentNo, department, location);
+                plantNumber, department, location);
         if (boxStatus.equals(Box.BoxStatus.UNDEFINED)) {
             return lockers.subList(0,50);
         }
@@ -65,42 +64,33 @@ public class LockersController {
     }
 
 
-    @GetMapping("/quantity/{departmentNo}")
-    public int getLockersQuantity(@PathVariable Locker.DepartmentNumber departmentNo) {
-         return lockersRepository.getAmountOfLockersByPlantNumber(departmentNo);
+    @GetMapping("/quantity/{plantNumber}")
+    public int getLockersQuantity(@PathVariable int plantNumber) {
+         return lockersRepository.getAmountOfLockersByPlantNumber(plantNumber);
     }
-
-//    @RequestMapping(
-//            value = "/ex/bars",
-//            params = { "id", "second" },
-//            method = GET)
-
-//    (@PathVariable long fooid, @PathVariable long barid)
 
     @PostMapping
     @JsonView(Views.InternalForLockers.class)
     public Locker create(@RequestBody Locker locker) {
-        List<Box> boxes = boxesService.createBoxesForLocker(locker.getCapacity());
-        locker.setBoxes(boxes);
-        return lockersRepository.save(locker);
+        return lockerService.create(locker);
     }
 
-    @PostMapping("/create/{lockerNo}/{capacity}/{depNo}/{dep}/{location}")
+    @PostMapping("/create/{lockerNumber}/{capacity}/{plantNumber}/{department}/{location}")
         public Locker createLocker (
-        @PathVariable int lockerNo,
+        @PathVariable int lockerNumber,
         @PathVariable int capacity,
-        @PathVariable Locker.DepartmentNumber depNo,
-        @PathVariable Department dep,
-        @PathVariable Locker.Location location) {
-        return lockersService.createLocker(
-                lockerNo, capacity, depNo, dep, location);
+        @PathVariable int plantNumber,
+        @PathVariable String department,
+        @PathVariable String location) {
+        return lockerService.createLocker(
+                lockerNumber, capacity, plantNumber, department, location);
     }
 
     @JsonView(Views.InternalForLockers.class)
-    @PostMapping("/change_location/{lockerNumber}/{departmentNumber}/{location}/{desiredLocation}")
-    public Locker changeLocation(@PathVariable Integer lockerNumber, @PathVariable Locker.DepartmentNumber departmentNumber,
-                                 @PathVariable Locker.Location location, @PathVariable Locker.Location desiredLocation) {
-        return lockersService.changeLocation(lockerNumber, departmentNumber, location, desiredLocation);
+    @PostMapping("/change_location/{lockerNumber}/{plantNumber}/{location}/{desiredLocation}")
+    public Locker changeLocation(@PathVariable Integer lockerNumber, @PathVariable int plantNumber,
+                                 @PathVariable Location location, @PathVariable Location desiredLocation) {
+        return lockerService.changeLocation(lockerNumber, plantNumber, location, desiredLocation);
     }
 
     @DeleteMapping("/{id}")
@@ -110,6 +100,6 @@ public class LockersController {
 
     @DeleteMapping("/deleteLockerById/{id}")
     public Locker deleteLockerByNumber(@PathVariable Long id) {
-        return lockersService.deleteLockerByNumber(id);
+        return lockerService.deleteLockerByNumber(id);
     }
 }

@@ -1,9 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Article {
@@ -15,6 +13,9 @@ public class Article {
 
     @Enumerated(EnumType.STRING)
     private ClothType clothType;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    private Set<Cloth> clothes;
 
     public Article() {
 
@@ -47,5 +48,13 @@ public class Article {
 
     public void setClothType(ClothType clothType) {
         this.clothType = clothType;
+    }
+
+    public Set<Cloth> getClothes() {
+        return clothes;
+    }
+
+    public void setClothes(Set<Cloth> clothes) {
+        this.clothes = clothes;
     }
 }

@@ -174,7 +174,7 @@ public class ExcelWriter {
                 for (Box box : boxes) {
                     row.createCell(4).setCellValue(box.getLocker().getLockerNumber());
                     row.createCell(5).setCellValue(box.getBoxNumber());
-                    row.createCell(6).setCellValue(box.getLocker().getDepartmentNumber().getNumber());
+                    row.createCell(6).setCellValue(box.getLocker().getPlant().getPlantNumber());
                 }
             } else {
                 row.createCell(3).setCellValue("brak");

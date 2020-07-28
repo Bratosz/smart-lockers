@@ -4,11 +4,11 @@ import pl.bratosz.smartlockers.model.Employee;
 
 import java.util.Comparator;
 
-public class DepartmentNumberSorter implements Comparator<Employee> {
+public class PlantNumberSorter implements Comparator<Employee> {
 
     @Override
     public int compare(Employee o1, Employee o2) {
-        return o1.getFirstLockerPlantNumber().getNumber()
-                - o2.getFirstLockerPlantNumber().getNumber();
+        return o1.getFirstLockerPlantNumber()
+                - o2.getFirstLockerPlantNumber();
     }
 }

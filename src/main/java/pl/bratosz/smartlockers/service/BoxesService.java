@@ -8,7 +8,6 @@ import pl.bratosz.smartlockers.repository.EmployeesRepository;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import static pl.bratosz.smartlockers.model.Box.BoxStatus.*;
 
@@ -17,7 +16,7 @@ public class BoxesService {
 
     private BoxesRepository boxesRepository;
     private EmployeesRepository employeesRepository;
-    private LockersService lockersService;
+    private LockerService lockerService;
 
 
     public BoxesService(BoxesRepository boxesRepository, EmployeesRepository employeesRepository) {

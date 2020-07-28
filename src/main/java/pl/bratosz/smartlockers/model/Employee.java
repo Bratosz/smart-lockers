@@ -22,6 +22,7 @@ public class Employee {
     private String lastName;
 
     @JsonView(Views.Public.class)
+    @OneToOne
     private Department department;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForClothes.class})

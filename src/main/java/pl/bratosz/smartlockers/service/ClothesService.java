@@ -1,28 +1,20 @@
 package pl.bratosz.smartlockers.service;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.bratosz.smartlockers.date.CurrentDateForFiles;
-import pl.bratosz.smartlockers.date.FormatDate;
-import pl.bratosz.smartlockers.exception.NotReleasedClothException;
 import pl.bratosz.smartlockers.repository.RotationalClothesRepository;
 import pl.bratosz.smartlockers.service.exels.*;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.ClothesRepository;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-import static pl.bratosz.smartlockers.model.ClothType.EMPLOYEE;
-import static pl.bratosz.smartlockers.model.ClothType.ROTATIONAL;
 import static pl.bratosz.smartlockers.service.exels.ClothOperationType.*;
 
 @Service
@@ -85,8 +77,11 @@ public class ClothesService {
     }
 
     private Cloth createCloth(RowForRotationUpdate rowForRotationUpdate) {
-        ClothType clothType = resolveClothType(rowForRotationUpdate.getLockerNo());
-        if (clothType.equals(EMPLOYEE)) {
+
+        if (isClothRotational(rowForRotationUpdate.getLockerNo())) {
+
+            return new RotationalCloth();
+        } else {
             Employee employee = employeeService.getEmployeeByFullNameAndFullBoxNumber(
                     rowForRotationUpdate.getFirstName(),
                     rowForRotationUpdate.getLastName(),
@@ -94,16 +89,14 @@ public class ClothesService {
                     rowForRotationUpdate.getBoxNo()
             );
             return new EmployeeCloth();
-        } else {
-            return new RotationalCloth();
         }
     }
 
-    private ClothType resolveClothType(int lockerNo) {
+    private boolean isClothRotational(int lockerNo) {
         if (lockerNo == 0) {
-            return ROTATIONAL;
+            return true;
         } else {
-            return EMPLOYEE;
+            return false;
         }
     }
 
@@ -127,9 +120,8 @@ public class ClothesService {
             row.createCell(4).setCellValue(emp.getFirstBoxNumber());
             row.createCell(5).setCellValue(emp.getDepartment().getName());
             row.createCell(6).setCellValue(cloth.getId());
-            row.createCell(7).setCellValue(cloth.getName().getName());
-            row.createCell(8).setCellValue(cloth.getArticleNo());
-//            row.createCell(9).setCellValue(FormatDate.getDate(cloth.getReleasedToEmployee()));
+            row.createCell(7).setCellValue(cloth.getArticle().getName());
+            row.createCell(8).setCellValue(cloth.getArticle().getId());
         }
         FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/rotacja_do_zwrotu.xlsx");
         workbook.write(fileOut);

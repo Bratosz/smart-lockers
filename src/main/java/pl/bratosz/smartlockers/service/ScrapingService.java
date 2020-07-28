@@ -1,16 +1,13 @@
 package pl.bratosz.smartlockers.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.ClothesRepository;
-import pl.bratosz.smartlockers.scraping.ServiceScrapper;
+import pl.bratosz.smartlockers.scraping.Scrapper;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -18,20 +15,26 @@ public class ScrapingService {
     private BoxesRepository boxesRepository;
     private ClothesRepository clothesRepository;
     private Set<EmployeeCloth> currentClothes;
+    private PlantService plantService;
+    private Scrapper scrapper;
 
-    @Autowired
-    public ScrapingService(BoxesRepository boxesRepository, ClothesRepository clothesRepository) {
+    public ScrapingService(BoxesRepository boxesRepository, ClothesRepository clothesRepository, PlantService plantService) {
         this.boxesRepository = boxesRepository;
         this.clothesRepository = clothesRepository;
-    }
 
+        this.plantService = plantService;
+    }
 
     public Box updateEmployeeClothes(long boxId) throws IOException {
         Box box = boxesRepository.getBoxById(boxId);
-        Locker.DepartmentNumber departmentNumber = box.getLocker().getDepartmentNumber();
+        int plantNumber = box.getLocker().getPlant().getPlantNumber();
         Employee employee = box.getEmployee();
         currentClothes = employee.getClothing();
-        ServiceScrapper scrapper = new ServiceScrapper(departmentNumber);
+        Plant plant = plantService.getByNumber(plantNumber);
+
+        String login = plant.getLogin();
+        String password = plant.getPassword();
+        scrapper.createConnection(login, password);
         scrapper.findByLockerAndBox(box.getLocker().getLockerNumber(),
                                     box.getBoxNumber());
         if(employee.getLastName().equals(

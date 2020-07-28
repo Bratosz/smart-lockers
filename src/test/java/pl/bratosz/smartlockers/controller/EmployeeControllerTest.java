@@ -15,8 +15,6 @@ import pl.bratosz.smartlockers.model.Locker;
 class EmployeeControllerTest {
 
     private Employee employee;
-    private Locker.DepartmentNumber departmentNumber = Locker.DepartmentNumber.DEP_384;
-    private Department department = Department.METAL;
     private Integer boxNumber = 1;
     private Integer lockerNumber = 2;
 

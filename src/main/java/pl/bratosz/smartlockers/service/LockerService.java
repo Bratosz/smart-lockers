@@ -1,0 +1,75 @@
+package pl.bratosz.smartlockers.service;
+
+import org.springframework.stereotype.Service;
+import pl.bratosz.smartlockers.model.*;
+import pl.bratosz.smartlockers.repository.LockersRepository;
+
+import java.util.List;
+
+@Service
+public class LockerService {
+    private LockersRepository lockersRepository;
+    private EmployeeService employeeService;
+    private BoxesService boxesService;
+    private PlantService plantService;
+    private DepartmentService departmentService;
+    private LocationService locationService;
+
+    public LockerService(LockersRepository lockersRepository, EmployeeService employeeService,
+                         BoxesService boxesService, PlantService plantService, DepartmentService departmentService,
+                         LocationService locationService) {
+        this.lockersRepository = lockersRepository;
+        this.employeeService = employeeService;
+        this.boxesService = boxesService;
+        this.plantService = plantService;
+        this.departmentService = departmentService;
+        this.locationService = locationService;
+    }
+
+    public Locker deleteLockerByNumber(Long id) {
+        return lockersRepository.deleteLockerById(id);
+    }
+
+    public Locker changeLocation(Integer lockerNumber, int plantNumber,
+                                 Location location, Location desiredLocation) {
+        Locker locker = getLockerByParameters(lockerNumber, plantNumber, location);
+        locker.setLocation(desiredLocation);
+        return lockersRepository.save(locker);
+    }
+
+    public Locker getLockerByParameters(Integer lockerNumber, int plantNumber,
+                                        Location location) {
+        return lockersRepository.getLockerByParameters(lockerNumber, plantNumber, location);
+    }
+
+    public List<Locker> getLockersFromRange(int plantNumber, int firstLocker, int lastLocker) {
+        return lockersRepository.getLockersFromRange(plantNumber, firstLocker, lastLocker);
+    }
+
+    public Locker createLocker(
+            int lockerNumber,
+            int capacity,
+            int plantNumber,
+            String departmentName,
+            String locationName) {
+        List<Box> boxes = boxesService.createBoxesForLocker(capacity);
+        Plant plant = plantService.getByNumber(plantNumber);
+        Department department = departmentService.getByNameAndPlantNumber(departmentName, plantNumber);
+        Location location = locationService.getByNameAndPlantNumber(locationName, plantNumber);
+        Locker locker = new Locker(
+                lockerNumber, capacity, plant, department, location, boxes);
+        locker.setBoxes(boxes);
+        return lockersRepository.save(locker);
+    }
+
+    public Locker create(Locker locker) {
+        List<Box> boxes = boxesService.createBoxesForLocker(locker.getCapacity());
+        locker.setBoxes(boxes);
+        return lockersRepository.save(locker);
+    }
+
+    public List<Locker> getLockersByPlantNumber(int plantNumber) {
+        List<Locker> lockers = lockersRepository.findAllByPlantNumber(plantNumber);
+        return lockers;
+    }
+}

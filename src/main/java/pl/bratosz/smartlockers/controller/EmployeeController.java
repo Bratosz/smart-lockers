@@ -45,11 +45,12 @@ public class EmployeeController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("add/{department}/{plantNumber}/{location}")
-    public Employee createEmployee(@PathVariable Department department,
-                                   @PathVariable Locker.Location location,
+    @PostMapping("add/{plantNumber}/{department}/{location}")
+    public Employee createEmployee(@PathVariable int plantNumber,
+                                   @PathVariable Department department,
+                                   @PathVariable Location location,
                                    @RequestBody Employee employee) {
-        return employeeService.createEmployeeAndAssignToBox(department, location, employee);
+        return employeeService.createEmployeeAndAssignToBox(plantNumber, department, location, employee);
     }
 
     @JsonView(Views.Public.class)
@@ -60,9 +61,8 @@ public class EmployeeController {
 
     @JsonView(Views.InternalForEmployees.class)
     @GetMapping("/find/{firstName}/{lastName}")
-    public List<Employee> getEmployeesByFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName) {
-        List<Employee> employeesByFirstNameAndLastName = employeeService.getByFirstNameAndLastName(firstName, lastName);
-        return employeesByFirstNameAndLastName;
+    public List<Employee> getByFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName) {
+        return employeeService.getByFirstNameAndLastName(firstName, lastName);
     }
 
     @JsonView(Views.InternalForEmployees.class)
@@ -73,26 +73,27 @@ public class EmployeeController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/change_box/{lockerNumber}/{boxNumber}/{depNumber}/{targetLockerNumber}/{targetBoxNumber}/{targetDepNumber}")
+    @PostMapping("/change_box/{lockerNumber}/{boxNumber}/{plantNumber}/{targetLockerNumber}/{targetBoxNumber}/{targetPlantNumber}")
     public Box changeEmployeeBox(@PathVariable int lockerNumber, @PathVariable int boxNumber,
-                                 @PathVariable Locker.DepartmentNumber depNumber, @PathVariable int targetLockerNumber,
-                                 @PathVariable int targetBoxNumber, @PathVariable Locker.DepartmentNumber targetDepNumber) {
-        return employeeService.changeEmployeeBox(lockerNumber, boxNumber, depNumber, targetLockerNumber,
-                targetBoxNumber, targetDepNumber);
+                                 @PathVariable int plantNumber, @PathVariable int targetLockerNumber,
+                                 @PathVariable int targetBoxNumber, @PathVariable int targetPlantNumber) {
+        return employeeService.changeEmployeeBox(lockerNumber, boxNumber, plantNumber, targetLockerNumber,
+                targetBoxNumber, targetPlantNumber);
 
     }
 
     @JsonView(Views.InternalForBoxes.class)
-    @PostMapping("/change_box_next/{lockerNumber}/{boxNumber}/{depNumber}/{targetDep}/{targetLocation}/{targetDepNumber}")
-    public Box changeEmployeeBoxOnNextAvaliable(@PathVariable int lockerNumber, @PathVariable int boxNumber,
-                                                @PathVariable Locker.DepartmentNumber depNumber, @PathVariable Department targetDep,
-                                                @PathVariable Locker.Location targetLocation, @PathVariable Locker.DepartmentNumber targetDepNumber) {
-        return employeeService.changeEmployeeBoxOnNextFree(lockerNumber, boxNumber, depNumber, targetDep,
-                targetLocation, targetDepNumber);
+    @PostMapping("/change_box_next/{lockerNumber}/{boxNumber}/{plantNumber}/{targetDep}/{targetLocation}/{targetPlantNumber}")
+    public Box changeEmployeeBoxOnNextAvaliable(
+            @PathVariable int lockerNumber, @PathVariable int boxNumber,
+            @PathVariable int plantNumber, @PathVariable Department targetDep,
+            @PathVariable Location targetLocation, @PathVariable int targetPlantNumber) {
+        return employeeService.changeEmployeeBoxOnNextFree(lockerNumber, boxNumber, plantNumber, targetDep,
+                targetLocation, targetPlantNumber);
     }
 
-    public List<Employee> sortEmployeesByDepartmentLockerAndBox(List<Employee> employees) {
-        return employeeService.sortEmployeesByDepartmentBoxAndLocker(employees);
+    public List<Employee> sortByPlantLockerAndBox(List<Employee> employees) {
+        return employeeService.sortByPlantBoxAndLocker(employees);
     }
 
     @JsonView(Views.InternalForEmployees.class)

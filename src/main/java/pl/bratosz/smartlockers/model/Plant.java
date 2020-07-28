@@ -20,6 +20,7 @@ public class Plant {
     private int plantNumber;
 
     @JsonView(Views.Public.class)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Address address;
 
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
@@ -33,6 +34,10 @@ public class Plant {
 
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
     private Set<Location> locations;
+
+    private String login;
+
+    private String password;
 
     public Plant() {
     }
@@ -111,5 +116,21 @@ public class Plant {
 
     public void setLocations(Set<Location> locations) {
         this.locations = locations;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
