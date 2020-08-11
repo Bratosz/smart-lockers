@@ -39,7 +39,7 @@ public class FileController {
 
     private FileStorageService fileStorageService;
     private EmployeeService employeeService;
-    private BoxesService boxesService;
+    private BoxService boxesService;
     private LockerService lockerService;
     private FileService fileService;
     private LabelsService labelsService;
@@ -49,7 +49,7 @@ public class FileController {
     private LocationService locationService;
 
     public FileController(FileStorageService fileStorageService, EmployeeService employeeService,
-                          BoxesService boxesService, LockerService lockerService, FileService fileService,
+                          BoxService boxesService, LockerService lockerService, FileService fileService,
                           LabelsService labelsService, DepartmentService departmentService, PlantService plantService,
                           ClientService clientService, LocationService locationService) {
         this.fileStorageService = fileStorageService;
@@ -66,7 +66,7 @@ public class FileController {
 
     @Autowired
     public FileController(FileStorageService fileStorageService, EmployeeService employeeService,
-                          BoxesService boxesService, LockerService lockerService,
+                          BoxService boxesService, LockerService lockerService,
                           FileService fileService, LabelsService labelsService) {
         this.fileStorageService = fileStorageService;
         this.employeeService = employeeService;
@@ -106,24 +106,19 @@ public class FileController {
 
         List<Employee> employeeList = new LinkedList<>();
         for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
-            XSSFRow row = worksheet.getRow(i);
-
             //creating instance of employee from row
-            Employee employee = new Employee();
-            employee.setFirstName(row.getCell(2).getStringCellValue());
-            employee.setLastName(row.getCell(1).getStringCellValue());
-            Department department = departmentService.getByNameAndPlantNumber(row.getCell(3).getStringCellValue(),
-                    (int) row.getCell(7).getNumericCellValue());
-            employee.setDepartment(department);
-
-
+            XSSFRow row = worksheet.getRow(i);
+            int plantNumber = (int) row.getCell(2).getNumericCellValue();
+            String departmentName = row.getCell(3).getStringCellValue();
+            int lockerNumber = (int) row.getCell(4).getNumericCellValue();
+            int boxNumber = (int) row.getCell(5).getNumericCellValue();
+            String firstName = row.getCell(0).getStringCellValue();
+            String lastName = row.getCell(1).getStringCellValue();
             //adding employee to box
-            Employee loadedEmployee = employeeService.createEmployee(
-                    (int) row.getCell(4).getNumericCellValue(),
-                    (int) row.getCell(5).getNumericCellValue(),
-                    (int) row.getCell(6).getNumericCellValue(),
-                    employee);
-            employeeList.add(loadedEmployee);
+            Employee employee = employeeService.createEmployee(
+                    plantNumber, departmentName, lockerNumber,
+                    boxNumber, firstName, lastName);
+            employeeList.add(employee);
         }
         return employeeList;
     }
@@ -135,9 +130,6 @@ public class FileController {
             @RequestParam("file") MultipartFile newEmployeesFile) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(newEmployeesFile.getInputStream());
         List<Employee> employeeList = new LinkedList<>();
-        Client client = clientService.getByPlantNumber(plantNumber);
-        Set<Plant> plants = client.getPlants();
-
 
         Set<Department> departments = plantService.getDepartments(plantNumber);
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {

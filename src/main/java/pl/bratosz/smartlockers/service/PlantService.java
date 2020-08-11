@@ -6,6 +6,7 @@ import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.repository.PlantsRepository;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,9 +14,11 @@ import java.util.stream.Collectors;
 public class PlantService {
 
     private PlantsRepository plantsRepository;
+    private ClientService clientService;
 
-    public PlantService(PlantsRepository plantsRepository) {
+    public PlantService(PlantsRepository plantsRepository, ClientService clientService) {
         this.plantsRepository = plantsRepository;
+        this.clientService = clientService;
     }
 
     public Plant getByNumber(int plantNumber) {
@@ -45,5 +48,20 @@ public class PlantService {
                 .map(plant -> plant.getPlantNumber())
                 .collect(Collectors.toSet());
         return plantNumbers;
+    }
+
+    public Plant create(long clientId, int plantNumber, String name, String login, String password) {
+        Client client = clientService.getById(clientId);
+        Plant plant = new Plant(plantNumber, name, login, password);
+        plant.setClient(client);
+        return plantsRepository.save(plant);
+    }
+
+    public List<Plant> getAll(long clientId) {
+        return plantsRepository.getAll(clientId);
+    }
+
+    public Plant getById(long id) {
+        return plantsRepository.getOne(id);
     }
 }

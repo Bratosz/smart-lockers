@@ -1,5 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -8,9 +10,14 @@ public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(Views.Public.class)
     private long id;
 
+    @JsonView(Views.Public.class)
     private String name;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Client client;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Plant plant;
@@ -28,10 +35,9 @@ public class Location {
     public Location() {
     }
 
-    public Location(String name, Plant plant, Set<Locker> lockers) {
+    public Location(String name, Client client) {
         this.name = name;
-        this.plant = plant;
-        this.lockers = lockers;
+        this.client = client;
     }
 
     public long getId() {
@@ -64,5 +70,21 @@ public class Location {
 
     public void setLockers(Set<Locker> lockers) {
         this.lockers = lockers;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public Set<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(Set<Department> departments) {
+        this.departments = departments;
     }
 }

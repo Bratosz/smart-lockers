@@ -3,8 +3,8 @@ const boxId = url.searchParams.get("id");
 let lockerNumber;
 let boxNumber;
 let lastName;
-let departmentNumber;
 let employeeId;
+const clientId = 1;
 
 function reloadEmployee() {
     $.ajax({
@@ -58,7 +58,7 @@ function displayClothes(box) {
     const clothes = box.employee.clothing;
     console.log(clothes);
     clothes.sort(function (a, b) {
-        return a.articleNo - b.articleNo || a.ordinalNo - b.ordinalNo;
+        return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
     });
     for(let i = 0; i < clothes.length; i++) {
         const cloth = clothes[i];
@@ -67,9 +67,9 @@ function displayClothes(box) {
         }
         const $row = $rowTemplate.clone();
         $row.css("display", "table-row");
-        $row.find(".cell-ordinal-number").text(cloth.ordinalNo);
-        $row.find(".cell-article-number").text(cloth.articleNo);
-        $row.find(".cell-article-name").text(cloth.name);
+        $row.find(".cell-ordinal-number").text(cloth.ordinalNumber);
+        $row.find(".cell-article-number").text(cloth.article.articleNumber);
+        $row.find(".cell-article-name").text(cloth.article.name);
         $row.find(".cell-size").text(cloth.size);
         $row.find(".cell-assignment-date").text(cloth.assignment.substring(0,10));
         $row.find(".cell-id-bar-code").text(cloth.id);
@@ -85,10 +85,14 @@ function displayClothes(box) {
 // } ) );
 
 $('#button-confirm-order').click(function () {
+    let clothesId = new Array;
+    let orderType = $("#select-order-type").val();
     $('#table-of-clothes-body').find('input[type="checkbox"]:checked').each(function () {
-        let row = $(this).closest('tr').find('.cell-id-bar-code').text();
-        console.log(row);
+        let clothId = $(this).closest('tr').find('.cell-id-bar-code').text();
+        clothesId.push(clothId);
     });
+    console.log(clothesId);
+    console.log(orderType);
 });
 
 reloadEmployee();

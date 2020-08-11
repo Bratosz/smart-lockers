@@ -21,4 +21,14 @@ public class Views {
     public static class InternalForClothes extends Public{
 
     }
+
+    public static class PlantBasicInfo extends Public {
+
+    }
+
+    public static class PlantExtendedInfo extends Public{}
+
+
+    public static class DepartmentBasicInfo extends Public {
+    }
 }

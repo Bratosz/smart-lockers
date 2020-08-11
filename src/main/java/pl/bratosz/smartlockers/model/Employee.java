@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
 import javax.validation.ConstraintViolationException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,10 +22,6 @@ public class Employee {
     @JsonView(Views.Public.class)
     private String lastName;
 
-    @JsonView(Views.Public.class)
-    @OneToOne
-    private Department department;
-
     @JsonView({Views.InternalForEmployees.class, Views.InternalForClothes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private Set<Box> boxes;
@@ -32,7 +29,6 @@ public class Employee {
     @JsonView(Views.DismissedEmployees.class)
     @ManyToMany(mappedBy = "dismissedEmployees")
     private List<Box> boxesOccupiedInPast;
-
 
     @JsonView(Views.InternalForEmployees.class)
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
@@ -46,8 +42,18 @@ public class Employee {
     @OneToMany
     private Set<EmployeeCloth> decommitedClothing;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Department department;
+
     public Employee() {
     }
+
+    public Employee(String firstName, String lastName, Department department) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.department = department;
+    }
+
 
     public Set<RotationalCloth> getRotationalClothing() {
         return rotationalClothing;
@@ -65,12 +71,6 @@ public class Employee {
         this.clothing = clothing;
     }
 
-    public Employee(String firstName, String lastName, Department department) throws ConstraintViolationException {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.department = department;
-    }
-
     public Long getId() {
         return id;
     }
@@ -82,8 +82,6 @@ public class Employee {
     public void setBoxesOccupiedInPast(List<Box> boxesOccupiedInPast) {
         this.boxesOccupiedInPast = boxesOccupiedInPast;
     }
-
-
 
     public void setId(Long id) {
         this.id = id;
@@ -103,14 +101,6 @@ public class Employee {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
     }
 
     public Set<Box> getBoxes() {
@@ -140,6 +130,14 @@ public class Employee {
             return getBoxes().stream().findFirst().get().getLocker().getPlant().getPlantNumber();
         }
         return 0;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 
     public boolean isEmployeeHaveThisBox(int lockerNo, int boxNo) {

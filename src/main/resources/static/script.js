@@ -18,9 +18,9 @@ function reloadTableRows() {
                     $row.find(".cell-last-name").text(locker.boxes[j].employee.lastName);
                     $row.find(".cell-locker").text(locker.lockerNumber);
                     $row.find(".cell-box-number").text(locker.boxes[j].boxNumber);
-                    $row.find(".cell-department-number").text(locker.departmentNumber);
-                    $row.find(".cell-department").text(locker.department);
-                    $row.find(".cell-location").text(locker.location);
+                    $row.find(".cell-department-number").text(locker.plant.plantNumber);
+                    $row.find(".cell-department").text(locker.department.name);
+                    $row.find(".cell-location").text(locker.location.name);
                     $row.find(".cell-status").text(locker.boxes[j].boxStatus);
                     $row.find(".button-edit-employee").click(function () {
                         window.location.href = `edit-employee.html?id=${locker.boxes[j].id}`;
@@ -63,7 +63,7 @@ $("#button-filter").click(function () {
                     $row.find(".cell-last-name").text(locker.boxes[j].employee.lastName);
                     $row.find(".cell-locker").text(locker.lockerNumber);
                     $row.find(".cell-box-number").text(locker.boxes[j].boxNumber);
-                    $row.find(".cell-department-number").text(locker.departmentNumber);
+                    $row.find(".cell-department-number").text(locker.plant);
                     $row.find(".cell-department").text(locker.department);
                     $row.find(".cell-location").text(locker.location);
                     $row.find(".cell-status").text(locker.boxes[j].boxStatus);
@@ -106,7 +106,7 @@ $("#button-input-lastname").click(function () {
                     $row.find(".cell-last-name").text(employee.lastName);
                     $row.find(".cell-locker").text(locker.lockerNumber);
                     $row.find(".cell-box-number").text(box.boxNumber);
-                    $row.find(".cell-department-number").text(locker.departmentNumber);
+                    $row.find(".cell-department-number").text(locker.plant);
                     $row.find(".cell-department").text(locker.department);
                     $row.find(".cell-location").text(locker.location);
                     $row.find(".cell-status").text(box.boxStatus);
@@ -127,6 +127,9 @@ $("#button-input-lastname").click(function () {
 
 
 reloadTableRows();
+loadPlants();
+loadDepartments();
+loadLocations();
 
 
 

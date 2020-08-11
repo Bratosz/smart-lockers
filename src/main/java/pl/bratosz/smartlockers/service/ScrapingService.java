@@ -18,19 +18,19 @@ public class ScrapingService {
     private PlantService plantService;
     private Scrapper scrapper;
 
-    public ScrapingService(BoxesRepository boxesRepository, ClothesRepository clothesRepository, PlantService plantService) {
+    public ScrapingService(BoxesRepository boxesRepository, ClothesRepository clothesRepository,
+                           PlantService plantService, Scrapper scrapper) {
         this.boxesRepository = boxesRepository;
         this.clothesRepository = clothesRepository;
-
         this.plantService = plantService;
+        this.scrapper = scrapper;
     }
 
     public Box updateEmployeeClothes(long boxId) throws IOException {
         Box box = boxesRepository.getBoxById(boxId);
-        int plantNumber = box.getLocker().getPlant().getPlantNumber();
+        Plant plant = box.getLocker().getPlant();
         Employee employee = box.getEmployee();
         currentClothes = employee.getClothing();
-        Plant plant = plantService.getByNumber(plantNumber);
 
         String login = plant.getLogin();
         String password = plant.getPassword();

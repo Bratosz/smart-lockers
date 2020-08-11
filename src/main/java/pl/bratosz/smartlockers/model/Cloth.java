@@ -1,6 +1,5 @@
 package pl.bratosz.smartlockers.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
@@ -30,7 +29,7 @@ public abstract class Cloth {
     protected Date releaseDate;
 
     @JsonView(Public.class)
-    protected int ordinalNo;
+    protected int ordinalNumber;
 
     @JsonView(Public.class)
     @ManyToOne(cascade = CascadeType.ALL)
@@ -39,23 +38,18 @@ public abstract class Cloth {
     @JsonView(Public.class)
     protected boolean isActive;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private ClothOrder clothOrder;
+
     public Cloth(){}
 
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
     public Cloth(long id, Date assignment, Date lastWashing,
-                 Date releaseDate, int ordinalNo, Article article, Size size) {
+                 Date releaseDate, int ordinalNumber, Article article, Size size) {
         this.id = id;
         this.assignment = assignment;
         this.lastWashing = lastWashing;
         this.releaseDate = releaseDate;
-        this.ordinalNo = ordinalNo;
+        this.ordinalNumber = ordinalNumber;
         this.article = article;
         this.size = size;
         isActive = true;
@@ -93,12 +87,12 @@ public abstract class Cloth {
         this.releaseDate = releaseDate;
     }
 
-    public int getOrdinalNo() {
-        return ordinalNo;
+    public int getOrdinalNumber() {
+        return ordinalNumber;
     }
 
-    public void setOrdinalNo(int ordinalNo) {
-        this.ordinalNo = ordinalNo;
+    public void setOrdinalNumber(int ordinalNumber) {
+        this.ordinalNumber = ordinalNumber;
     }
 
     public Article getArticle() {
@@ -115,6 +109,26 @@ public abstract class Cloth {
 
     public void setArticleNo(Article article) {
         this.article = article;
+    }
+
+    public void setArticle(Article article) {
+        this.article = article;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public ClothOrder getClothOrder() {
+        return clothOrder;
+    }
+
+    public void setClothOrder(ClothOrder clothOrder) {
+        this.clothOrder = clothOrder;
     }
 
     @Override

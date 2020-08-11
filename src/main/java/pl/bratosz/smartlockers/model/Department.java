@@ -1,7 +1,9 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -9,12 +11,22 @@ public class Department {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(Views.Public.class)
     private long id;
 
+    @JsonView(Views.Public.class)
     private String name;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private Plant plant;
+    private Client client;
+
+    @ManyToMany
+    @JoinTable(
+            name = "plants",
+            joinColumns = @JoinColumn(name = "department_id"),
+            inverseJoinColumns = @JoinColumn(name = "plant_id")
+    )
+    private Set<Plant> plants;
 
     @ManyToMany(mappedBy = "departments")
     private Set<Location> locations;
@@ -25,16 +37,16 @@ public class Department {
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
     private Set<Locker> lockers;
 
-    @OneToOne
-    private Employee employee;
+    private int mainPlantNumber;
 
     public Department() {
     }
 
-    public Department(String name, Set<Employee> employees, Set<Locker> lockers) {
+    public Department(String name, Client client, Set<Plant> plants, int mainPlantNumber) {
         this.name = name;
-        this.employees = employees;
-        this.lockers = lockers;
+        this.client = client;
+        this.plants = plants;
+        this.mainPlantNumber = mainPlantNumber;
     }
 
     public long getId() {
@@ -53,12 +65,16 @@ public class Department {
         this.name = name;
     }
 
-    public Plant getPlant() {
-        return plant;
+    public Set<Plant> getPlants() {
+        return plants;
     }
 
-    public void setPlant(Plant plant) {
-        this.plant = plant;
+    public void setPlants(Set<Plant> plants) {
+        this.plants = plants;
+    }
+
+    public void addPlant(Plant plant) {
+        plants.add(plant);
     }
 
     public Set<Location> getLocations() {
@@ -85,11 +101,19 @@ public class Department {
         this.lockers = lockers;
     }
 
-    public Employee getEmployee() {
-        return employee;
+    public int getMainPlantNumber() {
+        return mainPlantNumber;
     }
 
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    public void setMainPlantNumber(int mainPlantNumber) {
+        this.mainPlantNumber = mainPlantNumber;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 }

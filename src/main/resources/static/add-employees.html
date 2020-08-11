@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>SL - dodawanie pracowników</title>
     <script src="jquery-3.3.1.min.js"></script>
+    <script src="smart-lockers.js"></script>
     <script src="add-employees.js" defer></script>
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -74,32 +75,22 @@
         <div class="col-lg-4">
             <form class="form">
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Imię" id="employee-first-name-input">
+                    <input type="text" class="form-control" placeholder="Imię" id="input-first-name">
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Nazwisko" id="employee-last-name-input">
+                    <input type="text" class="form-control" placeholder="Nazwisko" id="input-last-name">
                 </div>
                 <div class="form-group">
-                    <select class="form-control" id="employee-department-select">
-                        <option value="null">Oddział</option>
-                        <option value="METAL">Structures</option>
-                        <option value="JIT">Jit</option>
-                        <option value="MANTRANS">Mantrans</option>
-                    </select>
+                    <select class="form-control" id="select-department"></select>
                 </div>
                 <div class="form-group">
-                    <select class="form-control" id="employee-department-number-select">
-                        <option value="null">Numer oddziału</option>
-                        <option value="DEP_384">384</option>
-                        <option value="DEP_385">385</option>
-                        <option value="DEP_386">386</option>
-                    </select>
+                    <select class="form-control" id="select-plant"></select>
                 </div>
                 <div class="form-group">
-                    <input type="number" class="form-control" placeholder="Szafka" id="employee-locker-input">
+                    <input type="number" class="form-control" placeholder="Szafka" id="input-locker-number">
                 </div>
                 <div class="form-group">
-                    <input type="number" class="form-control" placeholder="Box" id="employee-box-input">
+                    <input type="number" class="form-control" placeholder="Box" id="input-box-number">
                 </div>
 
                 <button type="button" class="btn btn-primary" id="button-add-employee">Dodaj</button>

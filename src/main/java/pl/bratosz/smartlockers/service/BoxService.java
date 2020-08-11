@@ -12,14 +12,14 @@ import java.util.List;
 import static pl.bratosz.smartlockers.model.Box.BoxStatus.*;
 
 @Service
-public class BoxesService {
+public class BoxService {
 
     private BoxesRepository boxesRepository;
     private EmployeesRepository employeesRepository;
     private LockerService lockerService;
 
 
-    public BoxesService(BoxesRepository boxesRepository, EmployeesRepository employeesRepository) {
+    public BoxService(BoxesRepository boxesRepository, EmployeesRepository employeesRepository) {
         this.boxesRepository = boxesRepository;
         this.employeesRepository = employeesRepository;
     }
@@ -64,8 +64,8 @@ public class BoxesService {
         return boxesRepository.getBox(lockerNumber, boxNumber, location, plantNumber);
     }
 
-    public Box getBox(int lockerNumber, int boxNumber, int plantNumber) {
-        return boxesRepository.getBox(lockerNumber, boxNumber, plantNumber);
+    public Box getBox(long plantId, int lockerNumber, int boxNumber) {
+        return boxesRepository.getBox(plantId, lockerNumber, boxNumber);
     }
 
     public boolean isBoxFree(int lockerNo, int boxNo, Location location, int plantNumber) {
@@ -142,5 +142,6 @@ public class BoxesService {
         }
         return false;
     }
+
 }
 

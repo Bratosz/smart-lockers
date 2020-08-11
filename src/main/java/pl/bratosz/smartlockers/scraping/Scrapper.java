@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import pl.bratosz.smartlockers.date.FormatDate;
+import pl.bratosz.smartlockers.exception.ArticleNotExistException;
 import pl.bratosz.smartlockers.model.Article;
 import pl.bratosz.smartlockers.model.EmployeeCloth;
 import pl.bratosz.smartlockers.model.Size;
@@ -101,7 +102,13 @@ public class Scrapper {
     }
 
     private Article getArticleByArticleNumber(Elements td) {
-        return articleService.getByArticleNumber(Integer.parseInt(td.get(1).text()));
+        int articleNumber = Integer.parseInt(td.get(1).text());
+        Article article = articleService.getByArticleNumber(articleNumber);
+        if (article == null) {
+            String articleName = td.get(2).text();
+            return articleService.addNewArticle(articleNumber, articleName);
+        }
+        return article;
     }
 
     private Size getSize(Elements td) {

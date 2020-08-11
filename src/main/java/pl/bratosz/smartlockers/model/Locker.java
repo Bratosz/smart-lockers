@@ -36,8 +36,11 @@ public class Locker {
     @JoinColumn(name = "locker_id")
     private List<Box> boxes;
 
+    @JsonView(Views.Public.class)
     @ManyToOne(cascade = CascadeType.ALL)
     private Plant plant;
+
+    private int plantNumber;
 
     public Locker() {
     }
@@ -51,6 +54,12 @@ public class Locker {
         this.department = department;
         this.location = location;
         this.boxes = boxes;
+        plantNumber = plant.getPlantNumber();
+    }
+
+    public Locker(int lockerNumber, int capacity) {
+        this.lockerNumber = lockerNumber;
+        this.capacity = capacity;
     }
 
     public List<Box> getBoxes() {
@@ -111,5 +120,13 @@ public class Locker {
 
     public void setPlant(Plant plant) {
         this.plant = plant;
+    }
+
+    public int getPlantNumber() {
+        return plantNumber;
+    }
+
+    public void setPlantNumber(int plantNumber) {
+        this.plantNumber = plantNumber;
     }
 }

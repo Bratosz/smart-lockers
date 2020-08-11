@@ -2,10 +2,7 @@ package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -16,7 +13,6 @@ public class EmployeeCloth extends Cloth {
 
     @JsonView(Views.Public.class)
     private boolean acceptedForExchange;
-
 
     public EmployeeCloth(){}
 

@@ -24,9 +24,9 @@ public class ScrappingController {
         this.scrapingService = scrapingService;
     }
 
-    @GetMapping("/update-clothes/{plantNumber}/{boxId}")
+    @GetMapping("/update-clothes/{boxId}")
     @JsonView(Views.InternalForBoxes.class)
-    public Box updateEmployeeClothes(@PathVariable Long boxId) throws IOException {
+    public Box updateEmployeeClothes(@PathVariable long boxId) throws IOException {
         try {
             return scrapingService.updateEmployeeClothes(boxId);
         } catch (IOException e) {

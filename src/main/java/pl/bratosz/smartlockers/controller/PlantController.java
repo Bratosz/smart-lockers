@@ -1,14 +1,16 @@
 package pl.bratosz.smartlockers.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Plant;
+import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.service.PlantService;
 
+import java.util.List;
+import java.util.Set;
+
 @RestController
-@RequestMapping("/plants")
+@RequestMapping("/plant")
 public class PlantController {
 
     private PlantService plantService;
@@ -17,8 +19,20 @@ public class PlantController {
         this.plantService = plantService;
     }
 
+    @JsonView(Views.PlantBasicInfo.class)
+    @GetMapping("/get_all/{clientId}")
+    public List<Plant> getAll(@PathVariable long clientId) {
+        return plantService.getAll(clientId);
+    }
+
     @GetMapping("/get_by_number/{plantNumber}")
     public Plant getByNumber(@PathVariable int plantNumber) {
         return plantService.getByNumber(plantNumber);
+    }
+
+    @PostMapping("/create/{clientId}/{plantNumber}/{name}/{login}/{password}")
+    public Plant create(@PathVariable long clientId, @PathVariable int plantNumber, @PathVariable String name,
+                        @PathVariable String login, @PathVariable String password) {
+        return plantService.create(clientId, plantNumber, name, login, password);
     }
 }

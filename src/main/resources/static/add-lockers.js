@@ -1,27 +1,24 @@
 $("#button-add-locker").click(function () {
-    const departmentNo = $("#pass-locker-department-no").val();
+    const plantId = $("#select-plant").val();
     $.ajax({
-        url: `http://localhost:8080/lockers/quantity/${departmentNo}`,
+        url: `http://localhost:8080/lockers/quantity/${plantId}`,
         method: "get",
         success: function (lockersQuantity) {
-            const amount = $("#locker-amount-input").val();
+            const amount = $("#input-lockers-amount").val();
             for (let i = 0; i < amount; i++) {
-                const capacity = $("#pass-locker-capacity").val();
-                const department = $("#pass-locker-department").val();
-                const location = $("#pass-locker-location").val();
+                const capacity = $("#select-locker-capacity").val();
+                const departmentId = $("#select-department").val();
+                const locationId = $("#select-locker-location").val();
 
                 lockersQuantity++;
 
                 const locker = {
                     lockerNumber: lockersQuantity,
                     capacity: capacity,
-                    departmentNumber: departmentNo,
-                    department: department,
-                    location: location
                 };
 
                 $.ajax({
-                    url: "http://localhost:8080/lockers",
+                    url: `http://localhost:8080/lockers/create/${plantId}/${departmentId}/${locationId}`,
                     method: "post",
                     data: JSON.stringify(locker),
                     contentType: "application/json",
@@ -33,3 +30,7 @@ $("#button-add-locker").click(function () {
         }
     })
 });
+
+loadPlants();
+loadDepartments();
+loadLocations();

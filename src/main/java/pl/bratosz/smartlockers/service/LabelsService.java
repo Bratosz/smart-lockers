@@ -15,9 +15,9 @@ import java.util.List;
 
 @Service
 public class LabelsService {
-    private BoxesService boxesService;
+    private BoxService boxesService;
 
-    public LabelsService(BoxesService boxesService) {
+    public LabelsService(BoxService boxesService) {
         this.boxesService = boxesService;
     }
 

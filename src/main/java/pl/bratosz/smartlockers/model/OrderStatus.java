@@ -2,17 +2,18 @@ package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum ClothType {
-    SHIRT("Koszulka"),
-    TROUSERS("Spodnie"),
-    SWEATSHIRT("Bluza"),
-    APRON("Fartuch"),
-    JACKET("Kurtka"),
-    NOT_DEFINED("Nieokreślony");
+import javax.persistence.Entity;
+
+
+public enum OrderStatus {
+    DECLINED("odrzucone"),
+    ACCEPTED("przyjęte"),
+    INPROGRESS("w realizacji"),
+    FINALIZED("zakończone");
 
     private final String name;
 
-    ClothType(String name) {
+    OrderStatus(String name) {
         this.name = name;
     }
 

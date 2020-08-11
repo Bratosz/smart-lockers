@@ -6,10 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pl.bratosz.smartlockers.model.Box;
-import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.Location;
-import pl.bratosz.smartlockers.model.Locker;
+import pl.bratosz.smartlockers.model.*;
 
 import java.util.List;
 
@@ -26,7 +23,7 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             "(l.plantNumber = :plantNumber or :plantNumber is null) and " +
             "(l.location = :location or :location is null) order by l.lockerNumber, b.boxNumber ")
     List<Box> getBoxesByParameters(@Param("department") Department department,
-                                   @Param("plantNumber") int plantNumber,
+                                   @Param("plant") int plantNumber,
                                    @Param("location") Location location,
                                    @Param("boxStatus") Box.BoxStatus boxStatus);
 
@@ -40,11 +37,11 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
 
     Box getBoxById(long id);
 
-    @Query("select b from Box b join b.locker l where " +
-            "b.boxNumber = :boxNumber and " +
-            "l.lockerNumber = :lockerNumber and " +
-            "l.plantNumber = :plantNumber ")
-    Box getBox(int lockerNumber, int boxNumber, int plantNumber);
+    @Query("select b from Box b " +
+            "where b.locker.plant.id = :plantId " +
+            "and b.locker.lockerNumber = :lockerNumber " +
+            "and b.boxNumber = :boxNumber")
+    Box getBox(long plantId, int lockerNumber, int boxNumber);
 
     @Query("select b from Box b join b.locker l where " +
             "l.plantNumber = :plantNumber " +

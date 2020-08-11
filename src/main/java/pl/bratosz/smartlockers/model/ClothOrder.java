@@ -1,10 +1,10 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -20,11 +20,40 @@ public class ClothOrder {
     private Size size;
 
     @JsonView(Views.Public.class)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Article article;
 
     @JsonView(Views.Public.class)
-    @OneToMany
-    private Set<EmployeeCloth> employeeClothes;
+    @OneToOne(mappedBy = "clothOrder", cascade = CascadeType.ALL)
+    private Cloth cloth;
+
+    @JsonView(Views.Public.class)
+    private OrderStatus orderStatus;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private UserClient reportedBy;
+
+    @JsonView(Views.Public.class)
+    private Date reportDate;
+
+    @JsonView(Views.Public.class)
+    private Date estimatedDateOfExecution;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private UserEmployee acceptedBy;
+
+    private Date acceptDate;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private UserEmployee realizedBy;
+
+    @JsonView(Views.Public.class)
+    private boolean isrealized;
+
+    @JsonView(Views.Public.class)
+    private Date realizeDate;
+
+
 
     public ClothOrder(){}
 
@@ -67,11 +96,11 @@ public class ClothOrder {
         this.article = article;
     }
 
-    public Set<EmployeeCloth> getEmployeeClothes() {
-        return employeeClothes;
+    public Cloth getCloth() {
+        return cloth;
     }
 
-    public void setEmployeeClothes(Set<EmployeeCloth> employeeClothes) {
-        this.employeeClothes = employeeClothes;
+    public void setCloth(Cloth cloth) {
+        this.cloth = cloth;
     }
 }

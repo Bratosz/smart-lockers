@@ -30,7 +30,7 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             "and " +
             "(l.location = :location or :location is null) order by l.lockerNumber ")
     List<Locker> filterAllByPlantNumberAndDepartmentAndLocation(
-            @Param("plantNumber") int plantNumber,
+            @Param("plant") int plantNumber,
             @Param("department") Department department,
             @Param("location") Location location);
 
@@ -44,23 +44,13 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             "(b.boxStatus = :boxStatus or :boxStatus is null) " +
             "order by l.lockerNumber, b.boxNumber ")
     List<Locker> filterAllByPlantNumberAndDepartmentAndLocationAndStatus(
-            @Param("plantNumber") int plantNumber,
+            @Param("plant") int plantNumber,
             @Param("department") Department department,
             @Param("location") Location location,
             @Param("boxStatus") Box.BoxStatus boxStatus);
 
-    @Query("select count(l.plantNumber) from Locker l where l.plantNumber = :plantNumber ")
-    int getAmountOfLockersByPlantNumber(@Param("plantNumber") int plantNumber);
-
-    @Query("select b from Locker l join l.boxes b " +
-            "where l.lockerNumber = :lockerNumber " +
-            "and " +
-            "l.plantNumber = :plantNumber " +
-            "and " +
-            "b.boxNumber = :boxNumber ")
-    Box getBox(@Param("plantNumber") int plantNumber,
-               @Param("lockerNumber") Integer lockerNumber,
-               @Param("boxNumber") Integer boxNumber);
+    @Query("select count(l.plantNumber) from Locker l where l.plant.id = :plantId ")
+    int getAmountOfLockersByPlantId(@Param("plantId") long plantId);
 
     Locker deleteLockerById(Long id);
 
@@ -70,7 +60,7 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             "and " +
             "l.location = :location ")
     Locker getLockerByParameters(@Param("lockerNumber") Integer lockerNumber,
-                                 @Param("plantNumber") int plantNumber,
+                                 @Param("plant") int plantNumber,
                                  @Param("location") Location location);
 
     @Query("select l from Locker l where l.plantNumber = :plantNumber " +

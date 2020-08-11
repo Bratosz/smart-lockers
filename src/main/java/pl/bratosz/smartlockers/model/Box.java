@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
@@ -116,8 +117,14 @@ public class Box {
 
         private String name;
 
+
         BoxStatus(String name) {
             this.name = name;
+        }
+
+        @JsonValue
+        public String getName() {
+            return name;
         }
     }
 

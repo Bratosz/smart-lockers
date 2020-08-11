@@ -3,24 +3,19 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Box;
-import pl.bratosz.smartlockers.model.Employee;
-import pl.bratosz.smartlockers.model.EmployeeCloth;
 import pl.bratosz.smartlockers.model.Views;
-import pl.bratosz.smartlockers.service.BoxesService;
+import pl.bratosz.smartlockers.service.BoxService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
-
-import static pl.bratosz.smartlockers.model.Locker.*;
 
 @RestController
 @RequestMapping("/boxes")
-public class BoxesController {
+public class BoxController {
 
-    private BoxesService boxesService;
+    private BoxService boxesService;
 
-    public BoxesController(BoxesService boxesService) {
+    public BoxController(BoxService boxesService) {
         this.boxesService = boxesService;
     }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.LockersRepository;
-import pl.bratosz.smartlockers.service.BoxesService;
+import pl.bratosz.smartlockers.service.BoxService;
 import pl.bratosz.smartlockers.service.LockerService;
 
 
@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lockers")
-public class LockersController {
+public class LockerController {
 
     private LockersRepository lockersRepository;
     private LockerService lockerService;
-    private BoxesService boxesService;
+    private BoxService boxesService;
 
-    public LockersController(LockersRepository lockersRepository, LockerService lockerService, BoxesService boxesService) {
+    public LockerController(LockersRepository lockersRepository, LockerService lockerService, BoxService boxesService) {
         this.lockersRepository = lockersRepository;
         this.lockerService = lockerService;
         this.boxesService = boxesService;
@@ -64,15 +64,16 @@ public class LockersController {
     }
 
 
-    @GetMapping("/quantity/{plantNumber}")
-    public int getLockersQuantity(@PathVariable int plantNumber) {
-         return lockersRepository.getAmountOfLockersByPlantNumber(plantNumber);
+    @GetMapping("/quantity/{plantId}")
+    public int getLockersQuantity(@PathVariable long plantId) {
+         return lockerService.getAmountOfLockersByPlantId(plantId);
     }
 
-    @PostMapping
+    @PostMapping("create/{plantId}/{departmentId}/{locationId}")
     @JsonView(Views.InternalForLockers.class)
-    public Locker create(@RequestBody Locker locker) {
-        return lockerService.create(locker);
+    public Locker create(@PathVariable long plantId, @PathVariable long departmentId,
+                         @PathVariable long locationId, @RequestBody Locker locker) {
+        return lockerService.create(locker, plantId, departmentId, locationId);
     }
 
     @PostMapping("/create/{lockerNumber}/{capacity}/{plantNumber}/{department}/{location}")

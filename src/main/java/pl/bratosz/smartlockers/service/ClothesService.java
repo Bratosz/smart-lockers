@@ -121,7 +121,7 @@ public class ClothesService {
             row.createCell(5).setCellValue(emp.getDepartment().getName());
             row.createCell(6).setCellValue(cloth.getId());
             row.createCell(7).setCellValue(cloth.getArticle().getName());
-            row.createCell(8).setCellValue(cloth.getArticle().getId());
+            row.createCell(8).setCellValue(cloth.getArticle().getArticleNumber());
         }
         FileOutputStream fileOut = new FileOutputStream("C:/Users/HP/Desktop/files_to_testing/Lear/raports/rotacja_do_zwrotu.xlsx");
         workbook.write(fileOut);

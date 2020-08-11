@@ -7,5 +7,4 @@ import pl.bratosz.smartlockers.model.Client;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    Client getByPlantNumber(int plantNumber);
 }

@@ -1,25 +1,21 @@
 $("#button-add-employee").click(function () {
-    const lockerNo = $("#employee-locker-input").val();
-    const boxNo = $("#employee-box-input").val();
-    const departmentNo = $("#employee-department-number-select").val();
+    const lockerNo = $("#input-locker-number").val();
+    const boxNo = $("#input-box-number").val();
+    const plantId = $("#select-plant").val();
+    const departmentId = $("#select-department").val();
+    const firstName = $("#input-first-name").val();
+    const lastName = $("#input-last-name").val();
 
-    const firstName = $("#employee-first-name-input").val();
-    const lastName = $("#employee-last-name-input").val();
-    const department = $("#employee-department-select").val();
-
-    const employee = {
-        firstName: firstName,
-        lastName: lastName,
-        department: department
-    };
     $.ajax({
-        url: `http://localhost:8080/employees/create_employee/${departmentNo}/${lockerNo}/${boxNo}`,
+        url: `http://localhost:8080/employees/create_employee/${plantId}/${departmentId}/${lockerNo}/${boxNo}/` +
+            `${firstName}/${lastName}`,
         method: "post",
-        data: JSON.stringify(employee),
-        contentType: "application/json",
         success: function () {
-            console.log(employee);
+            console.log("Dodano pracownika");
         }
     })
 });
+
+loadPlants();
+loadDepartments();
 

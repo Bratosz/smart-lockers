@@ -19,21 +19,27 @@ public class Plant {
     @JsonView(Views.Public.class)
     private int plantNumber;
 
-    @JsonView(Views.Public.class)
+    @JsonView(Views.PlantBasicInfo.class)
+    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    private Set<Location> locations;
+
+    @JsonView(Views.PlantBasicInfo.class)
+    @ManyToMany(mappedBy = "plants")
+    private Set<Department> departments;
+
+    @JsonView(Views.PlantExtendedInfo.class)
     @ManyToOne(cascade = CascadeType.ALL)
     private Address address;
 
-    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
-    private Set<Department> departments;
 
+    @JsonView(Views.PlantExtendedInfo.class)
     @ManyToOne(cascade = CascadeType.ALL)
     private Client client;
 
+    @JsonView(Views.PlantExtendedInfo.class)
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
     private Set<Locker> lockers;
 
-    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
-    private Set<Location> locations;
 
     private String login;
 
@@ -52,6 +58,13 @@ public class Plant {
         this.client = client;
         this.lockers = lockers;
         this.locations = locations;
+    }
+
+    public Plant(int plantNumber, String name, String login, String password) {
+        this.plantNumber = plantNumber;
+        this.name = name;
+        this.login = login;
+        this.password = password;
     }
 
     public long getId() {

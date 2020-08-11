@@ -10,13 +10,13 @@ import java.util.List;
 public class LockerService {
     private LockersRepository lockersRepository;
     private EmployeeService employeeService;
-    private BoxesService boxesService;
+    private BoxService boxesService;
     private PlantService plantService;
     private DepartmentService departmentService;
     private LocationService locationService;
 
     public LockerService(LockersRepository lockersRepository, EmployeeService employeeService,
-                         BoxesService boxesService, PlantService plantService, DepartmentService departmentService,
+                         BoxService boxesService, PlantService plantService, DepartmentService departmentService,
                          LocationService locationService) {
         this.lockersRepository = lockersRepository;
         this.employeeService = employeeService;
@@ -62,14 +62,28 @@ public class LockerService {
         return lockersRepository.save(locker);
     }
 
-    public Locker create(Locker locker) {
+    public Locker create(Locker locker, long plantId, long departmentId, long locationId) {
+        Plant plant = plantService.getById(plantId);
+        Department department = departmentService.getById(departmentId);
+        Location location = locationService.getById(locationId);
         List<Box> boxes = boxesService.createBoxesForLocker(locker.getCapacity());
         locker.setBoxes(boxes);
+        locker.setPlant(plant);
+        locker.setDepartment(department);
+        locker.setLocation(location);
+        return lockersRepository.save(locker);
+    }
+
+    public Locker create(Locker locker) {
         return lockersRepository.save(locker);
     }
 
     public List<Locker> getLockersByPlantNumber(int plantNumber) {
         List<Locker> lockers = lockersRepository.findAllByPlantNumber(plantNumber);
         return lockers;
+    }
+
+    public int getAmountOfLockersByPlantId(long id) {
+        return lockersRepository.getAmountOfLockersByPlantId(id);
     }
 }
