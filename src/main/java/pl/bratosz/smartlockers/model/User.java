@@ -7,7 +7,7 @@ import javax.persistence.*;
 public abstract class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     protected long id;
 
     protected String firstName;
@@ -20,14 +20,18 @@ public abstract class User {
 
     protected String email;
 
+    protected Permissions permissions;
+
     public User() {}
 
-    public User(String firstName, String lastName, String login, String password, String email) {
+    public User(String firstName, String lastName, String login, String password,
+                String email, Permissions permissions) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.login = login;
         this.password = password;
         this.email = email;
+        this.permissions = permissions;
     }
 
     public long getId() {
@@ -76,5 +80,13 @@ public abstract class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Permissions getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Permissions permissions) {
+        this.permissions = permissions;
     }
 }

@@ -5,51 +5,97 @@ import com.fasterxml.jackson.annotation.JsonView;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
-
-import static pl.bratosz.smartlockers.model.Views.*;
+import java.util.Set;
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class Cloth {
-
-    @JsonView(Public.class)
+public class Cloth {
+    @JsonView(Views.Public.class)
     @Id protected long id;
 
-    @JsonView(Public.class)
+    @JsonView(Views.Public.class)
     @Enumerated(EnumType.STRING)
-    protected Size size;
+    protected ClothSize size;
 
-    @JsonView(Public.class)
+    @JsonView(Views.Public.class)
     protected Date assignment;
 
-    @JsonView(Public.class)
+    @JsonView(Views.Public.class)
     protected Date lastWashing;
 
-    @JsonView(Public.class)
+    @JsonView(Views.Public.class)
     protected Date releaseDate;
 
-    @JsonView(Public.class)
+    @JsonView(Views.Public.class)
     protected int ordinalNumber;
 
-    @JsonView(Public.class)
+    @JsonView(Views.InternalForBoxes.class)
     @ManyToOne(cascade = CascadeType.ALL)
     protected Article article;
 
-    @JsonView(Public.class)
+    @JsonView(Views.Public.class)
     protected boolean isActive;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private ClothOrder clothOrder;
+    @JsonView(Views.InternalForClothes.class)
+    @OneToMany(mappedBy = "cloth", cascade = CascadeType.ALL)
+    private Set<ClothOrder> clothOrders;
+
+    @JsonView(Views.InternalForClothes.class)
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Employee employee;
+
+    @JsonView(Views.Public.class)
+    private boolean acceptedForExchange;
+
+    private boolean rotational;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Employee rotationOwner;
+
+    private  boolean releaseAsRotational;
+
+    private Date releaseAsRotationalDate;
 
     public Cloth(){}
 
-    public Cloth(long id, Date assignment, Date lastWashing,
-                 Date releaseDate, int ordinalNumber, Article article, Size size) {
+    public Cloth(long id, Date assignment, Date lastWashing, Date release, int ordinalNo,
+                         Article article, Employee employee, ClothSize size) {
         this.id = id;
+        this.assignment = assignment;
+        this.lastWashing = lastWashing;
+        this.releaseDate = release;
+        this.ordinalNumber = ordinalNo;
+        this.article = article;
+        this.size = size;
+        this.employee = employee;
+        acceptedForExchange = false;
+        rotational = false;
+        releaseAsRotational = false;
+    }
+
+    public Cloth(long id, ClothSize size, Date assignment, Date lastWashing,
+                 Date releaseDate, int ordinalNumber, Article article, boolean isActive,
+                 ClothOrder clothOrder, Employee employee, boolean acceptedForExchange, boolean rotational) {
+        this.id = id;
+        this.size = size;
         this.assignment = assignment;
         this.lastWashing = lastWashing;
         this.releaseDate = releaseDate;
         this.ordinalNumber = ordinalNumber;
+        this.article = article;
+        this.isActive = isActive;
+        clothOrders.add(clothOrder);
+        this.employee = employee;
+        this.acceptedForExchange = acceptedForExchange;
+        this.rotational = rotational;
+    }
+
+    public Cloth(long id, Date assignment, Date lastWashing, Date release,
+                 int ordinalNo, Article article, ClothSize size) {
+        this.id = id;
+        this.assignment = assignment;
+        this.lastWashing = lastWashing;
+        this.releaseDate = release;
+        this.ordinalNumber = ordinalNo;
         this.article = article;
         this.size = size;
         isActive = true;
@@ -61,6 +107,14 @@ public abstract class Cloth {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public ClothSize getSize() {
+        return size;
+    }
+
+    public void setSize(ClothSize size) {
+        this.size = size;
     }
 
     public Date getAssignment() {
@@ -99,18 +153,6 @@ public abstract class Cloth {
         return article;
     }
 
-    public Size getSize() {
-        return size;
-    }
-
-    public void setSize(Size size) {
-        this.size = size;
-    }
-
-    public void setArticleNo(Article article) {
-        this.article = article;
-    }
-
     public void setArticle(Article article) {
         this.article = article;
     }
@@ -123,12 +165,60 @@ public abstract class Cloth {
         isActive = active;
     }
 
-    public ClothOrder getClothOrder() {
-        return clothOrder;
+    public Set<ClothOrder> getClothOrders() {
+        return clothOrders;
     }
 
-    public void setClothOrder(ClothOrder clothOrder) {
-        this.clothOrder = clothOrder;
+    public void setClothOrders(Set<ClothOrder> clothOrders) {
+        this.clothOrders = clothOrders;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+    public boolean isAcceptedForExchange() {
+        return acceptedForExchange;
+    }
+
+    public void setAcceptedForExchange(boolean acceptedForExchange) {
+        this.acceptedForExchange = acceptedForExchange;
+    }
+
+    public boolean isRotational() {
+        return rotational;
+    }
+
+    public void setRotational(boolean rotational) {
+        this.rotational = rotational;
+    }
+
+    public Employee getRotationOwner() {
+        return rotationOwner;
+    }
+
+    public void setRotationOwner(Employee rotationOwner) {
+        this.rotationOwner = rotationOwner;
+    }
+
+    public Date getReleaseAsRotationalDate() {
+        return releaseAsRotationalDate;
+    }
+
+    public void setReleaseAsRotationalDate(Date releaseAsRotationalDate) {
+        this.releaseAsRotationalDate = releaseAsRotationalDate;
+    }
+
+    public boolean isReleaseAsRotational() {
+        return releaseAsRotational;
+    }
+
+    public void setReleaseAsRotational(boolean releaseAsRotational) {
+        this.releaseAsRotational = releaseAsRotational;
     }
 
     @Override
@@ -143,4 +233,5 @@ public abstract class Cloth {
     public int hashCode() {
         return Objects.hash(getId());
     }
+
 }

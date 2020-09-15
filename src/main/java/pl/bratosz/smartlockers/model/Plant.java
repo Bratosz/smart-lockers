@@ -40,6 +40,9 @@ public class Plant {
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
     private Set<Locker> lockers;
 
+    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    private Set<UserClient> userClients;
+
 
     private String login;
 
@@ -145,5 +148,13 @@ public class Plant {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Set<UserClient> getUserClients() {
+        return userClients;
+    }
+
+    public void setUserClients(Set<UserClient> userClients) {
+        this.userClients = userClients;
     }
 }

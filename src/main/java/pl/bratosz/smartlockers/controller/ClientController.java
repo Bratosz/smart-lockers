@@ -4,11 +4,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.bratosz.smartlockers.model.Client;
-import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.Locker;
-import pl.bratosz.smartlockers.model.Plant;
+import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.service.ClientService;
+import pl.bratosz.smartlockers.service.UserService;
 
 @RestController
 @RequestMapping("/client")
@@ -18,13 +16,17 @@ public class ClientController {
     private DepartmentController departmentController;
     private LocationController locationController;
     private LockerController lockerController;
+    private EmployeeController employeeController;
+    private UserService userService;
 
-    public ClientController(ClientService clientService, PlantController plantController, DepartmentController departmentController, LocationController locationController, LockerController lockerController) {
+    public ClientController(ClientService clientService, PlantController plantController, DepartmentController departmentController, LocationController locationController, LockerController lockerController, EmployeeController employeeController, UserService userService) {
         this.clientService = clientService;
         this.plantController = plantController;
         this.departmentController = departmentController;
         this.locationController = locationController;
         this.lockerController = lockerController;
+        this.employeeController = employeeController;
+        this.userService = userService;
     }
 
     @PostMapping("/create/{name}")
@@ -62,8 +64,18 @@ public class ClientController {
         locationController.assignToPlant(id4, 385);
         locationController.assignToPlant(id5, 385);
 
-        Locker locker = new Locker(1,10);
-        lockerController.create(plant1.getId(), department1.getId(), id1, locker);
+        Locker locker1 = new Locker(1,10);
+        Locker locker2 = new Locker(4,10);
+        lockerController.create(plant1.getId(), department1.getId(), id1, locker1);
+        lockerController.create(plant1.getId(), department1.getId(), id1, locker2);
+
+
+        employeeController.createEmployee(1,1,1,1,
+                "DARIUSZ", "KULIG");
+        employeeController.createEmployee(1,1,4,7,
+                "GRZEGORZ", "KLEKOT");
+        userService.create("Admin", "Admin", Permissions.STAFF_ADVANCED);
+
         return client;
     }
 }

@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum Size {
+public enum ClothSize {
+    SIZE_DEFAULT("Taki sam"),
     SIZE_ZERO("0"),
     SIZE_34("34"),
     SIZE_36("36"),
@@ -41,20 +42,20 @@ public enum Size {
     SIZE_6XL("6XL");
 
     private final String name;
-    private static final Map<String, Size>
+    private static final Map<String, ClothSize>
             sizesByNames = new HashMap<>();
 
     static {
-        for(Size size : Size.values()) {
+        for(ClothSize size : ClothSize.values()) {
             sizesByNames.put(size.name, size);
         }
     }
 
-    Size(String name) {
+    ClothSize(String name) {
         this.name = name;
     }
 
-    public static Size getSizeByName(String name) {
+    public static ClothSize getSizeByName(String name) {
         if(sizesByNames.containsKey(name)) {
             return sizesByNames.get(name);
         } else {

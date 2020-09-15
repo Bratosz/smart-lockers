@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.bratosz.smartlockers.repository.RotationalClothesRepository;
 import pl.bratosz.smartlockers.service.exels.*;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.ClothesRepository;
@@ -18,18 +17,13 @@ import java.util.*;
 import static pl.bratosz.smartlockers.service.exels.ClothOperationType.*;
 
 @Service
-public class ClothesService {
+public class ClothService {
     private EmployeeService employeeService;
     private ClothesRepository clothesRepository;
-    private RotationalClothesRepository rotationalClothesRepository;
 
-    @Autowired
-    public ClothesService(EmployeeService employeeService, ClothesRepository clothesRepository,
-                          RotationalClothesRepository rotationalClothesRepository) {
+    public ClothService(EmployeeService employeeService, ClothesRepository clothesRepository) {
         this.employeeService = employeeService;
         this.clothesRepository = clothesRepository;
-        this.rotationalClothesRepository = rotationalClothesRepository;
-
     }
 
     public List<Cloth> uploadClothesRotation(Sheet sheet, ClothOperationType clothOperationType) {
@@ -38,7 +32,7 @@ public class ClothesService {
         return loadClothesRotation(rowsForRotationUpdate);
     }
 
-    public List<RotationalCloth> updateReleasedRotation(Sheet sheet, ClothOperationType clothOperationType) {
+    public List<Cloth> updateReleasedRotation(Sheet sheet, ClothOperationType clothOperationType) {
         if (clothOperationType.equals(RELEASED_ROTATIONAL_CLOTHING_UPDATE)) {
             ExcelClothesReader clothesReader = ExcelClothesReader.create(sheet, clothOperationType);
             List<RowReleasedRotationalClothes> loadedRotationalClothing = clothesReader.loadRows();
@@ -47,22 +41,27 @@ public class ClothesService {
         return null;
     }
 
-    private List<RotationalCloth> updateClothesRotation(List<RowReleasedRotationalClothes> clothRows) {
-        List<RotationalCloth> clothes = new LinkedList<>();
-        List<RotationalCloth> all = rotationalClothesRepository.findAll();
+    private List<Cloth> updateClothesRotation(List<RowReleasedRotationalClothes> clothRows) {
+        List<Cloth> clothes = new LinkedList<>();
+        List<Cloth> all = findAllClothesByRotationalValue(true);
         for (RowReleasedRotationalClothes row : clothRows) {
             if (all.stream().anyMatch(r -> r.getId() == row.getBarCode())) {
-                RotationalCloth cloth = rotationalClothesRepository.getOne(row.getBarCode());
+                Cloth cloth = clothesRepository.getOne(row.getBarCode());
                 Employee employee = employeeService.getOneEmployee(row.getFirstName(), row.getLastName());
                 if (employee.getId() == 1) {
                     continue;
                 }
-                cloth.setReleasedToEmployee(row.getReleaseDate());
-                cloth.setEmployee(employee);
+                cloth.setReleaseAsRotationalDate(row.getReleaseDate());
+                cloth.setRotationOwner(employee);
                 clothes.add(cloth);
             }
         }
         return clothesRepository.saveAll(clothes);
+    }
+
+    private List<Cloth> findAllClothesByRotationalValue(boolean isRotational) {
+        List<Cloth> clothes = clothesRepository.findAllClothesByRotationalValue(isRotational);
+        return clothes;
     }
 
 
@@ -79,8 +78,7 @@ public class ClothesService {
     private Cloth createCloth(RowForRotationUpdate rowForRotationUpdate) {
 
         if (isClothRotational(rowForRotationUpdate.getLockerNo())) {
-
-            return new RotationalCloth();
+            return new Cloth();
         } else {
             Employee employee = employeeService.getEmployeeByFullNameAndFullBoxNumber(
                     rowForRotationUpdate.getFirstName(),
@@ -88,7 +86,7 @@ public class ClothesService {
                     rowForRotationUpdate.getLockerNo(),
                     rowForRotationUpdate.getBoxNo()
             );
-            return new EmployeeCloth();
+            return new Cloth();
         }
     }
 
@@ -101,17 +99,17 @@ public class ClothesService {
     }
 
     public Cloth getClothById(long id) {
-        return clothesRepository.getClothById(id);
+        return clothesRepository.getOne(id);
     }
 
-    public List<RotationalCloth> getRotationalClothRaport() throws IOException {
-        List<RotationalCloth> rotationalClothes = rotationalClothesRepository.getReleasedRotationalClothes();
+    public List<Cloth> getRotationalClothRaport() throws IOException {
+        List<Cloth> rotationalClothes = getReleasedRotationalClothes();
         XSSFWorkbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Rotacja do zwrócenia");
         Row row;
         for (int i = 0; i < rotationalClothes.size(); i++) {
             row = sheet.createRow(i);
-            RotationalCloth cloth = rotationalClothes.get(i);
+            Cloth cloth = rotationalClothes.get(i);
             Employee emp = cloth.getEmployee();
             row.createCell(0).setCellValue(emp.getId());
             row.createCell(1).setCellValue(emp.getFirstName());
@@ -128,5 +126,27 @@ public class ClothesService {
         fileOut.close();
         workbook.close();
         return rotationalClothes;
+    }
+
+    private List<Cloth> getReleasedRotationalClothes() {
+        return clothesRepository.getReleasedRotationalClothes();
+    }
+
+    public List<Cloth> getClothesByIds(long[] clothsIds) {
+        List<Cloth> clothes = new LinkedList<>();
+        for(int i = 0; i < clothsIds.length; i++) {
+            long clothId = clothsIds[i];
+            Cloth cloth = clothesRepository.getClothById(clothId);
+            clothes.add(cloth);
+        }
+        return clothes;
+    }
+
+    public ClothSize determineDesiredSize(ClothSize desiredSize, ClothSize actualSize) {
+        if(desiredSize == ClothSize.SIZE_DEFAULT) {
+            return actualSize;
+        } else {
+            return desiredSize;
+        }
     }
 }

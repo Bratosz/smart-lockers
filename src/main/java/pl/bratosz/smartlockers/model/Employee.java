@@ -32,18 +32,25 @@ public class Employee {
 
     @JsonView(Views.InternalForEmployees.class)
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private Set<RotationalCloth> rotationalClothing;
+    private Set<Cloth> rotationalClothing;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private Set<EmployeeCloth> clothing;
+    private Set<Cloth> clothing;
 
     @JsonView(Views.InternalForEmployees.class)
     @OneToMany
-    private Set<EmployeeCloth> decommitedClothing;
+    private Set<Cloth> decommitedClothing;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Department department;
+
+    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
+    private UserEmployee userEmployee;
+
+    @JsonView(Views.InternalForBoxes.class)
+    @OneToMany(mappedBy = "employee")
+    private Set<ClothOrder> clothOrders;
 
     public Employee() {
     }
@@ -55,19 +62,19 @@ public class Employee {
     }
 
 
-    public Set<RotationalCloth> getRotationalClothing() {
+    public Set<Cloth> getRotationalClothing() {
         return rotationalClothing;
     }
 
-    public void setRotationalClothing(Set<RotationalCloth> rotationalClothing) {
+    public void setRotationalClothing(Set<Cloth> rotationalClothing) {
         this.rotationalClothing = rotationalClothing;
     }
 
-    public Set<EmployeeCloth> getClothing() {
+    public Set<Cloth> getClothing() {
         return clothing;
     }
 
-    public void setClothing(Set<EmployeeCloth> clothing) {
+    public void setClothing(Set<Cloth> clothing) {
         this.clothing = clothing;
     }
 
@@ -152,4 +159,27 @@ public class Employee {
         }
     }
 
+    public Set<Cloth> getDecommitedClothing() {
+        return decommitedClothing;
+    }
+
+    public void setDecommitedClothing(Set<Cloth> decommitedClothing) {
+        this.decommitedClothing = decommitedClothing;
+    }
+
+    public UserEmployee getUserEmployee() {
+        return userEmployee;
+    }
+
+    public void setUserEmployee(UserEmployee userEmployee) {
+        this.userEmployee = userEmployee;
+    }
+
+    public Set<ClothOrder> getClothOrders() {
+        return clothOrders;
+    }
+
+    public void setClothOrders(Set<ClothOrder> clothOrders) {
+        this.clothOrders = clothOrders;
+    }
 }

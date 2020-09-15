@@ -39,6 +39,9 @@ public class Department {
 
     private int mainPlantNumber;
 
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private Set<UserClient> userClients;
+
     public Department() {
     }
 
@@ -115,5 +118,13 @@ public class Department {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public Set<UserClient> getUserClients() {
+        return userClients;
+    }
+
+    public void setUserClients(Set<UserClient> userClients) {
+        this.userClients = userClients;
     }
 }

@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 import pl.bratosz.smartlockers.date.FormatDate;
 import pl.bratosz.smartlockers.exception.ArticleNotExistException;
 import pl.bratosz.smartlockers.model.Article;
-import pl.bratosz.smartlockers.model.EmployeeCloth;
-import pl.bratosz.smartlockers.model.Size;
+import pl.bratosz.smartlockers.model.Cloth;
+import pl.bratosz.smartlockers.model.ClothSize;
+
 import pl.bratosz.smartlockers.service.ArticleService;
 
 import java.io.IOException;
@@ -45,12 +46,12 @@ public class Scrapper {
         return oc.getActualPage().select("#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(3)").text();
     }
 
-    public Set<EmployeeCloth> getClothes() {
+    public Set<Cloth> getClothes() {
         Elements elements = oc.getActualPage().select("#ctl00_MainContent_GridView2 > tbody > tr");
-        Set<EmployeeCloth> clothes = new HashSet<>();
+        Set<Cloth> clothes = new HashSet<>();
         for(int i = 1; i < elements.size(); i++) {
             Elements td = elements.get(i).select("td");
-            EmployeeCloth cloth = new EmployeeCloth(
+            Cloth cloth = new Cloth(
                     getId(td), getAssignment(td), getLastWashing(td),
                     getRelease(td), getOrdinalNo(td), getArticleByArticleNumber(td), getSize(td));
             clothes.add(cloth);
@@ -111,9 +112,9 @@ public class Scrapper {
         return article;
     }
 
-    private Size getSize(Elements td) {
+    private ClothSize getSize(Elements td) {
         String size = td.get(3).text();
-        return Size.getSizeByName(size);
+        return ClothSize.getSizeByName(size);
     }
 
     private Date getAssignment(Elements td) {

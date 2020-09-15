@@ -2,14 +2,15 @@ package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum ExchangeType {
+public enum OrderType {
+    EXCHANGE_FOR_A_NEW_ONE("Wymiana na nowe"),
     CHANGE_SIZE("Zmiana rozmiaru"),
-    FOR_A_NEW_ONE("Wymiana na nowe"),
-    CHANGE_ARTICLE("Zmiana artykułu");
+    CHANGE_ARTICLE("Zmiana artykułu"),
+    NEW_ARTICLE("Nowy artykuł");
 
     private final String name;
 
-    ExchangeType(String name){
+    OrderType(String name) {
         this.name = name;
     }
 
@@ -17,4 +18,5 @@ public enum ExchangeType {
     public String getName() {
         return name;
     }
+
 }

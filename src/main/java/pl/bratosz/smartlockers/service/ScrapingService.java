@@ -14,7 +14,7 @@ import java.util.Set;
 public class ScrapingService {
     private BoxesRepository boxesRepository;
     private ClothesRepository clothesRepository;
-    private Set<EmployeeCloth> currentClothes;
+    private Set<Cloth> currentClothes;
     private PlantService plantService;
     private Scrapper scrapper;
 
@@ -39,7 +39,7 @@ public class ScrapingService {
                                     box.getBoxNumber());
         if(employee.getLastName().equals(
                 scrapper.getEmployeeLastName().toUpperCase())) {
-            Set<EmployeeCloth> actualClothes = scrapper.getClothes();
+            Set<Cloth> actualClothes = scrapper.getClothes();
             compareAndUpdateClothes(actualClothes, employee);
             return box;
         } else {
@@ -47,20 +47,20 @@ public class ScrapingService {
         }
     }
 
-    private void compareAndUpdateClothes(Set<EmployeeCloth> actualClothes, Employee employee) {
-        Set<EmployeeCloth> newClothes = new HashSet<>();
+    private void compareAndUpdateClothes(Set<Cloth> actualClothes, Employee employee) {
+        Set<Cloth> newClothes = new HashSet<>();
         if(currentClothes.isEmpty()) {
-            for(EmployeeCloth cloth : actualClothes){
+            for(Cloth cloth : actualClothes){
                 cloth.setEmployee(employee);
                 newClothes.add(cloth);
             }
         } else {
-            for(EmployeeCloth cloth : currentClothes) {
+            for(Cloth cloth : currentClothes) {
                 if(!actualClothes.contains(cloth)) {
                     cloth.setActive(false);
                     continue;
                 }
-                for(EmployeeCloth actualCloth : actualClothes) {
+                for(Cloth actualCloth : actualClothes) {
                     if(!currentClothes.contains(actualCloth)) {
                         actualCloth.setEmployee(employee);
                         newClothes.add(actualCloth);

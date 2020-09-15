@@ -22,7 +22,8 @@ public class Article {
     @JsonView(Views.Public.class)
     private ClothType clothType;
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    @JsonView(Views.InternalForEmployees.class)
+    @OneToMany(mappedBy = "article")
     private Set<Cloth> clothes;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)

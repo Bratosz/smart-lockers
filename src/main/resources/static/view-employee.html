@@ -100,34 +100,14 @@
     </div>
 
     <div class="gap-vertical-20"></div>
-
-    <div>
-        <div class="side-menu"><span>Przyjęcie odzieży: </span></div>
-        <div class="side-menu">
-            <input class="bar-code-input" type="number" />
-            <input class="bar-code-input" type="number" />
-            <input class="bar-code-input" type="number" />
-            <input class="bar-code-input" type="number" />
-            <input class="bar-code-input" type="number" />
-        </div>
-    </div>
     <div>
         <div class="side-menu"><span>Zamówienie odzieży: </span></div>
         <div class="side-menu">
             <select id="select-order-type" class="form-control">
-                <option value="FOR_A_NEW_ONE">Wymiana na nowe</option>
+                <option value="EXCHANGE_FOR_A_NEW_ONE">Wymiana na nowe</option>
                 <option value="CHANGE_SIZE">Zmiana rozmiaru</option>
                 <option value="CHANGE_ARTICLE">Zmiana artykułu</option>
                 <option value="NEW_ARTICLE">Nowy artykuł</option>
-            </select>
-        </div>
-        <div class="side-menu">
-            <select id="select-cloth-type">
-                <option value="SHIRT">Koszulka</option>
-                <option value="TROUSERS">Spodnie</option>
-                <option value="SWEATSHIRT">Bluza</option>
-                <option value="APRON">Fartuch</option>
-                <option value="JACKET">Kurtka</option>
             </select>
         </div>
         <div class="side-menu">
@@ -139,122 +119,150 @@
         <div>
             <p>Wybierz koszulkę: </p>
             <div class="cloth-list">
-                <input type="radio" id="shirt-1" name="shirt" value="5116">
+                <input type="radio" id="shirt-1" name="cloth" value="5116">
                  <label for="shirt-1">T-shirt męski niebieski</label>
                 <br/>
-                <input type="radio" id="shirt-2" name="shirt" value="5115">
+                <input type="radio" id="shirt-2" name="cloth" value="5115">
                 <label for="shirt-2">T-shirt damski niebieski</label>
                 <br/>
-                <input type="radio" id="shirt-3" name="shirt" value="5073">
+                <input type="radio" id="shirt-3" name="cloth" value="5073">
                 <label for="shirt-3">Polo niebieskie</label>
             </div>
             <div class="cloth-list">
-                <input type="radio" id="shirt-4" name="shirt" value="1828">
+                <input type="radio" id="shirt-4" name="cloth" value="1828">
                 <label for="shirt-4">T-shirt męski melanż </label>
                 <br/>
-                <input type="radio" id="shirt-5" name="shirt" value="5099">
+                <input type="radio" id="shirt-5" name="cloth" value="5099">
                 <label for="shirt-5">T-shirt damski melanż</label>
                 <br/>
-                <input type="radio" id="shirt-6" name="shirt" value="5074">
+                <input type="radio" id="shirt-6" name="cloth" value="5074">
                 <label for="shirt-6">Polo szare</label>
             </div>
             <div class="cloth-list">
-                <input type="radio" id="shirt-7" name="shirt" value="5012">
+                <input type="radio" id="shirt-7" name="cloth" value="5012">
                 <label for="shirt-7">T-shirt czarny </label>
                 <br/>
-                <input type="radio" id="shirt-8" name="shirt" value="5077">
+                <input type="radio" id="shirt-8" name="cloth" value="5077">
                 <label for="shirt-8">T-shirt czarny dł. rękaw</label>
                 <br/>
-                <input type="radio" id="shirt-9" name="shirt" value="5071">
+                <input type="radio" id="shirt-9" name="cloth" value="5071">
                 <label for="shirt-9">Polo czarne</label>
             </div>
             <div class="cloth-list">
-                <input type="radio" id="shirt-10" name="shirt" value="5016">
+                <input type="radio" id="shirt-10" name="cloth" value="5016">
                 <label for="shirt-10">T-shirt żółty </label>
                 <br/>
-                <input type="radio" id="shirt-11" name="shirt" value="5064">
+                <input type="radio" id="shirt-11" name="cloth" value="5064">
                 <label for="shirt-11">Polo żółte</label>
                 <br/>
-                <input type="radio" id="shirt-12" name="shirt" value="5071">
+                <input type="radio" id="shirt-12" name="cloth" value="5071">
                 <label for="shirt-12">T-shirt brązowy</label>
             </div>
             <div class="cloth-list">
-                <input type="radio" id="shirt-13" name="shirt" value="5014">
+                <input type="radio" id="shirt-13" name="cloth" value="5014">
                 <label for="shirt-13">T-shirt czerwony</label>
                 <br/>
-                <input type="radio" id="shirt-14" name="shirt" value="5072">
+                <input type="radio" id="shirt-14" name="cloth" value="5072">
                 <label for="shirt-14">Polo czerwone</label>
                 <br/>
-                <input type="radio" id="shirt-15" name="shirt" value="5070">
+                <input type="radio" id="shirt-15" name="cloth" value="5070">
                 <label for="shirt-15">Polo białe</label>
             </div>
         </div>
-        <div>
-            <div class="side-menu"><p>Wybierz rozmiar:</p></div>
-            <div class="side-menu">
-                <select id="select-shirt-size">
-                    <option value="XS">XS</option>
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="XL">XL</option>
-                    <option value="2XL">2XL</option>
-                    <option value="3XL">3XL</option>
-                    <option value="4XL">4XL</option>
-                    <option value="5XL">5XL</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="gap-vertical-20"></div>
 
         <div>
             <p>Wybierz spodnie: </p>
             <div class="cloth-list">
-                <input type="radio" id="trousers-1" name="trousers" value="1052">
+                <input type="radio" id="trousers-1" name="cloth" value="1052">
                 <label for="trousers-1">Spodnie szare męskie</label>
                 <br/>
-                <input type="radio" id="trousers-2" name="trousers" value="1051">
+                <input type="radio" id="trousers-2" name="cloth" value="1051">
                 <label for="trousers-2">Spodnie szare damskie</label>
                 <br/>
-                <input type="radio" id="trousers-3" name="trousers" value="1351">
+                <input type="radio" id="trousers-3" name="cloth" value="1351">
                 <label for="trousers-3">Ogrodniczki szare</label>
             </div>
             <div class="cloth-list">
-                <input type="radio" id="trousers-4" name="trousers" value="1345">
+                <input type="radio" id="trousers-4" name="cloth" value="1345">
                 <label for="trousers-4">Ogrodniczki czarne</label>
                 <br/>
-                <input type="radio" id="trousers-5" name="trousers" value="5595">
+                <input type="radio" id="trousers-5" name="cloth" value="5595">
                 <label for="trousers-5">Spodnie spawalnicze do pasa</label>
                 <br/>
-                <input type="radio" id="trousers-6" name="trousers" value="6595">
+                <input type="radio" id="trousers-6" name="cloth" value="6595">
                 <label for="trousers-6">Ogrodniczki spawalnicze</label>
             </div>
         </div>
         <div>
             <div class="side-menu"><p>Wybierz rozmiar:</p></div>
             <div class="side-menu">
-                <select id="select-trousers-size">
-                    <option value="34">34</option>
-                    <option value="36">36</option>
-                    <option value="38">38</option>
-                    <option value="40">40</option>
-                    <option value="42">42</option>
-                    <option value="44">44</option>
-                    <option value="46">46</option>
-                    <option value="48">48</option>
-                    <option value="50">50</option>
-                    <option value="52">52</option>
-                    <option value="54">54</option>
-                    <option value="56">56</option>
-                    <option value="58">58</option>
-                    <option value="60">60</option>
-                    <option value="62">62</option>
-                    <option value="64">64</option>
-                    <option value="66">66</option>
+                <select id="select-shirt-size">
+                    <option value="SIZE_DEFAULT">Taki sam</option>
+                    <option value="SIZE_XS">XS</option>
+                    <option value="SIZE_S">S</option>
+                    <option value="SIZE_M">M</option>
+                    <option value="SIZE_L">L</option>
+                    <option value="SIZE_XL">XL</option>
+                    <option value="SIZE_2XL">2XL</option>
+                    <option value="SIZE_3XL">3XL</option>
+                    <option value="SIZE_4XL">4XL</option>
+                    <option value="SIZE_5XL">5XL</option>
+                    <option value="SIZE_34">34</option>
+                    <option value="SIZE_36">36</option>
+                    <option value="SIZE_38">38</option>
+                    <option value="SIZE_40">40</option>
+                    <option value="SIZE_42">42</option>
+                    <option value="SIZE_44">44</option>
+                    <option value="SIZE_46">46</option>
+                    <option value="SIZE_48">48</option>
+                    <option value="SIZE_50">50</option>
+                    <option value="SIZE_52">52</option>
+                    <option value="SIZE_54">54</option>
+                    <option value="SIZE_56">56</option>
+                    <option value="SIZE_58">58</option>
+                    <option value="SIZE_60">60</option>
+                    <option value="SIZE_62">62</option>
+                    <option value="SIZE_64">64</option>
+                    <option value="SIZE_66">66</option>
                 </select>
             </div>
         </div>
+    </div>
+
+    <div class="container-table">
+        <table id="table-of-orders">
+            <thead>
+            <th>Rodzaj zamówienia</th>
+            <th>Status zamówienia</th>
+            <th>Id zamówienia</th>
+            <th>Ubranie do wymiany</th>
+            <th>Nowe ubranie</th>
+            <th>Rozmiar</th>
+            <th>Data akceptacji</th>
+            </thead>
+            <tbody id="table-of-orders-body">
+            <tr id="row-order-template" style="display: none">
+                <td class="cell-order-type"></td>
+                <td class="cell-order-status"></td>
+                <td class="cell-id-cloth-order"></td>
+                <td class="cell-cloth-to-exchange"></td>
+                <td class="cell-ordered-cloth"></td>
+                <td class="cell-ordered-cloth-size"></td>
+                <td class="cell-accept-date"></td>
+                <td><input type="checkbox" class="cloth-check-box"/></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <div class="side-menu"><p>Co chcesz zrobić: </p></div>
+        <div class="side-menu">
+            <select id="select-action-on-orders">
+                <option value="ACCEPT">Zaakceptuj</option>
+                <option value="CANCEL">Usuń</option>
+            </select>
+        </div>
+        <div><button id="button-confirm-action-on-orders">Zatwierdź</button></div>
     </div>
 
 </main>

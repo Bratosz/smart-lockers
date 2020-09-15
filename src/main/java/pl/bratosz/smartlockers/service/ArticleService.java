@@ -25,4 +25,17 @@ public class ArticleService {
         Article article = new Article(articleNumber, articleName, clothType);
         return articlesRepository.save(article);
     }
+
+    public Article determineDesiredArticle(int articleNumber, Article article) throws ArticleNotExistException {
+        if(articleNumber == 0) {
+            return article;
+        } else{
+             Article a = getByArticleNumber(articleNumber);
+             if(a == null) {
+                 throw new ArticleNotExistException("Article number: " + articleNumber);
+             } else {
+                 return a;
+             }
+        }
+    }
 }

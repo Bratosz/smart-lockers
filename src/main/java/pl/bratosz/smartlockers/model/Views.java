@@ -31,4 +31,6 @@ public class Views {
 
     public static class DepartmentBasicInfo extends Public {
     }
+
+    public static class InternalForClothOrders extends Public {}
 }

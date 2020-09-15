@@ -5,6 +5,7 @@ let boxNumber;
 let lastName;
 let employeeId;
 const clientId = 1;
+const userId = 1;
 
 function reloadEmployee() {
     $.ajax({
@@ -14,14 +15,15 @@ function reloadEmployee() {
             console.log(box);
             lockerNumber = box.locker.lockerNumber;
             boxNumber = box.boxNumber;
-            lastName = box.employee.lastName;
-            employeeId = box.employee.id;
+            employee = box.employee;
+            lastName = employee.lastName;
+            employeeId = employee.id;
 
             $("#employee").text(box.locker.lockerNumber + "/" + box.boxNumber
             + " " + box.employee.firstName + " " + box.employee.lastName);
 
            displayClothes(box);
-
+           displayOrders(employee.clothOrders);
         }
     })
 }
@@ -77,21 +79,84 @@ function displayClothes(box) {
         $row.find(".cell-washing-date").text(cloth.lastWashing.substring(0,10));
         $("#table-of-clothes-body").append($row);
     }
+}
 
+function displayOrders(clothOrders) {
+    $("#table-of-orders-body > tr:not(#row-order-template)").remove();
+    const $rowTemplate = $("#row-order-template");
+    clothOrders.sort(function (a, b) {
+        return a.cloth.article.articleNumber - b.cloth.article.articleNumber
+            || a.orderStatus - b.orderStatus
+            || a.cloth.ordinalNumber - b.cloth.ordinalNumber;
+    });
+    console.log(clothOrders);
+    for(let i = 0; i < clothOrders.length; i++) {
+        if(clothOrders[i].isCancelled == true) {
+            continue;
+        }
+        const $row = $rowTemplate.clone();
+        let order = clothOrders[i];
+        $row.css("display", "table-row");
+        $row.find(".cell-order-type").text(order.orderType);
+        $row.find(".cell-order-status").text(order.orderStatus);
+        $row.find(".cell-id-cloth-order").text(order.id);
+        $row.find(".cell-cloth-to-exchange").text(order.cloth.article.name + " lp. " + order.cloth.ordinalNumber);
+        $row.find(".cell-ordered-cloth").text(order.article.name);
+        $row.find(".cell-ordered-cloth-size").text(order.size);
+        $row.find(".cell-accept-date").text(order.acceptDate);
+        $("#table-of-orders-body").append($row);
+    }
+}
+
+function isValueNullOrFalse(val) {
+    return !val;
 }
 
 // var rows = $( client_table.$('input[type="checkbox"]').map(function () {
 //     return $(this).closest('tr');
 // } ) );
 
+$('#button-confirm-action-on-orders').click(function() {
+    let actionType = $('#select-action-on-orders').val();
+    let orderIds = new Array;
+    $('#table-of-orders-body').find('input[type="checkbox"]:checked').each(function () {
+        let orderId = parseInt($(this).closest('tr').find('.cell-id-cloth-order').text());
+        orderIds.push(orderId);
+    });
+    $.ajax({
+        url: `http://localhost:8080/order/action/${actionType}/${userId}`,
+        method: "post",
+        contentType: "application/json",
+        data: JSON.stringify(orderIds),
+        success: function(response) {
+            console.log(response);
+        }
+    });
+});
+
 $('#button-confirm-order').click(function () {
-    let clothesId = new Array;
+    let clothIds = new Array;
     let orderType = $("#select-order-type").val();
     $('#table-of-clothes-body').find('input[type="checkbox"]:checked').each(function () {
-        let clothId = $(this).closest('tr').find('.cell-id-bar-code').text();
-        clothesId.push(clothId);
+        let clothId = parseInt($(this).closest('tr').find('.cell-id-bar-code').text());
+        clothIds.push(clothId);
     });
-    console.log(clothesId);
+    let articleNumber = $('input[name="cloth"]:checked').val();
+    if(typeof articleNumber === "undefined"){
+        articleNumber = 0;
+    }
+    let size = $('#select-shirt-size').val();
+    $.ajax({
+        url: `http://localhost:8080/order/place/${articleNumber}/${size}/${orderType}/${userId}`,
+        method: "post",
+        contentType: "application/json",
+        data: JSON.stringify(clothIds),
+        success: function (response) {
+            // $('.answer').html(response);
+            console.log(response);
+        }
+    });
+    console.log(clothIds);
     console.log(orderType);
 });
 
