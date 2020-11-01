@@ -3,6 +3,7 @@ const boxId = url.searchParams.get("id");
 let lockerNumber;
 let boxNumber;
 let lastName;
+let firstName;
 let employeeId;
 const clientId = 1;
 const userId = 1;
@@ -17,12 +18,15 @@ function reloadEmployee() {
             boxNumber = box.boxNumber;
             employee = box.employee;
             lastName = employee.lastName;
+            firstName = employee.firstName;
             employeeId = employee.id;
 
-            $("#employee").text(box.locker.lockerNumber + "/" + box.boxNumber
-            + " " + box.employee.firstName + " " + box.employee.lastName);
+            $("#employee").text(lockerNumber + "/" + boxNumber
+            + " " + firstName + " " + lastName);
 
            displayClothes(box);
+           console.log(employee.acceptedClothes);
+           displayAcceptedClothes(employee.acceptedClothes);
            displayOrders(employee.clothOrders);
         }
     })
@@ -63,21 +67,54 @@ function displayClothes(box) {
         return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
     });
     for(let i = 0; i < clothes.length; i++) {
-        const cloth = clothes[i];
-        if(cloth.isActive == false) {
-            continue;
-        }
-        const $row = $rowTemplate.clone();
+        let cloth = clothes[i];
+        let $row = $rowTemplate.clone();
+        let assignmentDate = formatDate(cloth.assignment);
+        let releaseDate = formatDate(cloth.releaseDate);
+        let lastWashingDate = formatDate(cloth.lastWashing);
         $row.css("display", "table-row");
         $row.find(".cell-ordinal-number").text(cloth.ordinalNumber);
         $row.find(".cell-article-number").text(cloth.article.articleNumber);
         $row.find(".cell-article-name").text(cloth.article.name);
         $row.find(".cell-size").text(cloth.size);
-        $row.find(".cell-assignment-date").text(cloth.assignment.substring(0,10));
+        $row.find(".cell-assignment-date").text(assignmentDate);
         $row.find(".cell-id-bar-code").text(cloth.id);
-        $row.find(".cell-release-date").text(cloth.releaseDate.substring(0,10));
-        $row.find(".cell-washing-date").text(cloth.lastWashing.substring(0,10));
+        $row.find(".cell-release-date").text(releaseDate);
+        $row.find(".cell-washing-date").text(lastWashingDate);
         $("#table-of-clothes-body").append($row);
+    }
+}
+
+function displayAcceptedClothes(acceptedClothes) {
+    $("#table-of-accepted-clothes-body > tr:not(#row-template-accepted-clothes)").remove();
+    let $rowTemplate = $("#row-template-accepted-clothes");
+    if(acceptedClothes !== undefined) {
+        acceptedClothes.sort(function (a, b) {
+            return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
+        });
+        for (let i = 0; i < acceptedClothes.length; i++) {
+            let cloth = acceptedClothes[i];
+            console.log(cloth);``
+            let $row = $rowTemplate.clone();
+            let acceptedDate = formatDate(cloth.acceptedForExchangeDate);
+            $row.css("display", "table-row");
+            $row.find(".cell-ordinal-number").text(cloth.ordinalNumber);
+            $row.find(".cell-article-number").text(cloth.article.articleNumber);
+            $row.find(".cell-article-name").text(cloth.article.name);
+            $row.find(".cell-size").text(cloth.size);
+            $row.find(".cell-id-bar-code").text(cloth.id);
+            $row.find(".cell-accepted-for-exchange-date").text(acceptedDate);
+            $("#table-of-accepted-clothes-body").append($row);
+        }
+    }
+}
+
+function formatDate(date) {
+    date = date.substring(0,10);
+    if(date == "1970-01-01"){
+        return "";
+    } else {
+        return date;
     }
 }
 
@@ -89,7 +126,6 @@ function displayOrders(clothOrders) {
             || a.orderStatus - b.orderStatus
             || a.cloth.ordinalNumber - b.cloth.ordinalNumber;
     });
-    console.log(clothOrders);
     for(let i = 0; i < clothOrders.length; i++) {
         if(clothOrders[i].isCancelled == true) {
             continue;
@@ -145,7 +181,10 @@ $('#button-confirm-order').click(function () {
     if(typeof articleNumber === "undefined"){
         articleNumber = 0;
     }
-    let size = $('#select-shirt-size').val();
+    let size = $('input[name="size"]:checked').val();
+    if(typeof size === "undefined"){
+        size = "SIZE_DEFAULT";
+    }
     $.ajax({
         url: `http://localhost:8080/order/place/${articleNumber}/${size}/${orderType}/${userId}`,
         method: "post",

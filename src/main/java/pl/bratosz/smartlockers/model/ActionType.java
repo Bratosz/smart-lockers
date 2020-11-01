@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ActionType {
     ACCEPT("Zaakceptuj"),
-    CANCEL("Usuń");
+    CANCEL("Anuluj");
 
     private final String name;
 

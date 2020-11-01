@@ -60,7 +60,7 @@ public class EmployeeController {
     @JsonView(Views.Public.class)
     @DeleteMapping("/{id}")
     public void deleteFromBoxEmployeeById(@PathVariable Long id) {
-        employeeService.deleteFromBoxEmployeeById(id);
+        employeeService.dismissById(id);
     }
 
     @JsonView(Views.InternalForEmployees.class)
@@ -72,8 +72,15 @@ public class EmployeeController {
     @JsonView(Views.InternalForEmployees.class)
     @GetMapping("/find/{lastName}")
     public List<Employee> getEmployeesByLastName(@PathVariable String lastName) {
-        lastName.toUpperCase();
+        lastName.toUpperCase().trim();
         return employeeService.getEmployeesByLastName(lastName);
+    }
+
+    @JsonView(Views.InternalForEmployees.class)
+    @GetMapping("/find_by_first_Name/{firstName}")
+    public List<Employee> getEmployeesByFirstName(@PathVariable String firstName) {
+        firstName.toUpperCase().trim();
+        return employeeService.getEmployeesByFirstName(firstName);
     }
 
     @JsonView(Views.InternalForEmployees.class)
@@ -102,7 +109,7 @@ public class EmployeeController {
 
     @JsonView(Views.InternalForEmployees.class)
     @PostMapping("/dismiss_by_id/{id}")
-    public Set<Box> dismissById(@PathVariable Long id) {
+    public Box dismissById(@PathVariable Long id) {
         return employeeService.dismissById(id);
     }
 
@@ -133,4 +140,5 @@ public class EmployeeController {
             @RequestBody Employee employee, @PathVariable Long id) {
         return employeeService.changeDepartment(employee.getDepartment(), id);
     }
+
 }

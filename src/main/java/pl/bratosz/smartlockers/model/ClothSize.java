@@ -25,6 +25,7 @@ public enum ClothSize {
     SIZE_62("62"),
     SIZE_64("64"),
     SIZE_66("66"),
+    SIZE_68("68"),
     SIZE_XS("XS"),
     SIZE_S("S"),
     SIZE_M("M"),

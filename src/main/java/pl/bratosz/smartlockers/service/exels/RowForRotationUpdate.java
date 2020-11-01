@@ -1,47 +1,47 @@
 package pl.bratosz.smartlockers.service.exels;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import pl.bratosz.smartlockers.date.FormatDate;
 
 import java.util.Date;
 import java.util.Map;
 
-import static pl.bratosz.smartlockers.service.exels.Index.*;
+import static pl.bratosz.smartlockers.service.exels.ColumnType.*;
 
-public class RowForRotationUpdate extends LoadedRow {
+public class RowForRotationUpdate extends RowForCloth {
     private int ordinalNo;
     private int articleNo;
     private int lockerNo;
     private int boxNo;
     private Date washingDate;
 
-    public RowForRotationUpdate(Row row, Map<Index, Integer> indexes) {
+    public RowForRotationUpdate(Row row, Map<ColumnType, Integer> indexes) {
         super(row, indexes);
-        setOrdinalNo(ORDINAL_NO);
-        setArticleNo(ARTICLE_NO);
-        setLockerNo(LOCKER_NO);
-        setBoxNo(BOX_NO);
+        setOrdinalNo(ORDINAL_NUMBER);
+        setArticleNo(ARTICLE_NUMBER);
+        setLockerNo(LOCKER_NUMBER);
+        setBoxNo(BOX_NUMBER);
         setWashingDate(WASHING_DATE);
     }
 
-    private void setOrdinalNo(Index ordinalNo) {
-        this.ordinalNo = (int) getCellByIndex(ordinalNo).getNumericCellValue();
+    private void setOrdinalNo(ColumnType columnType) {
+        this.ordinalNo = getNumericCellValueByColumnType(columnType);
     }
 
-    private void setArticleNo(Index articleNo) {
-        this.articleNo = (int) getCellByIndex(articleNo).getNumericCellValue();
+    private void setArticleNo(ColumnType columnType) {
+        this.articleNo = getNumericCellValueByColumnType(columnType);
     }
 
-    private void setLockerNo(Index lockerNo) {
-        this.lockerNo = (int) getCellByIndex(lockerNo).getNumericCellValue();
+    private void setLockerNo(ColumnType columnType) {
+            this.lockerNo = getNumericCellValueByColumnType(columnType);
     }
 
-    private void setBoxNo(Index boxNo) {
-        this.boxNo = (int) getCellByIndex(boxNo).getNumericCellValue();
+    private void setBoxNo(ColumnType columnType) {
+            this.boxNo = getNumericCellValueByColumnType(columnType);
     }
 
-    private void setWashingDate(Index washingDate) {
-        this.washingDate = getCellByIndex(washingDate).getDateCellValue();
+    private void setWashingDate(ColumnType columnType) {
+        this.washingDate = FormatDate.getDate(getStringCellValueByColumnType(columnType));
     }
 
     public int getOrdinalNo() {

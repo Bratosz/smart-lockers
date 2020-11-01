@@ -14,9 +14,9 @@ import java.util.List;
 
 @Repository
 public interface LockersRepository extends JpaRepository<Locker, Long> {
-    @Override
-    @Query("select l from Locker l order by l.lockerNumber ")
-    List<Locker> findAll();
+
+    @Query("select l from Locker l where l.plant.client.id = :clientId order by l.plantNumber, l.lockerNumber ")
+    List<Locker> getAllByClientId(@Param("clientId") long clientId);
 
     @Query("select l from Locker l where " +
             "l.plantNumber = :plantNumber " +
@@ -24,30 +24,16 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
     List<Locker> findAllByPlantNumber(int plantNumber);
 
     @Query("select l from Locker l where " +
-            "(l.plantNumber = :plantNumber or :plantNumber is null) " +
+            "(l.plant.id = :plantId or :plantId is null) " +
             "and " +
-            "(l.department = :department or :department is null) " +
+            "(l.department.id = :departmentId or :departmentId is null) " +
             "and " +
-            "(l.location = :location or :location is null) order by l.lockerNumber ")
-    List<Locker> filterAllByPlantNumberAndDepartmentAndLocation(
-            @Param("plant") int plantNumber,
-            @Param("department") Department department,
-            @Param("location") Location location);
+            "(l.location.id = :locationId or :locationId is null) order by l.lockerNumber ")
+    List<Locker> filterAllByPlantAndDepartmentAndLocation(
+            @Param("plantId") long plantId,
+            @Param("departmentId") long departmentId,
+            @Param("locationId") long locationId);
 
-    @Query("select l from Locker l join l.boxes b where " +
-            "(l.plantNumber = :plantNumber or :plantNumber is null) " +
-            "and " +
-            "(l.department = :department or :department is null) " +
-            "and " +
-            "(l.location = :location or :location is null)" +
-            "and " +
-            "(b.boxStatus = :boxStatus or :boxStatus is null) " +
-            "order by l.lockerNumber, b.boxNumber ")
-    List<Locker> filterAllByPlantNumberAndDepartmentAndLocationAndStatus(
-            @Param("plant") int plantNumber,
-            @Param("department") Department department,
-            @Param("location") Location location,
-            @Param("boxStatus") Box.BoxStatus boxStatus);
 
     @Query("select count(l.plantNumber) from Locker l where l.plant.id = :plantId ")
     int getAmountOfLockersByPlantId(@Param("plantId") long plantId);

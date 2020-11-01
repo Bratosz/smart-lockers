@@ -21,10 +21,11 @@ public class Box {
     private BoxStatus boxStatus;
 
     @JsonView({Views.InternalForLockers.class, Views.InternalForBoxes.class})
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Employee employee;
+    @OneToOne(cascade = CascadeType.ALL)
+    private EmployeeGeneral employee;
 
-    private Long emptyBoxEmployeeNo;
+    @OneToOne(cascade = CascadeType.ALL)
+    private EmployeeDummy employeeDummy;
 
     @JsonView(Views.DismissedEmployees.class)
     @ManyToMany
@@ -36,29 +37,30 @@ public class Box {
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class, Views.InternalForClothes.class})
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "locker_id", insertable = false, updatable = false)
+    @JoinColumn(name="locker_id")
     private Locker locker;
 
     public Box() {
     }
 
-    public Box(int boxNumber, BoxStatus boxStatus) {
+    public Box(int boxNumber) {
         this.boxNumber = boxNumber;
-        this.boxStatus = boxStatus;
     }
 
-    public Box(int boxNumber, BoxStatus boxStatus, Long emptyEmployeeNo) {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public int getBoxNumber() {
+        return boxNumber;
+    }
+
+    public void setBoxNumber(int boxNumber) {
         this.boxNumber = boxNumber;
-        this.boxStatus = boxStatus;
-        this.emptyBoxEmployeeNo = emptyEmployeeNo;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
     }
 
     public BoxStatus getBoxStatus() {
@@ -69,28 +71,26 @@ public class Box {
         this.boxStatus = boxStatus;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public EmployeeGeneral getEmployee() {
+        return employee;
     }
 
-    public void setBoxNumber(int boxNumber) {
-        this.boxNumber = boxNumber;
+    public void setEmployee(EmployeeGeneral employee) {
+        if(employee.isDummy()) {
+            this.employee = employee;
+            setBoxStatus(BoxStatus.FREE);
+        } else {
+            this.employee = employee;
+            setBoxStatus(BoxStatus.OCCUPY);
+        }
     }
 
-    public Long getId() {
-        return id;
+    public EmployeeDummy getEmployeeDummy() {
+        return employeeDummy;
     }
 
-    public int getBoxNumber() {
-        return boxNumber;
-    }
-
-    public Locker getLocker() {
-        return locker;
-    }
-
-    public void setLocker(Locker locker) {
-        this.locker = locker;
+    public void setEmployeeDummy(EmployeeDummy employeeDummy) {
+        this.employeeDummy = employeeDummy;
     }
 
     public List<Employee> getDismissedEmployees() {
@@ -101,13 +101,26 @@ public class Box {
         this.dismissedEmployees = dismissedEmployees;
     }
 
-    public Long getEmptyBoxEmployeeNo() {
-        return emptyBoxEmployeeNo;
+    public Locker getLocker() {
+        return locker;
     }
 
-    public void setEmptyBoxEmployeeNo(Long emptyBoxEmployeeNo) {
-        this.emptyBoxEmployeeNo = emptyBoxEmployeeNo;
+    public void setLocker(Locker locker) {
+        this.locker = locker;
     }
+
+//    public void setEmployee(Employee employee) {
+//        if(employee.isEmpty()) {
+//            this.employee = employee;
+//            setBoxStatus(BoxStatus.FREE);
+//        } else {
+//            setEmptyEmployee(this.employee);
+//            this.employee = employee;
+//            setBoxStatus(BoxStatus.OCCUPY);
+//        }
+//    }
+
+
 
     public enum BoxStatus {
         OCCUPY("Zajęta"),
@@ -128,4 +141,13 @@ public class Box {
         }
     }
 
+
+
+//    private void setEmptyEmployee(Employee emptyEmployee) {
+//        if(emptyEmployee.isEmpty()) {
+//            this.emptyEmployee = emptyEmployee;
+//        } else {
+//            throw new InvalidEmployeeException("Empty employee is not empty");
+//        }
+//    }
 }

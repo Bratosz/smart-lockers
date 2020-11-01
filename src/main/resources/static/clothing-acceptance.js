@@ -1,6 +1,3 @@
-const clientId = 1;
-const userId = 1;
-const enterValue = 13;
 let isSended = true;
 
 $(document).ready(function () {
@@ -13,10 +10,14 @@ $(document).ready(function () {
         } else if (isSended && initialInputValue.length == 0) {
             isSended = false;
         }
-        let char = event.which;
-        if (char == enterValue) {
+        let keyPressed = event.which;
+        if (isEnterKeyPressed(keyPressed)) {
+            let clothBarCode = input.val();
+            console.log(clothBarCode);
+            console.log(userId);
+            let exchangeType = $('input[name="exchange"]:checked').val();
             $.ajax({
-                url: `http://localhost:8080/clothes/acceptance/${input.val()}`,
+                url: `http://localhost:8080/clothes/acceptance/${clientId}/${userId}/${clothBarCode}/${exchangeType}`,
                 method: "post",
                 success: function (response) {
                     console.log(response)
@@ -26,3 +27,12 @@ $(document).ready(function () {
         }
     });
 });
+
+function isEnterKeyPressed(char) {
+    let enterKeyValue = 13;
+    if(char == enterKeyValue) {
+        return true;
+    } else {
+        return false;
+    }
+}

@@ -3,10 +3,9 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Box;
+import pl.bratosz.smartlockers.model.EmployeeGeneral;
 import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.service.BoxService;
-
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -26,8 +25,9 @@ public class BoxController {
 
     @JsonView(Views.InternalForLockers.class)
     @PostMapping("/dismiss_employee")
-    public Box dismissEmployeeByBox(@RequestBody Box box) {
-        return boxesService.dismissEmployee(box);
+    public Box dismissEmployeeByBox(@RequestBody Box b) {
+        EmployeeGeneral e = b.getEmployee();
+        return boxesService.dismissEmployee(b, e);
     }
 
     @JsonView(Views.InternalForBoxes.class)
@@ -36,18 +36,6 @@ public class BoxController {
         return boxesService.getBoxById(id);
     }
 
-    @PostMapping("/create_labels/{folderName}/{sheetName}/{plantNumber}/{firstLocker}/{lastLocker}")
-    public void createLabels(@PathVariable String folderName,
-                             @PathVariable String sheetName,
-                             @PathVariable int plantNumber,
-                             @PathVariable int firstLocker,
-                             @PathVariable int lastLocker) throws IOException {
-    }
-    @JsonView(Views.InternalForBoxes.class)
-    @PostMapping("/set_empty_box_employee")
-    public Box setEmptyBoxEmployee() {
-        return boxesService.setEmptyBoxEmployee();
-    }
 
     @PostMapping("/set_actual_status")
     public List<Box> setActualStatus(){

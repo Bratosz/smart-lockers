@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.xmlbeans.impl.xb.xsdschema.All;
 
 import javax.persistence.*;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -71,5 +73,23 @@ public class Client {
 
     public void setDepartments(Set<Department> departments) {
         this.departments = departments;
+    }
+
+    public Department getDepartmentByName(String departmentName) {
+        Optional<Department> departmentOpt = departments.stream().filter(d -> d.getName().equals(departmentName))
+                .findFirst();
+        return departmentOpt.orElseThrow(NoSuchElementException::new);
+    }
+
+    public Location getLocationByName(String locationName) {
+        Optional<Location> locationOpt = locations.stream().filter(l -> l.getName().equals(locationName))
+                .findFirst();
+        return locationOpt.orElseThrow(NoSuchElementException::new);
+    }
+
+    public Plant getPlantByNumber(int plantNumber) {
+        Optional<Plant> plantOpt = plants.stream().filter(p -> p.getPlantNumber() == plantNumber)
+                .findFirst();
+        return plantOpt.orElseThrow(NoSuchElementException::new);
     }
 }

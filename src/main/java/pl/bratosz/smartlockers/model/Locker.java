@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Entity
@@ -32,8 +33,7 @@ public class Locker {
     private Location location;
 
     @JsonView(Views.InternalForLockers.class)
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "locker_id")
+    @OneToMany(mappedBy = "locker", cascade = CascadeType.ALL)
     private List<Box> boxes;
 
     @JsonView(Views.Public.class)
@@ -111,7 +111,7 @@ public class Locker {
     }
 
     public Optional<Box> getBoxByNumber(Integer boxNumber) {
-        return boxes.stream().filter(x -> x.getBoxNumber() == boxNumber).findFirst();
+        return boxes.stream().filter(b -> b.getBoxNumber() == boxNumber).findFirst();
     }
 
     public Plant getPlant() {

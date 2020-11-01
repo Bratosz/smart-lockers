@@ -5,7 +5,9 @@ import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
+import pl.bratosz.smartlockers.service.creators.BoxCreator;
 
+import javax.persistence.GeneratedValue;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,8 +18,6 @@ public class BoxService {
 
     private BoxesRepository boxesRepository;
     private EmployeesRepository employeesRepository;
-    private LockerService lockerService;
-
 
     public BoxService(BoxesRepository boxesRepository, EmployeesRepository employeesRepository) {
         this.boxesRepository = boxesRepository;
@@ -33,21 +33,21 @@ public class BoxService {
         return boxes.stream().findFirst().get();
     }
 
-    public Box dismissEmployee(Box box) {
-        box.getDismissedEmployees().add(box.getEmployee());
-        box.setEmployee(employeesRepository.getEmployeeById(box.getEmptyBoxEmployeeNo()));
-        box.setBoxStatus(FREE);
-        return boxesRepository.save(box);
+    public Box dismissEmployee(Box box, EmployeeGeneral empToDismiss) {
+        if (box.getBoxStatus().equals(OCCUPY)) {
+            EmployeeDummy empForEmptyBox = box.getEmployeeDummy();
+            if (empToDismiss.getClass().isInstance(EmployeeDummy.class)) {
+                return box;
+            } else {
+                box.getDismissedEmployees().add((Employee) empToDismiss);
+                box.setEmployee(empForEmptyBox);
+                return boxesRepository.save(box);
+            }
+        } else {
+            return box;
+        }
     }
 
-    public Employee releaseEmployeeFromBox(Box box) {
-        Employee employee = box.getEmployee();
-        employee.getBoxesOccupiedInPast().add(box);
-        box.setEmployee(employeesRepository.getEmployeeById(box.getEmptyBoxEmployeeNo()));
-        box.setBoxStatus(FREE);
-        boxesRepository.save(box);
-        return employee;
-    }
 
     public Box setEmployee(Employee employee, Box box) {
         box.setEmployee(employee);
@@ -86,33 +86,13 @@ public class BoxService {
     }
 
     public List<Box> createBoxesForLocker(int lockerCapacity) {
-        List<Box> boxes = new LinkedList<>();
-        for (int i = 1; i <= lockerCapacity; i++) {
-            Employee employee = new Employee("", "", null);
-            List<Employee> employees = new LinkedList<>();
-            employees.add(employee);
-
-            Box box = new Box(i, FREE, employee.getId());
-            box.setEmployee(employee);
-            box.setDismissedEmployees(employees);
-            boxes.add(box);
-        }
+        BoxCreator boxCreator = new BoxCreator();
+        List<Box> boxes = boxCreator.createBoxesForLocker(lockerCapacity);
         return boxes;
     }
 
     public List<Box> getBoxesByLockersRange(int plantNumber, int firstLocker, int lastLocker) {
         return boxesRepository.getBoxesByLockersRange(plantNumber, firstLocker, lastLocker);
-    }
-
-    public Box setEmptyBoxEmployee() {
-        for(int i = 3362; i<=3370; i++) {
-            Box boxById = boxesRepository.getBoxById((long) i);
-            Employee emptyEmployee = employeesRepository.save(new Employee("", "", null));
-            Long emptyEmployeeId = emptyEmployee.getId();
-            boxById.setEmptyBoxEmployeeNo(emptyEmployeeId);
-            boxesRepository.save(boxById);
-        }
-        return boxesRepository.getBoxById((long) 3370);
     }
 
     public List<Box> setActualBoxStatus() {
@@ -134,14 +114,23 @@ public class BoxService {
     }
 
     private boolean isEmployeePresent(Box b) {
-        Employee employee = b.getEmployee();
-        String lastName = employee.getLastName();
-        if((lastName != null)
-                && (lastName.length() > 0)) {
+        EmployeeGeneral e = b.getEmployee();
+        if(e.getClass().isInstance(Employee.class)){
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
+
+    public Employee getEmployeeToChangeBox(Box b) {
+        EmployeeGeneral e = b.getEmployee();
+        if(e.getClass().isInstance(Employee.class)){
+            return (Employee) dismissEmployee(b, e).getEmployee();
+        } else {
+            throw new BoxNotAvailableException("Box is empty\n" + b.toString());
+        }
+
+    }
 }
 

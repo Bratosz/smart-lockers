@@ -1,47 +1,49 @@
 package pl.bratosz.smartlockers.service.exels;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Map;
 
-import static pl.bratosz.smartlockers.service.exels.Index.*;
+import static pl.bratosz.smartlockers.service.exels.ColumnType.*;
 
 public class LoadedRow {
     private String firstName;
     private String lastName;
-    private long barCode;
     private Row row;
-    private Map<Index, Integer> indexes;
+    private Map<ColumnType, Integer> indexes;
 
-    public LoadedRow(Row row, Map<Index, Integer> indexes){
+    public LoadedRow(Row row, Map<ColumnType, Integer> indexes){
         this.row = row;
         this.indexes = indexes;
         setFirstName(FIRST_NAME);
         setLastName(LAST_NAME);
-        setBarCode(BAR_CODE);
     }
 
 
-    private  void setFirstName(Index firstName) {
-        this.firstName = getCellByIndex(firstName).getStringCellValue();
+    private  void setFirstName(ColumnType firstName) {
+        this.firstName = getStringCellValueByColumnType(firstName);
     }
 
-    private void setLastName(Index lastName) {
-        this.lastName = getCellByIndex(lastName).getStringCellValue();
+    private void setLastName(ColumnType lastName) {
+        this.lastName = getStringCellValueByColumnType(lastName);
     }
 
-    private void setBarCode(Index barCode) {
-        if(CellTypeResolver.isCellNumeric(getCellByIndex(barCode))) {
-            this.barCode = (long) getCellByIndex(barCode).getNumericCellValue();
-        } else {
-            this.barCode = Long.parseLong(getCellByIndex(barCode).getStringCellValue());
+
+
+     String getStringCellValueByColumnType(ColumnType columnType) {
+        int columnIndex = indexes.get(columnType);
+        Cell cell = row.getCell(columnIndex);
+        if(CellValueManager.isCellValueValid(cell)){
+            String cellValue = CellValueManager.getNormalizedStringValue(cell);
+            return cellValue;
         }
+        return "";
     }
 
-     Cell getCellByIndex(Index index) {
-        return row.getCell(indexes.get(index));
+    int getNumericCellValueByColumnType(ColumnType columnType) {
+        String s = getStringCellValueByColumnType(columnType);
+        return (int) Double.parseDouble(s);
     }
 
     public String getFirstName() {
@@ -50,9 +52,5 @@ public class LoadedRow {
 
     public String getLastName() {
         return lastName;
-    }
-
-    public long getBarCode() {
-        return barCode;
     }
 }

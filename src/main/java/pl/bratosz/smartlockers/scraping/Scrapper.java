@@ -46,6 +46,10 @@ public class Scrapper {
         return oc.getActualPage().select("#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(3)").text();
     }
 
+    public String getEmployeeFirstName() {
+        return oc.getActualPage().select("#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(2)").text();
+    }
+
     public Set<Cloth> getClothes() {
         Elements elements = oc.getActualPage().select("#ctl00_MainContent_GridView2 > tbody > tr");
         Set<Cloth> clothes = new HashSet<>();

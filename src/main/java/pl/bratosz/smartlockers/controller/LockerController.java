@@ -26,14 +26,14 @@ public class LockerController {
     }
 
     @JsonView(Views.InternalForLockers.class)
-    @GetMapping
-    public List<Locker> getAll() {
-        List<Locker> lockers = lockersRepository.findAll();
-        if(lockers.size() < 50) {
+    @GetMapping("/{clientId}")
+    public List<Locker> getAll(@PathVariable long clientId) {
+        List<Locker> lockers = lockersRepository.getAllByClientId(clientId);
+        if(lockers.size() < 2) {
             return lockers;
         } else {
         }
-        return lockers.subList(0,50);
+        return lockers.subList(0,1);
     }
 
     @JsonView(Views.InternalForLockers.class)
@@ -43,16 +43,14 @@ public class LockerController {
     }
 
     @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/filter/{plantNumber}/{department}/{location}/{boxStatus}")
-    public List<Locker> getFiltered(@PathVariable int plantNumber,
-                                    @PathVariable Department department,
-                                    @PathVariable Location location,
+    @GetMapping("/filter/{plantId}/{departmentId}/{locationId}/{boxStatus}")
+    public List<Locker> getFiltered(@PathVariable long plantId,
+                                    @PathVariable long departmentId,
+                                    @PathVariable long locationId,
                                     @PathVariable Box.BoxStatus boxStatus) {
-        List<Locker> lockers = lockersRepository.filterAllByPlantNumberAndDepartmentAndLocation(
-                plantNumber, department, location);
-        if (boxStatus.equals(Box.BoxStatus.UNDEFINED)) {
-            return lockers.subList(0,50);
-        }
+        List<Locker> lockers = lockersRepository.filterAllByPlantAndDepartmentAndLocation(
+                plantId, departmentId, locationId);
+
         for (Locker locker : lockers) {
             List<Box> boxes = locker.getBoxes();
             List<Box> filteredBoxes = boxes.stream()
@@ -60,7 +58,10 @@ public class LockerController {
                     .collect(Collectors.toList());
             locker.setBoxes(filteredBoxes);
         }
-        return lockers.subList(0,50);
+        if(lockers.size() < 15){
+            return lockers;
+        }
+        return lockers.subList(0,10);
     }
 
 

@@ -1,7 +1,9 @@
 package pl.bratosz.smartlockers.service.exels;
 
-public enum ClothOperationType {
+public enum LoadType {
     CLOTHES_ROTATION_UPLOAD,
     CLOTHES_ROTATION_UPDATE,
     RELEASED_ROTATIONAL_CLOTHING_UPDATE,
+    BASIC_DATA_BASE_UPLOAD,
+    DETAILED_DATA_BASE_UPLOAD,
 }

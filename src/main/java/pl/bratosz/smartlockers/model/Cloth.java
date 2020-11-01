@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -43,13 +44,25 @@ public class Cloth {
     @ManyToOne(cascade = CascadeType.ALL)
     private Employee employee;
 
+    @JsonView(Views.InternalForClothes.class)
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Employee acceptedOwner;
+
+    @JsonView(Views.InternalForClothes.class)
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Employee rotationOwner;
+
+    @JsonView(Views.InternalForClothes.class)
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Employee withdrawnOwner;
+
     @JsonView(Views.Public.class)
     private boolean acceptedForExchange;
 
-    private boolean rotational;
+    @JsonView(Views.Public.class)
+    private Date acceptedForExchangeDate;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Employee rotationOwner;
+    private boolean rotational;
 
     private  boolean releaseAsRotational;
 
@@ -166,6 +179,8 @@ public class Cloth {
     }
 
     public Set<ClothOrder> getClothOrders() {
+        if(clothOrders.equals(null))
+            return new HashSet<>();
         return clothOrders;
     }
 
@@ -213,12 +228,28 @@ public class Cloth {
         this.releaseAsRotationalDate = releaseAsRotationalDate;
     }
 
+    public Employee getAcceptedOwner() {
+        return acceptedOwner;
+    }
+
+    public void setAcceptedOwner(Employee acceptedOwner) {
+        this.acceptedOwner = acceptedOwner;
+    }
+
     public boolean isReleaseAsRotational() {
         return releaseAsRotational;
     }
 
     public void setReleaseAsRotational(boolean releaseAsRotational) {
         this.releaseAsRotational = releaseAsRotational;
+    }
+
+    public Date getAcceptedForExchangeDate() {
+        return acceptedForExchangeDate;
+    }
+
+    public void setAcceptedForExchangeDate(Date acceptedForExchangeDate) {
+        this.acceptedForExchangeDate = acceptedForExchangeDate;
     }
 
     @Override
@@ -234,4 +265,21 @@ public class Cloth {
         return Objects.hash(getId());
     }
 
+    @Override
+    public String toString() {
+        return getArticle().getName() + " " + getSize() + " " + "lp. " +
+                getOrdinalNumber();
+    }
+
+    public long getClientId() {
+        return getEmployee().getDepartment().getClient().getId();
+    }
+
+    public Employee getWithdrawnOwner() {
+        return withdrawnOwner;
+    }
+
+    public void setWithdrawnOwner(Employee withdrawnOwner) {
+        this.withdrawnOwner = withdrawnOwner;
+    }
 }

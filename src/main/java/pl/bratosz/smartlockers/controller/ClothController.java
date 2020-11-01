@@ -5,8 +5,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pl.bratosz.smartlockers.response.ClothAcceptanceResponse;
-import pl.bratosz.smartlockers.service.exels.ClothOperationType;
+import pl.bratosz.smartlockers.model.OrderType;
+import pl.bratosz.smartlockers.response.ResponseClothAcceptance;
+import pl.bratosz.smartlockers.service.exels.LoadType;
 import pl.bratosz.smartlockers.service.exels.ExcelExtractor;
 import pl.bratosz.smartlockers.model.Cloth;
 import pl.bratosz.smartlockers.service.ClothService;
@@ -28,21 +29,21 @@ public class ClothController {
     }
 
     @JsonView(InternalForClothes.class)
-    @PostMapping("/upload/{clothOperationType}")
+    @PostMapping("/upload/{loadType}")
     public List<Cloth> uploadClothes(
             @RequestParam("file")MultipartFile file,
-            @PathVariable ClothOperationType clothOperationType) throws IOException {
+            @PathVariable LoadType loadType) throws IOException {
         Sheet sheet = ExcelExtractor.getSheet(file);
-        return clothesService.uploadClothesRotation(sheet, clothOperationType);
+        return clothesService.uploadClothesRotation(sheet, loadType);
     }
 
     @JsonView(InternalForClothes.class)
-    @PostMapping("/upload_released_rotation/{clothOperationType}")
+    @PostMapping("/upload_released_rotation/{loadType}")
     public List<Cloth> uploadReleasedRotation(
             @RequestParam("file")MultipartFile file,
-            @PathVariable ClothOperationType clothOperationType) throws IOException {
+            @PathVariable LoadType loadType) throws IOException {
         Sheet sheet = ExcelExtractor.getSheet(file);
-        return clothesService.updateReleasedRotation(sheet, clothOperationType);
+        return clothesService.updateReleasedRotation(sheet, loadType);
     }
 
     @JsonView(InternalForClothes.class)
@@ -58,8 +59,11 @@ public class ClothController {
     }
 
     @JsonView(InternalForClothes.class)
-    @PostMapping("/acceptance/{barCode}")
-    public ClothAcceptanceResponse acceptance(@PathVariable long barCode) {
-        return ;
+    @PostMapping("/acceptance/{clientId}/{userId}/{clothId}/{orderType}")
+    public int accept(
+            @PathVariable long userId, @PathVariable long clientId,
+            @PathVariable long clothId, @PathVariable OrderType orderType) {
+        clothesService.accept(clientId, userId, clothId, orderType);
+        return 1;
     }
 }

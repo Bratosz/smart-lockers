@@ -159,7 +159,7 @@ public class FileController {
                     //creating emploee and assign it to the next free box
                     Employee createdEmployee = employeeService.createEmployeeAndAssignToBox(
                             plantNumberCell, department, location, employee);
-                    Box box = createdEmployee.getBoxes().stream().findFirst().get();
+                    Box box = createdEmployee.getBox();
                     row.getCell(3).setCellValue(box.getLocker().getLockerNumber());
                     row.getCell(4).setCellValue(box.getBoxNumber());
                     row.getCell(5).setCellValue(box.getLocker().getPlant().getPlantNumber());
@@ -191,10 +191,9 @@ public class FileController {
 
             //Adding employee to raport list of deleted employees
             Employee employee = employeeService.getEmployeeById(id);
-            Set<Box> boxes = employee.getBoxes();
-            for (Box box : boxes) {
-                releasedBoxes.add(boxesService.dismissEmployee(box));
-            }
+            Box box = employee.getBox();
+                releasedBoxes.add(boxesService.dismissEmployee(box, employee));
+
         }
         return releasedBoxes;
     }

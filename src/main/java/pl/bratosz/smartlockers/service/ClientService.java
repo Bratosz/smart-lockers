@@ -1,17 +1,27 @@
 package pl.bratosz.smartlockers.service;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Client;
-import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.Plant;
+import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.repository.ClientRepository;
+import pl.bratosz.smartlockers.response.DataLoadedResponse;
+import pl.bratosz.smartlockers.service.exels.DataBaseLoader;
+import pl.bratosz.smartlockers.service.exels.LoadType;
+
+import java.util.List;
 
 @Service
 public class ClientService {
     private ClientRepository clientRepository;
 
+    @Autowired
+    private LockerService lockerService;
+
     public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
+
     }
 
     public Client create(String name) {
@@ -19,7 +29,16 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
+    public DataLoadedResponse loadDataBase(long clientId, LoadType loadType, XSSFWorkbook wb) {
+        Client client = getById(clientId);
+        DataBaseLoader dbLoader = new DataBaseLoader(wb, loadType, client);
+        List<Locker> lockers = dbLoader.loadDataBase();
+        lockerService.saveLockers(lockers);
+        DataLoadedResponse response = DataLoadedResponse.createLockersBoxesAndEmployeesLoadedSuccesfully(lockers);
+        return response;
+    }
+
     public Client getById(long clientId) {
-        return clientRepository.getOne(clientId);
+        return clientRepository.getById(clientId);
     }
 }

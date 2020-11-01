@@ -9,7 +9,6 @@ import pl.bratosz.smartlockers.model.Employee;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 public class ExcelWriter {
     private List<String> columns;
@@ -94,7 +93,7 @@ public class ExcelWriter {
     }
 
     private int calculateNumberOfRows(int numberOfLabels) {
-        return (int) Math.ceil((float)numberOfLabels / labelsInRow);
+        return (int) Math.ceil((float) numberOfLabels / labelsInRow);
     }
 
     private void createFont(LabelsSheetParameters parameters) {
@@ -162,25 +161,18 @@ public class ExcelWriter {
         for (Employee employee : employees) {
             Row row = sheet.createRow(counter++);
 
-//            row.createCell(0).setCellValue(employee.getBoxes().stream().findFirst().get().getEmployee().getId());
+//            headerRow.createCell(0).setCellValue(employee.getBoxes().stream().findFirst().get().getEmployee().getId());
             row.createCell(0).setCellValue(employee.getId());
             row.createCell(1).setCellValue(employee.getLastName());
             row.createCell(2).setCellValue(employee.getFirstName());
             row.createCell(3).setCellValue(employee.getDepartment().getName());
 
-            if (employee.getBoxes().size() > 0) {
-                Set<Box> boxes;
-                boxes = employee.getBoxes();
-                for (Box box : boxes) {
-                    row.createCell(4).setCellValue(box.getLocker().getLockerNumber());
-                    row.createCell(5).setCellValue(box.getBoxNumber());
-                    row.createCell(6).setCellValue(box.getLocker().getPlant().getPlantNumber());
-                }
-            } else {
-                row.createCell(3).setCellValue("brak");
-                row.createCell(4).setCellValue("szafki");
-            }
-
+            Box box = employee.getBox();
+            int lockerNumber = box.getLocker().getLockerNumber();
+            int boxNumber = box.getBoxNumber();
+            row.createCell(4).setCellValue(lockerNumber);
+            row.createCell(5).setCellValue(boxNumber);
+            row.createCell(6).setCellValue(box.getLocker().getPlant().getPlantNumber());
         }
 
         //Resize all columns to fit the content

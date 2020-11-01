@@ -6,7 +6,8 @@ import java.time.format.DateTimeFormatter;
 public class CurrentDate {
     private String date;
 
-    public CurrentDate() {        date = dateTimeFormatter.format(now);
+    public CurrentDate() {
+        date = dateTimeFormatter.format(now);
     }
 
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter

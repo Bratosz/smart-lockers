@@ -72,7 +72,7 @@ public class LabelsService {
     }
 
     private String getLabelFromBox(Box box) {
-        Employee emp = box.getEmployee();
+        EmployeeGeneral emp = box.getEmployee();
         String firstName = emp.getFirstName();
         String lastName = emp.getLastName();
         int lockerNumber = box.getLocker().getLockerNumber();

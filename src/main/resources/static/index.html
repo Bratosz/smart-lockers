@@ -27,7 +27,7 @@
 
 
 <div class="container">
-    <div class="row mx-lg-n5">
+    <div class="headerRow mx-lg-n5">
         <div class="col-lg-2">
             <img src="kls_logo.jpg" class="img-fluid" alt="Responsive image">
         </div>
@@ -73,7 +73,7 @@
     <br>
 
     <!--Form-->
-    <div class="row">
+    <div class="headerRow">
         <div class="col-lg-4">
             <form class="form-inline">
                 <div class="form-group">
@@ -89,7 +89,23 @@
             </form>
         </div>
     </div>
-    <div class="row">
+    <div class="headerRow">
+        <div class="col-lg-4">
+            <form class="form-inline">
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Imię" aria-label="Imię"
+                               aria-describedby="input-first-name" id="input-first-name">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="button-input-first-name">Szukaj
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="headerRow">
         <div class="col-lg-4">
             <form class="form-inline">
                 <div class="form-group">
@@ -108,7 +124,7 @@
 
 
     <!--Filtering-->
-    <div class="row">
+    <div class="headerRow">
         <div class="col-lg-4">
             <form class="form-inline">
                 <div class="form-group">
@@ -136,11 +152,10 @@
             <th>Nazwisko</th>
             <th>Szafa</th>
             <th>Box</th>
-            <th>Numer Oddziału</th>
+            <th>Numer zakładu</th>
             <th>Oddział</th>
             <th>Lokalizacja</th>
             <th>Status</th>
-            <th>Numer</th>
             <th></th>
             <th></th>
         </tr>
@@ -152,13 +167,12 @@
             <td class="cell-last-name"></td>
             <td class="cell-locker"></td>
             <td class="cell-box-number"></td>
-            <td class="cell-department-number"></td>
+            <td class="cell-plant-number"></td>
             <td class="cell-department"></td>
             <td class="cell-location"></td>
             <td class="cell-status"></td>
-            <td class="cell-number"></td>
-            <td><input type="button" value="Pokaż" class="button-view-employee"></td>
-            <td><input type="button" value="Edytuj" class="button-edit-employee"></td>
+            <td><input type="button" value="pokaż" class="button-view-employee"></td>
+            <td><input type="button" value="Zwolnij" class="button-dismiss-employee"></td>
         </tr>
         </tbody>
     </table>

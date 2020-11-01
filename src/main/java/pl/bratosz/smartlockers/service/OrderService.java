@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.exception.ArticleNotExistException;
 import pl.bratosz.smartlockers.model.*;
@@ -12,15 +13,15 @@ import java.util.function.Consumer;
 public class OrderService {
     private OrdersRepository ordersRepository;
     private UserService userService;
-    private ClothService clothesService;
     private ArticleService articleService;
+    @Autowired
+    private ClothService clothesService;
 
 
     public OrderService(OrdersRepository ordersRepository, UserService userService,
-                        ClothService clothesService, ArticleService articleService) {
+                        ArticleService articleService) {
         this.ordersRepository = ordersRepository;
         this.userService = userService;
-        this.clothesService = clothesService;
         this.articleService = articleService;
     }
 
@@ -49,13 +50,49 @@ public class OrderService {
         return clothOrders;
     }
 
-    private ClothOrder create(
+    public ClothOrder create(
             Cloth cloth, OrderType orderType, int articleNumber,
             ClothSize size, OrderStatus orderStatus, Date date, User user) throws ArticleNotExistException {
         Employee employee = cloth.getEmployee();
         Article article = articleService.determineDesiredArticle(articleNumber, cloth.getArticle());
         ClothSize desiredSize = clothesService.determineDesiredSize(size, cloth.getSize());
         ClothOrder order = new ClothOrder(employee, cloth, orderType, article, desiredSize, orderStatus, date, user);
+        return ordersRepository.save(order);
+    }
+
+    public ClothOrder createOrderForChangeSize(Cloth cloth, ClothSize size, OrderStatus orderStatus,
+                                               Date date, long userId) {
+        User user = userService.getUserById(userId);
+        OrderType orderType = OrderType.CHANGE_SIZE;
+        Employee employee = cloth.getEmployee();
+        Article article = cloth.getArticle();
+        ClothSize desiredSize = size;
+        ClothOrder order = new ClothOrder(employee, cloth, orderType, article, desiredSize,
+                 orderStatus, date, user);
+        return ordersRepository.save(order);
+    }
+
+    public ClothOrder createOrderForExchangeForNewOne(Cloth cloth, OrderStatus orderStatus,
+                                                      Date date, long userId) {
+        User user = userService.getUserById(userId);
+        OrderType orderType = OrderType.EXCHANGE_FOR_A_NEW_ONE;
+        Employee employee = cloth.getEmployee();
+        Article article = cloth.getArticle();
+        ClothSize size = cloth.getSize();
+        ClothOrder order = new ClothOrder(employee, cloth, orderType, article, size,
+                orderStatus, date, user);
+        return ordersRepository.save(order);
+    }
+
+    public ClothOrder createOrderForChangeArticle(Cloth cloth, int articleNumber, ClothSize desiredSize,
+                                                  OrderStatus orderStatus,
+                                                  Date date, long userId) {
+        User user = userService.getUserById(userId);
+        OrderType orderType = OrderType.CHANGE_ARTICLE;
+        Employee employee = cloth.getEmployee();
+        Article desiredArticle = articleService.getByArticleNumber(articleNumber);
+        ClothOrder order = new ClothOrder(employee, cloth, orderType, desiredArticle, desiredSize,
+                orderStatus, date, user);
         return ordersRepository.save(order);
     }
 
@@ -81,7 +118,7 @@ public class OrderService {
             case CLIENT_MEDIUM:
                 return OrderStatus.CONFIRMED_AND_PENDING_FOR_ACCEPTANCE;
             case CLIENT_FULL:
-                return OrderStatus.CONFIRMED_AND_PENDING_FOR_ACCEPTANCE;
+                return OrderStatus.ACCEPTED_AND_PENDING_FOR_REALIZATION;
             default:
                 return OrderStatus.CONFIRMED_AND_PENDING_FOR_ACCEPTANCE;
         }
@@ -121,4 +158,6 @@ public class OrderService {
         }
         return clothOrders;
     }
+
+
 }

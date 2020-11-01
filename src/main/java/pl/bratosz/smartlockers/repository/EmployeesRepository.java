@@ -21,4 +21,9 @@ public interface EmployeesRepository extends JpaRepository<Employee, Long> {
     List<Employee> getEmployeesByLastName(@Param("lastName") String lastName);
 
     Integer deleteEmployeeById(Long id);
+
+    @Query("select e from Employee e " +
+    "where e.firstName like %:firstName%")
+    List<Employee> getEmployeesByFirstName(@Param("firstName") String firstName);
+
 }

@@ -31,10 +31,10 @@ public class ClothOrder {
     private Date requestDate;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private User confirmedBy;
+    private User requestedBy;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private User requestedBy;
+    private User confirmedBy;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private User acceptedBy;
@@ -77,6 +77,8 @@ public class ClothOrder {
     @JsonView(Views.Public.class)
     private boolean isAccepted;
 
+    private boolean isReadyForRealization;
+
     @JsonView(Views.Public.class)
     private OrderType orderType;
 
@@ -94,6 +96,11 @@ public class ClothOrder {
         this.employee = employee;
         this.cloth = cloth;
         this.orderType = orderType;
+        if(orderType.equals(OrderType.NEW_ARTICLE) || cloth.isAcceptedForExchange()){
+            isReadyForRealization = true;
+        } else {
+            isReadyForRealization = false;
+        }
         this.article = article;
         this.size = desiredSize;
         this.orderStatus = orderStatus;
@@ -393,5 +400,27 @@ public class ClothOrder {
 
     public void setCancelled(boolean cancelled) {
         isCancelled = cancelled;
+    }
+
+    public boolean isReadyForRealization() {
+        return isReadyForRealization;
+    }
+
+    public void setReadyForRealization(boolean readyForRealization) {
+        isReadyForRealization = readyForRealization;
+    }
+
+    @Override
+    public String toString() {
+        Cloth c = getCloth();
+        Employee e = c.getEmployee();
+        String clothOrderDescription = "Rodzaj zamówienia: " + getOrderType().getName() + "\n" +
+                "Status zamówienia: " + getOrderStatus() + "\n" +
+                "Ubranie zamówione: " + getArticle().getName() + " " + getSize() + "\n" +
+                "Ubranie zdane: " + c.getArticle().getName() + " " + c.getSize().getName() + " lp. "
+                + c.getOrdinalNumber() + "\n" +
+                "Szafka: " + e.getBox().getLocker().getLockerNumber() + "/" + e.getBox().getBoxNumber() + "\n" +
+                "Pracownik: " + e.getLastName() + " " + e.getFirstName();
+        return clothOrderDescription;
     }
 }

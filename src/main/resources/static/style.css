@@ -89,8 +89,24 @@ tr:nth-child(odd) {
     display: inline-block;
 }
 
-.cloth-list {
+.radio-list {
     display: inline-block;
+    vertical-align: top;
+}
+
+.acceptance-parameters {
+    display: inline-block;
+    vertical-align: top;
+    padding: 10px;
+}
+
+.size-option {
+    display: inline-block;
+}
+
+.numerical-size {
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 

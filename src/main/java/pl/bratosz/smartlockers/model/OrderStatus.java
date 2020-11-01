@@ -9,6 +9,7 @@ public enum OrderStatus {
     DECLINED_BY_CLIENT("odrzucone przez kilenta",1),
     RESTORED_BY_CLIENT("przywrócone przez klienta", 1),
     ACCEPTED_AND_PENDING_FOR_REALIZATION("oczekuje na wykonanie",2),
+    ACCEPTED_AND_READY_FOR_REALIZATION("gotowe do wykonania", 2),
     DECLINED("odrzucone", 2),
     RESTORED("przywrócone", 2),
     DEFFERED("odroczone", 2),

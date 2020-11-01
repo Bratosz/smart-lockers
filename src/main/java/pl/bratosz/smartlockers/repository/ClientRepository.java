@@ -7,4 +7,5 @@ import pl.bratosz.smartlockers.model.Client;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
+    Client getById(long clientId);
 }

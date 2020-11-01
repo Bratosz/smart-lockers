@@ -4,43 +4,30 @@ package pl.bratosz.smartlockers.model;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
-import javax.validation.ConstraintViolationException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
-public class Employee {
-    @JsonView(Views.Public.class)
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @JsonView(Views.Public.class)
-    private String firstName;
-
-    @JsonView(Views.Public.class)
-    private String lastName;
-
-    @JsonView({Views.InternalForEmployees.class, Views.InternalForClothes.class})
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private Set<Box> boxes;
-
+public class Employee extends EmployeeGeneral {
     @JsonView(Views.DismissedEmployees.class)
     @ManyToMany(mappedBy = "dismissedEmployees")
     private List<Box> boxesOccupiedInPast;
-
-    @JsonView(Views.InternalForEmployees.class)
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private Set<Cloth> rotationalClothing;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private Set<Cloth> clothing;
 
     @JsonView(Views.InternalForEmployees.class)
-    @OneToMany
-    private Set<Cloth> decommitedClothing;
+    @OneToMany(mappedBy = "rotationOwner", cascade = CascadeType.ALL)
+    private Set<Cloth> rotationalClothes;
+
+    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
+    @OneToMany(mappedBy = "acceptedOwner", cascade = CascadeType.ALL)
+    private Set<Cloth> acceptedClothes;
+
+    @JsonView(Views.InternalForEmployees.class)
+    @OneToMany(mappedBy = "withdrawnOwner", cascade = CascadeType.ALL)
+    private Set<Cloth> withdrawnClothesz;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Department department;
@@ -52,34 +39,23 @@ public class Employee {
     @OneToMany(mappedBy = "employee")
     private Set<ClothOrder> clothOrders;
 
+    @JsonView(Views.Public.class)
+    private boolean active;
+
     public Employee() {
     }
 
-    public Employee(String firstName, String lastName, Department department) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.department = department;
+    public Employee(String firstName, String lastName, Department department, boolean active) {
+        setFirstName(firstName);
+        setLastName(lastName);
+        setDepartment(department);
+        setActive(active);
     }
 
-
-    public Set<Cloth> getRotationalClothing() {
-        return rotationalClothing;
-    }
-
-    public void setRotationalClothing(Set<Cloth> rotationalClothing) {
-        this.rotationalClothing = rotationalClothing;
-    }
-
-    public Set<Cloth> getClothing() {
-        return clothing;
-    }
-
-    public void setClothing(Set<Cloth> clothing) {
-        this.clothing = clothing;
-    }
-
-    public Long getId() {
-        return id;
+    public Employee(boolean empty, String firstName, String lastName) {
+//        setEmpty(empty);
+//        setFirstName(firstName);
+//        setLastName(lastName);
     }
 
     public List<Box> getBoxesOccupiedInPast() {
@@ -90,53 +66,28 @@ public class Employee {
         this.boxesOccupiedInPast = boxesOccupiedInPast;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Set<Cloth> getRotationalClothes() {
+        return rotationalClothes;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public void setRotationalClothes(Set<Cloth> rotationalClothes) {
+        this.rotationalClothes = rotationalClothes;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public Set<Cloth> getClothing() {
+        return clothing;
     }
 
-    public String getLastName() {
-        return lastName;
+    public void setClothing(Set<Cloth> clothing) {
+        this.clothing = clothing;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public Set<Cloth> getWithdrawnClothesz() {
+        return withdrawnClothesz;
     }
 
-    public Set<Box> getBoxes() {
-        return boxes;
-    }
-
-    public void setBoxes(Set<Box> boxes) {
-        this.boxes = boxes;
-    }
-
-    public int getFirstLockerNumber() {
-        if (getBoxes().size() == 1) {
-            return getBoxes().stream().findFirst().get().getLocker().getLockerNumber();
-        } else
-            return 0;
-    }
-
-    public int getFirstBoxNumber() {
-        if (getBoxes().size() >= 1) {
-            return getBoxes().stream().findFirst().get().getBoxNumber();
-        }
-        return 0;
-    }
-
-    public int getFirstLockerPlantNumber() {
-        if (getBoxes().size() >= 1) {
-            return getBoxes().stream().findFirst().get().getLocker().getPlant().getPlantNumber();
-        }
-        return 0;
+    public void setWithdrawnClothesz(Set<Cloth> withdrawnClothesz) {
+        this.withdrawnClothesz = withdrawnClothesz;
     }
 
     public Department getDepartment() {
@@ -145,26 +96,6 @@ public class Employee {
 
     public void setDepartment(Department department) {
         this.department = department;
-    }
-
-    public boolean isEmployeeHaveThisBox(int lockerNo, int boxNo) {
-        long count = boxes.stream()
-                .filter(b -> b.getLocker().getLockerNumber() == lockerNo)
-                .filter(b -> b.getBoxNumber() == boxNo)
-                .count();
-        if(count > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public Set<Cloth> getDecommitedClothing() {
-        return decommitedClothing;
-    }
-
-    public void setDecommitedClothing(Set<Cloth> decommitedClothing) {
-        this.decommitedClothing = decommitedClothing;
     }
 
     public UserEmployee getUserEmployee() {
@@ -181,5 +112,27 @@ public class Employee {
 
     public void setClothOrders(Set<ClothOrder> clothOrders) {
         this.clothOrders = clothOrders;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Set<Cloth> getAcceptedClothes() {
+        return acceptedClothes;
+    }
+
+    public void setAcceptedClothes(Set<Cloth> acceptedClothes) {
+        this.acceptedClothes = acceptedClothes;
+    }
+
+    @Override
+    public String toString() {
+        return box.getLocker().getLockerNumber() + "/" + box.getBoxNumber() + " " +
+                lastName + " " + firstName;
     }
 }

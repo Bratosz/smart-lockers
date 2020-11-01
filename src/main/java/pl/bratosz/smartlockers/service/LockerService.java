@@ -86,4 +86,8 @@ public class LockerService {
     public int getAmountOfLockersByPlantId(long id) {
         return lockersRepository.getAmountOfLockersByPlantId(id);
     }
+
+    public void saveLockers(List<Locker> lockers) {
+        lockersRepository.saveAll(lockers);
+    }
 }
