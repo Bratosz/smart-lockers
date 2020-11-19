@@ -12,6 +12,7 @@ import pl.bratosz.smartlockers.model.Cloth;
 import pl.bratosz.smartlockers.model.ClothSize;
 
 import pl.bratosz.smartlockers.service.ArticleService;
+import pl.bratosz.smartlockers.strings.MyString;
 
 import java.io.IOException;
 import java.util.*;
@@ -43,12 +44,18 @@ public class Scrapper {
     }
 
     public String getEmployeeLastName() {
-        return oc.getActualPage().select("#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(3)").text();
+        MyString lastName = MyString.create(oc.getActualPage().select(
+                "#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(3)").text());
+        return lastName.get();
     }
 
+
     public String getEmployeeFirstName() {
-        return oc.getActualPage().select("#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(2)").text();
+        MyString firstName = MyString.create(oc.getActualPage().select(
+                "#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(2)").text());
+        return firstName.get();
     }
+
 
     public Set<Cloth> getClothes() {
         Elements elements = oc.getActualPage().select("#ctl00_MainContent_GridView2 > tbody > tr");

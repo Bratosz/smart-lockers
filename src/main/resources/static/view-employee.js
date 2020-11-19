@@ -5,7 +5,6 @@ let boxNumber;
 let lastName;
 let firstName;
 let employeeId;
-const clientId = 1;
 const userId = 1;
 
 function reloadEmployee() {
@@ -32,30 +31,26 @@ function reloadEmployee() {
     })
 }
 
-$("#refresh-button").click(function () {
-    const table = $("#table-of-clothes > tbody > tr");
-    for(let i = 1; i < table.length; i++) {
-        table[i].remove();
-    }
-    console.log(table.length);
+$("#button-load-employee").click(function() {
+    let departmentId = $('#select-department').val();
     $.ajax({
-        url: `http://localhost:8080/scrap/update-clothes/${boxId}`,
-        method: "get",
-        success: function (box) {
-            reloadClothes(box.id);
-        }
-    })
-});
-
-function reloadClothes(boxId) {
-    $.ajax({
-        url: `http://localhost:8080/boxes/${boxId}`,
+        url: `http://localhost:8080/scrap/load-employee/${departmentId}${boxId}`,
         method: "get",
         success: function(box) {
             displayClothes(box);
         }
-    });
-}
+    })
+})
+
+$("#refresh-button").click(function () {
+    $.ajax({
+        url: `http://localhost:8080/scrap/update-clothes/${boxId}`,
+        method: "get",
+        success: function (box) {
+            displayClothes(box);
+        }
+    })
+});
 
 function displayClothes(box) {
     $("#table-of-clothes-body > tr:not(#row-template)").remove();
@@ -200,3 +195,4 @@ $('#button-confirm-order').click(function () {
 });
 
 reloadEmployee();
+loadDepartments();

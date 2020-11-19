@@ -6,7 +6,7 @@ import pl.bratosz.smartlockers.service.exels.ExcelSave;
 import pl.bratosz.smartlockers.service.exels.ExcelWriter;
 import pl.bratosz.smartlockers.service.exels.LabelEmployee;
 import pl.bratosz.smartlockers.service.exels.LabelsSheetParameters;
-import pl.bratosz.smartlockers.formaters.StringFormater;
+import pl.bratosz.smartlockers.strings.StringFormater;
 import pl.bratosz.smartlockers.model.*;
 
 import java.io.IOException;

@@ -196,6 +196,39 @@ public class ClothService {
         }
     }
 
+    public void updateClothes(
+            Set<Cloth> currentClothes, Set<Cloth> actualClothes, Employee employee) {
+        Set<Cloth> newClothes = new HashSet<>();
+        if (currentClothes.isEmpty()) {
+            for (Cloth cloth : actualClothes) {
+                cloth.setEmployee(employee);
+                newClothes.add(cloth);
+            }
+        } else {
+            for (Cloth cloth : currentClothes) {
+                if (!actualClothes.contains(cloth)) {
+                    cloth.setActive(false);
+                    continue;
+                }
+                for (Cloth actualCloth : actualClothes) {
+                    if (!currentClothes.contains(actualCloth)) {
+                        actualCloth.setEmployee(employee);
+                        newClothes.add(actualCloth);
+                    } else if (actualCloth.equals(cloth)) {
+                        cloth.setLastWashing(actualCloth.getLastWashing());
+                    }
+                }
+                clothesRepository.flush();
+            }
+        }
+        clothesRepository.saveAll(newClothes);
+    }
+
+    public void updateClothes(Set<Cloth> actualClothes, Employee employee) {
+        Set<Cloth> currentClothes = new HashSet<>();
+        updateClothes(currentClothes, actualClothes, employee);
+    }
+
     private boolean isClothNOTPresent(long clientId, Cloth cloth) {
         return cloth == null || isClothBelongsToOtherClient(cloth, clientId);
     }

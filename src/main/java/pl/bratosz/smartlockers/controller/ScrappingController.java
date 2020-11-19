@@ -35,5 +35,17 @@ public class ScrappingController {
         }
     }
 
+    @GetMapping("/load-employee/{departmentId}/{boxId}")
+    @JsonView(Views.InternalForBoxes.class)
+    public Box loadEmployee(
+            @PathVariable long departmentId, @PathVariable long boxId) throws IOException {
+        try {
+            return scrapingService.loadEmployee(departmentId, boxId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
+        }
+    }
+
 
 }

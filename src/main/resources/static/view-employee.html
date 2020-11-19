@@ -6,6 +6,7 @@
     <title>Smart Lockers - pracownik</title>
     <script src="jquery-3.3.1.min.js"></script>
     <script src="view-employee.js" defer></script>
+    <script src="smart-lockers.js"></script>
     <script src="clothing-acceptance.js" defer></script>
     <link rel="stylesheet" href="style.css" type="text/css"/>
 </head>
@@ -150,20 +151,39 @@
     <div class="gap-vertical-20"></div>
 
 
-    <div class="side-menu">
-        <select id="select-order-type" class="form-control">
-            <option value="EXCHANGE_FOR_A_NEW_ONE">Wymiana na nowe</option>
-            <option value="CHANGE_SIZE">Zmiana rozmiaru</option>
-            <option value="CHANGE_ARTICLE">Zmiana artykułu</option>
-            <option value="NEW_ARTICLE">Nowy artykuł</option>
-        </select>
-    </div>
-    <div class="side-menu">
+        <!--CLOTH ORDERS-->
+
+
+    <div>
         <div class="side-menu"><span>Zamówienie odzieży: </span></div>
+        <div class="side-menu">
+            <select id="select-order-type" class="form-control">
+                <option value="EXCHANGE_FOR_A_NEW_ONE">Wymiana na nowe</option>
+                <option value="CHANGE_SIZE">Zmiana rozmiaru</option>
+                <option value="CHANGE_ARTICLE">Zmiana artykułu</option>
+                <option value="NEW_ARTICLE">Nowy artykuł</option>
+            </select>
+        </div>
         <div class="side-menu">
             <button id="button-confirm-order">Zamów</button>
         </div>
-        <button id="refresh-button">Odśwież</button>
+        <div class="side-menu">
+            <button id="refresh-button">Odśwież</button>
+        </div>
+    </div>
+
+        <!--LOAD EMPLOYEE-->
+
+    <div>
+        <div class="side-menu">
+            <span>Wczytanie pracownika:</span>
+        </div>
+        <div class="side-menu">
+            <select class="form-control" id="select-department"></select>
+        </div>
+        <div class="side-menu">
+            <button id="button-load-employee"></button>
+        </div>
     </div>
 
     <div>

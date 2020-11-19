@@ -40,7 +40,7 @@ public class FileStorageService {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         try {
-            //Check if the file's name contains invalid characters
+            //Check if the file'str name contains invalid characters
             if (fileName.contains("..")) {
                 throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
             }
