@@ -6,7 +6,7 @@ function loadPlants() {
         success: function (plants) {
             console.log(plants);
             let select = $("#select-plant");
-            select.append(createSelectPlaceholder("Wybierz zakład"));
+            // select.append(createSelectPlaceholder("Wybierz zakład"));
             appendOptionsToSelect(plants, select)
         }
     })
@@ -19,7 +19,7 @@ function loadDepartments() {
         success: function (departments) {
             console.log(departments);
             let select = $("#select-department");
-            select.append(createSelectPlaceholder("Wybierz departament"));
+            select.append(createSelectPlaceholder("Wybierz oddział"));
             appendOptionsToSelect(departments, select);
         }
     })
@@ -52,5 +52,5 @@ function createOption(value, description) {
 }
 
 function createSelectPlaceholder(description) {
-    return `<option value="null" selected disabled>${description}</option>`;
+    return `<option value="0" selected>${description}</option>`;
 }

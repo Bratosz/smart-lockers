@@ -42,7 +42,6 @@ public class FileController {
     private BoxService boxesService;
     private LockerService lockerService;
     private FileService fileService;
-    private LabelsService labelsService;
     private DepartmentService departmentService;
     private PlantService plantService;
     private ClientService clientService;
@@ -50,14 +49,13 @@ public class FileController {
 
     public FileController(FileStorageService fileStorageService, EmployeeService employeeService,
                           BoxService boxesService, LockerService lockerService, FileService fileService,
-                          LabelsService labelsService, DepartmentService departmentService, PlantService plantService,
+                          DepartmentService departmentService, PlantService plantService,
                           ClientService clientService, LocationService locationService) {
         this.fileStorageService = fileStorageService;
         this.employeeService = employeeService;
         this.boxesService = boxesService;
         this.lockerService = lockerService;
         this.fileService = fileService;
-        this.labelsService = labelsService;
         this.departmentService = departmentService;
         this.plantService = plantService;
         this.clientService = clientService;
@@ -67,13 +65,12 @@ public class FileController {
     @Autowired
     public FileController(FileStorageService fileStorageService, EmployeeService employeeService,
                           BoxService boxesService, LockerService lockerService,
-                          FileService fileService, LabelsService labelsService) {
+                          FileService fileService) {
         this.fileStorageService = fileStorageService;
         this.employeeService = employeeService;
         this.boxesService = boxesService;
         this.lockerService = lockerService;
         this.fileService = fileService;
-        this.labelsService = labelsService;
     }
 
     @PostMapping("/uploadFile")

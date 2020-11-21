@@ -8,6 +8,7 @@ import pl.bratosz.smartlockers.service.BoxService;
 import pl.bratosz.smartlockers.service.LockerService;
 
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,45 +30,24 @@ public class LockerController {
     @GetMapping("/{clientId}")
     public List<Locker> getAll(@PathVariable long clientId) {
         List<Locker> lockers = lockersRepository.getAllByClientId(clientId);
-        if(lockers.size() < 2) {
+        if (lockers.size() < 2) {
             return lockers;
         } else {
         }
-        return lockers.subList(0,1);
+        return lockers.subList(0, 1);
     }
 
     @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/getLockersByDepartment/{plantNumber}")
-    public List<Locker> getLockersByPlantNumber(int plantNumber) {
-        return lockerService.getLockersByPlantNumber(plantNumber);
+    @GetMapping("/filter/{plantId}/{lockerNumber}")
+    public List<Locker> getLockersByPlantAndNumber(
+            @PathVariable long plantId, @PathVariable int lockerNumber)
+    {
+        return lockerService.getLockersByPlantAndNumber(plantId, lockerNumber);
     }
-
-    @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/filter/{plantId}/{departmentId}/{locationId}/{boxStatus}")
-    public List<Locker> getFiltered(@PathVariable long plantId,
-                                    @PathVariable long departmentId,
-                                    @PathVariable long locationId,
-                                    @PathVariable Box.BoxStatus boxStatus) {
-        List<Locker> lockers = lockersRepository.filterAllByPlantAndDepartmentAndLocation(
-                plantId, departmentId, locationId);
-
-        for (Locker locker : lockers) {
-            List<Box> boxes = locker.getBoxes();
-            List<Box> filteredBoxes = boxes.stream()
-                    .filter(box -> box.getBoxStatus().equals(boxStatus))
-                    .collect(Collectors.toList());
-            locker.setBoxes(filteredBoxes);
-        }
-        if(lockers.size() < 15){
-            return lockers;
-        }
-        return lockers.subList(0,10);
-    }
-
 
     @GetMapping("/quantity/{plantId}")
     public int getLockersQuantity(@PathVariable long plantId) {
-         return lockerService.getAmountOfLockersByPlantId(plantId);
+        return lockerService.getAmountOfLockersByPlantId(plantId);
     }
 
     @PostMapping("create/{plantId}/{departmentId}/{locationId}")
@@ -77,13 +57,37 @@ public class LockerController {
         return lockerService.create(locker, plantId, departmentId, locationId);
     }
 
+    @JsonView(Views.InternalForLockers.class)
+    @GetMapping("/filter/{plantId}/{departmentId}/{locationId}/{boxStatus}")
+    public List<Box> getFiltered(@PathVariable long plantId,
+                                    @PathVariable long departmentId,
+                                    @PathVariable long locationId,
+                                    @PathVariable Box.BoxStatus boxStatus) {
+        List<Locker> lockers = lockersRepository.filterAllByPlantAndDepartmentAndLocation(
+                plantId, departmentId, locationId);
+        List<Box> filteredBoxes = new LinkedList<>();
+        for (Locker locker : lockers) {
+            List<Box> boxes = locker.getBoxes();
+            for (Box b : boxes) {
+                if(b.getBoxStatus().equals(boxStatus)){
+                    filteredBoxes.add(b);
+                }
+            }
+            if(filteredBoxes.size() > 50) {
+
+                return filteredBoxes;
+            }
+        }
+        return filteredBoxes;
+    }
+
     @PostMapping("/create/{lockerNumber}/{capacity}/{plantNumber}/{department}/{location}")
-        public Locker createLocker (
-        @PathVariable int lockerNumber,
-        @PathVariable int capacity,
-        @PathVariable int plantNumber,
-        @PathVariable String department,
-        @PathVariable String location) {
+    public Locker createLocker(
+            @PathVariable int lockerNumber,
+            @PathVariable int capacity,
+            @PathVariable int plantNumber,
+            @PathVariable String department,
+            @PathVariable String location) {
         return lockerService.createLocker(
                 lockerNumber, capacity, plantNumber, department, location);
     }

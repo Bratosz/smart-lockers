@@ -4,10 +4,8 @@ import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
-import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.service.creators.BoxCreator;
 
-import javax.persistence.GeneratedValue;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,11 +15,9 @@ import static pl.bratosz.smartlockers.model.Box.BoxStatus.*;
 public class BoxService {
 
     private BoxesRepository boxesRepository;
-    private EmployeesRepository employeesRepository;
 
-    public BoxService(BoxesRepository boxesRepository, EmployeesRepository employeesRepository) {
+    public BoxService(BoxesRepository boxesRepository) {
         this.boxesRepository = boxesRepository;
-        this.employeesRepository = employeesRepository;
     }
 
     public Box findNextFreeBox(Department department, int plantNumber, Location location) throws BoxNotAvailableException {
@@ -131,6 +127,11 @@ public class BoxService {
             throw new BoxNotAvailableException("Box is empty\n" + b.toString());
         }
 
+    }
+
+    public List<Box> getFiltered(long plantId, long departmentId, long locationId, Box.BoxStatus boxStatus) {
+        List<Box> filtered = boxesRepository.getFiltered(plantId, departmentId, locationId, boxStatus);
+        return filtered;
     }
 }
 

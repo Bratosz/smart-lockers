@@ -90,4 +90,10 @@ public class LockerService {
     public void saveLockers(List<Locker> lockers) {
         lockersRepository.saveAll(lockers);
     }
+
+    public List<Locker> getLockersByPlantAndNumber(
+            long plantId, int lockerNumber)
+    {
+       return lockersRepository.getLockersByPlantAndNumber(plantId, lockerNumber);
+    }
 }

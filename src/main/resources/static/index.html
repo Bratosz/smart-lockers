@@ -110,10 +110,10 @@
             <form class="form-inline">
                 <div class="form-group">
                     <div class="input-group mb-3">
-                        <input type="boxNumber" class="form-control" placeholder="Szafa" aria-label="Szafa"
+                        <input type="text" id="input-locker-number" class="form-control" placeholder="Numer szafki" aria-label="Szafa"
                                aria-describedby="input-locker-boxNumber">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" id="input-locker-boxNumber">Szukaj
+                            <button class="btn btn-outline-secondary" type="button" id="button-get-lockers-by-number">Szukaj
                             </button>
                         </div>
                     </div>
@@ -132,7 +132,7 @@
                     <select class="form-control" id="select-department"></select>
                     <select class="form-control" id="select-locker-location"></select>
                     <select class="form-control" id="select-box-status">
-                        <option value="NULL" disabled>Status szafki</option>
+                        <option value="null">Status szafki</option>
                         <option value="OCCUPY">Zajęta</option>
                         <option value="FREE">Wolna</option>
                         <option value="DAMAGED">Uszkodzona</option>

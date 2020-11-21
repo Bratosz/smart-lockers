@@ -23,17 +23,6 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             "order by l.lockerNumber")
     List<Locker> findAllByPlantNumber(int plantNumber);
 
-    @Query("select l from Locker l where " +
-            "(l.plant.id = :plantId or :plantId is null) " +
-            "and " +
-            "(l.department.id = :departmentId or :departmentId is null) " +
-            "and " +
-            "(l.location.id = :locationId or :locationId is null) order by l.lockerNumber ")
-    List<Locker> filterAllByPlantAndDepartmentAndLocation(
-            @Param("plantId") long plantId,
-            @Param("departmentId") long departmentId,
-            @Param("locationId") long locationId);
-
 
     @Query("select count(l.plantNumber) from Locker l where l.plant.id = :plantId ")
     int getAmountOfLockersByPlantId(@Param("plantId") long plantId);
@@ -54,4 +43,24 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             "(l.lockerNumber between :firstLocker and :lastLocker) " +
             "order by l.lockerNumber ")
     List<Locker> getLockersFromRange(int plantNumber, int firstLocker, int lastLocker);
+
+    @Query("select l from Locker l where " +
+            "(l.plant.id = :plantId or :plantId is null) " +
+            "and " +
+            "(l.department.id = :departmentId or :departmentId is null) " +
+            "and " +
+            "(l.location.id = :locationId or :locationId is null) order by l.lockerNumber ")
+    List<Locker> filterAllByPlantAndDepartmentAndLocation(
+            @Param("plantId") long plantId,
+            @Param("departmentId") long departmentId,
+            @Param("locationId") long locationId);
+
+
+    @Query("select l from Locker l where " +
+            "l.plant.id = :plantId " +
+            "and " +
+            "l.lockerNumber = :lockerNumber")
+    List<Locker> getLockersByPlantAndNumber(
+            @Param("plantId") long plantId,
+            @Param("lockerNumber") int lockerNumber);
 }

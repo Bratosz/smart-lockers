@@ -21,22 +21,23 @@ public class Box {
     private BoxStatus boxStatus;
 
     @JsonView({Views.InternalForLockers.class, Views.InternalForBoxes.class})
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     private EmployeeGeneral employee;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     private EmployeeDummy employeeDummy;
 
     @JsonView(Views.DismissedEmployees.class)
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "dismissed_employees",
             joinColumns = @JoinColumn(name = "box_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id"))
+
     private List<Employee> dismissedEmployees;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class, Views.InternalForClothes.class})
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="locker_id")
     private Locker locker;
 
@@ -125,6 +126,7 @@ public class Box {
     public enum BoxStatus {
         OCCUPY("Zajęta"),
         FREE("Wolna"),
+        ALL("Wszystkie"),
         UNDEFINED("Niezdefiniowana"),
         DAMAGED("Uszkodzona");
 

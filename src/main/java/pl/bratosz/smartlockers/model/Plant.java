@@ -33,7 +33,7 @@ public class Plant {
 
 
     @JsonView(Views.PlantExtendedInfo.class)
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Client client;
 
     @JsonView(Views.PlantExtendedInfo.class)

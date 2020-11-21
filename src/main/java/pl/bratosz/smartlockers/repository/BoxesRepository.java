@@ -49,4 +49,17 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             "(l.lockerNumber between :firstLocker and :lastLocker) " +
             "order by l.lockerNumber, b.boxNumber ")
     List<Box> getBoxesByLockersRange(int plantNumber, int firstLocker, int lastLocker);
+
+    @Query("select b from Box b " +
+            "where " +
+            "(b.locker.plant.id = :plantId) and " +
+            "(b.locker.department.id = :departmentId) and " +
+            "(b.locker.location.id = :locationId) and " +
+            "(b.boxStatus = :boxStatus) ")
+    List<Box> getFiltered(
+            @Param("plantId") long plantId,
+            @Param("departmentId") long departmentId,
+            @Param("locationId") long locationId,
+            @Param("boxStatus") Box.BoxStatus boxStatus);
+
 }

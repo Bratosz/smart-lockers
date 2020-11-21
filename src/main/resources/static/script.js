@@ -30,9 +30,10 @@ $("#button-filter").click(function () {
     let locationId = $("#select-locker-location").val();
     let boxStatus = $("#select-box-status").val();
     $.ajax({
-        url: `http://localhost:8080/lockers/filter/${plantId}/${departmentId}/${locationId}/${boxStatus}`,
+        url: `http://localhost:8080/boxes/filter/${plantId}/${departmentId}/${locationId}/${boxStatus}`,
         method: "get",
         success: function (lockers) {
+            console.log(lockers);
             displayLockers(lockers);
         }
     })
@@ -40,9 +41,9 @@ $("#button-filter").click(function () {
 
 
 $("#button-input-lastname").click(function () {
-    const lastname = $("#input-lastname").val();
+    const lastName = $("#input-lastname").val();
     $.ajax({
-        url: `http://localhost:8080/employees/find/${lastname}`,
+        url: `http://localhost:8080/employees/find/${lastName}`,
         method: "get",
         success: function (employees) {
             console.log(employees);
@@ -50,6 +51,19 @@ $("#button-input-lastname").click(function () {
         }
     })
 });
+
+$("#button-get-lockers-by-number").click(function () {
+    let plantId = $("#select-plant").val();
+    let lockerNumber = $("#input-locker-number").val();
+    $.ajax({
+        url: `http://localhost:8080/lockers/filter/${plantId}/${lockerNumber}`,
+        method: "get",
+        success: function (lockers) {
+            console.log(lockers);
+            displayLockers(lockers);
+        }
+    })
+})
 
 $("#button-input-first-name").click(function () {
     let firstName = $("#input-first-name").val();

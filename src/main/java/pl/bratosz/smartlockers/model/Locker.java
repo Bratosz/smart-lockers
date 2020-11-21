@@ -25,11 +25,11 @@ public class Locker {
     private Integer capacity;
 
     @JsonView(Views.Public.class)
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Department department;
 
     @JsonView(Views.Public.class)
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Location location;
 
     @JsonView(Views.InternalForLockers.class)
@@ -37,7 +37,7 @@ public class Locker {
     private List<Box> boxes;
 
     @JsonView(Views.Public.class)
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Plant plant;
 
     private int plantNumber;
