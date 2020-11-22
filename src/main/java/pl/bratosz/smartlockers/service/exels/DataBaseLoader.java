@@ -67,7 +67,7 @@ public class DataBaseLoader {
     private Locker getLockerByRow(RowForBasicDataBaseUpload row) {
         int lockerNumber = row.getLockerNumber();
         int plantNumber = row.getPlantNumber();
-        return lockers.stream().filter(l -> l.getPlantNumber() == plantNumber)
+        return lockers.stream().filter(l -> l.getPlant().getPlantNumber() == plantNumber)
                 .filter(l -> l.getLockerNumber() == lockerNumber)
                 .findFirst().orElseThrow(NoSuchElementException::new);
     }
@@ -77,7 +77,7 @@ public class DataBaseLoader {
         int boxNumber = row.getBoxNumber();
         int plantNumber = row.getPlantNumber();
         Locker locker = lockers.stream().filter(l -> l.getLockerNumber() == lockerNumber)
-                .filter(l -> l.getPlantNumber() == plantNumber)
+                .filter(l -> l.getPlant().getPlantNumber() == plantNumber)
                 .findFirst().orElseThrow(NoSuchElementException::new);
         return locker.getBoxByNumber(boxNumber).orElseThrow(NoSuchElementException::new);
     }

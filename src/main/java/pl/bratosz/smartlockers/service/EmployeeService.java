@@ -45,9 +45,21 @@ public class EmployeeService {
                     " bo szafka o numerze " + lockerNumber + "/" + boxNumber + " jest zajęta");
         }
         Employee employee = new Employee(firstName, lastName, department, true);
-        employee.setBox(box);
+        employee.addToBox(box);
         return employeesRepository.save(employee);
+    }
 
+    public Employee createEmployee(
+            Set<Cloth> clothes, long departmentId, Box box, String firstName, String lastName) {
+        Department department = departmentService.getById(departmentId);
+        if(box.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
+            throw new BoxNotAvailableException("Box is occupy by"
+                    + box.getEmployee().getLastName() + " " + box.getEmployee().getFirstName());
+        }
+        Employee employee = new Employee(firstName, lastName, department, true);
+        employee.addToBox(box);
+        employee.addClothes(clothes);
+        return employeesRepository.save(employee);
     }
 
     public Employee createEmployee(int plantNumber, String departmentName, int lockerNumber,
@@ -63,12 +75,6 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public Employee createEmployee(Employee employee) {
-        Box box = employee.getBox();
-        box.setBoxStatus(Box.BoxStatus.OCCUPY);
-        return employeesRepository.save(employee);
-    }
-
     public Employee createEmployeeAndAssignToBox(
             int plantNumber, Department department, Location location, Employee employee) {
         Box emptyBox;
@@ -80,8 +86,7 @@ public class EmployeeService {
             return null;
         }
         emptyBox.setBoxStatus(Box.BoxStatus.OCCUPY);
-        emptyBox.setEmployee(employee);
-        employee.setBox(emptyBox);
+        employee.addToBox(emptyBox);
 
         return employeesRepository.save(employee);
     }

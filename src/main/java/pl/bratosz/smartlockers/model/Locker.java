@@ -22,7 +22,7 @@ public class Locker {
     private int lockerNumber;
 
     @JsonView(Views.Public.class)
-    private Integer capacity;
+    private int capacity;
 
     @JsonView(Views.Public.class)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,8 +40,6 @@ public class Locker {
     @ManyToOne(fetch = FetchType.LAZY)
     private Plant plant;
 
-    private int plantNumber;
-
     public Locker() {
     }
 
@@ -54,7 +52,6 @@ public class Locker {
         this.department = department;
         this.location = location;
         this.boxes = boxes;
-        plantNumber = plant.getPlantNumber();
     }
 
     public Locker(int lockerNumber, int capacity) {
@@ -102,11 +99,11 @@ public class Locker {
         this.lockerNumber = lockerNumber;
     }
 
-    public Integer getCapacity() {
+    public int getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(Integer capacity) {
+    public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
 
@@ -120,13 +117,5 @@ public class Locker {
 
     public void setPlant(Plant plant) {
         this.plant = plant;
-    }
-
-    public int getPlantNumber() {
-        return plantNumber;
-    }
-
-    public void setPlantNumber(int plantNumber) {
-        this.plantNumber = plantNumber;
     }
 }

@@ -81,9 +81,9 @@ public class BoxService {
         return boxesRepository.getBoxById(id);
     }
 
-    public List<Box> createBoxesForLocker(int lockerCapacity) {
+    public List<Box> createBoxesForLocker(Locker locker) {
         BoxCreator boxCreator = new BoxCreator();
-        List<Box> boxes = boxCreator.createBoxesForLocker(lockerCapacity);
+        List<Box> boxes = boxCreator.createBoxesForLocker(locker);
         return boxes;
     }
 

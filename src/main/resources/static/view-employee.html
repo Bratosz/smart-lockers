@@ -48,6 +48,25 @@
     <div class="gap-vertical-20"></div>
     <div id="employee" style="font-size: 30px;"></div>
 
+    <div class="gap-vertical-20"></div>
+
+    <!--LOAD EMPLOYEE-->
+
+    <div>
+        <div class="side-menu">
+            <button id="refresh-button">Odśwież</button>
+        </div>
+        <div class="side-menu">
+            <span>Wczytanie pracownika:</span>
+        </div>
+        <div class="side-menu">
+            <select class="form-control" id="select-department"></select>
+        </div>
+        <div class="side-menu">
+            <button id="button-load-employee">Wczytaj</button>
+        </div>
+    </div>
+
     <!--CLOTHES-->
 
     <div class="container-table">
@@ -153,42 +172,11 @@
 
         <!--CLOTH ORDERS-->
 
-
-    <div>
-        <div class="side-menu"><span>Zamówienie odzieży: </span></div>
-        <div class="side-menu">
-            <select id="select-order-type" class="form-control">
-                <option value="EXCHANGE_FOR_A_NEW_ONE">Wymiana na nowe</option>
-                <option value="CHANGE_SIZE">Zmiana rozmiaru</option>
-                <option value="CHANGE_ARTICLE">Zmiana artykułu</option>
-                <option value="NEW_ARTICLE">Nowy artykuł</option>
-            </select>
-        </div>
-        <div class="side-menu">
-            <button id="button-confirm-order">Zamów</button>
-        </div>
-        <div class="side-menu">
-            <button id="refresh-button">Odśwież</button>
-        </div>
-    </div>
-
-        <!--LOAD EMPLOYEE-->
-
-    <div>
-        <div class="side-menu">
-            <span>Wczytanie pracownika:</span>
-        </div>
-        <div class="side-menu">
-            <select class="form-control" id="select-department"></select>
-        </div>
-        <div class="side-menu">
-            <button id="button-load-employee"></button>
-        </div>
-    </div>
-
     <div>
         <div>
             <div>
+            <!--TSHIRT SELECTION-->
+
                 <div>
                     <p>Wybierz koszulkę: </p>
                     <div class="radio-list">
@@ -243,6 +231,8 @@
                     </div>
                 </div>
 
+            <!--TROUSERS SELECTION-->
+
                 <div>
                     <p>Wybierz spodnie: </p>
                     <div class="radio-list">
@@ -268,6 +258,9 @@
                 </div>
             </div>
             <div>
+
+            <!--SIZE SELECTION-->
+
                 <div>
                     <p>Wybierz rozmiar:</p>
                     <div class="radio-list">
@@ -399,6 +392,24 @@
                         </div>
                     </div>
                 </div>
+
+            </div>
+
+            <div class="gap-vertical-20"></div>
+
+            <div>
+                <div class="side-menu"><span>Zamówienie odzieży: </span></div>
+                <div class="side-menu">
+                    <select id="select-order-type" class="form-control">
+                        <option value="EXCHANGE_FOR_A_NEW_ONE">Wymiana na nowe</option>
+                        <option value="CHANGE_SIZE">Zmiana rozmiaru</option>
+                        <option value="CHANGE_ARTICLE">Zmiana artykułu</option>
+                        <option value="NEW_ARTICLE">Nowy artykuł</option>
+                    </select>
+                </div>
+                <div class="side-menu">
+                    <button id="button-add-order">Zamów</button>
+                </div>
             </div>
 
 
@@ -441,7 +452,7 @@
             </select>
         </div>
         <div>
-            <button id="button-confirm-action-on-orders">Zatwierdź</button>
+            <button id="button-perform-action-on-orders">Zatwierdź</button>
         </div>
     </div>
 

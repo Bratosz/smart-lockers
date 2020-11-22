@@ -5,9 +5,91 @@ let boxNumber;
 let lastName;
 let firstName;
 let employeeId;
+let boxStatus;
 const userId = 1;
 
-function reloadEmployee() {
+reloadPage();
+loadDepartments();
+
+$("#button-load-employee").click(function () {
+    loadEmployee();
+});
+
+$("#refresh-button").click(function () {
+    if(boxStatus == "Wolna") {
+        loadEmployee();
+    } else {
+        updateClothes();
+    }
+});
+
+$("#button-perform-action-on-orders").click(function () {
+    performActionOnOrders();
+});
+
+$('#button-add-order').click(function () {
+    addOrder();
+
+});
+
+function addOrder() {
+    let clothIds = new Array;
+    let orderType = $("#select-order-type").val();
+    $('#table-of-clothes-body').find('input[type="checkbox"]:checked').each(function () {
+        let clothId = parseInt($(this).closest('tr').find('.cell-id-bar-code').text());
+        clothIds.push(clothId);
+    });
+    let articleNumber = $('input[name="cloth"]:checked').val();
+    if (typeof articleNumber === "undefined") {
+        articleNumber = 0;
+    }
+    let size = $('input[name="size"]:checked').val();
+    if (typeof size === "undefined") {
+        size = "SIZE_DEFAULT";
+    }
+    $.ajax({
+        url: `http://localhost:8080/order/place/${articleNumber}/${size}/${orderType}/${userId}`,
+        method: "post",
+        contentType: "application/json",
+        data: JSON.stringify(clothIds),
+        success: function (clothOrders) {
+            console.log("Cloth orders:");
+            console.log(clothOrders);
+            displayOrders(clothOrders)
+        }
+    });
+}
+
+function performActionOnOrders() {
+    let actionType = $('#select-action-on-orders').val();
+    let orderIds = new Array;
+    $('#table-of-orders-body').find('input[type="checkbox"]:checked').each(function () {
+        let orderId = parseInt($(this).closest('tr').find('.cell-id-cloth-order').text());
+        orderIds.push(orderId);
+    });
+    $.ajax({
+        url: `http://localhost:8080/order/action/${actionType}/${userId}`,
+        method: "post",
+        contentType: "application/json",
+        data: JSON.stringify(orderIds),
+        success: function (clothOrders) {
+            console.log(clothOrders);
+            displayOrders();
+        }
+    });
+}
+
+function updateClothes() {
+    $.ajax({
+        url: `http://localhost:8080/scrap/update-clothes/${boxId}`,
+        method: "get",
+        success: function () {
+            location.reload();
+        }
+    })
+}
+
+function reloadPage() {
     $.ajax({
         url: `http://localhost:8080/boxes/${boxId}`,
         method: "get",
@@ -15,42 +97,40 @@ function reloadEmployee() {
             console.log(box);
             lockerNumber = box.locker.lockerNumber;
             boxNumber = box.boxNumber;
+            boxStatus = box.boxStatus;
             employee = box.employee;
             lastName = employee.lastName;
             firstName = employee.firstName;
             employeeId = employee.id;
 
             $("#employee").text(lockerNumber + "/" + boxNumber
-            + " " + firstName + " " + lastName);
+                + " " + firstName + " " + lastName);
 
-           displayClothes(box);
-           console.log(employee.acceptedClothes);
-           displayAcceptedClothes(employee.acceptedClothes);
-           displayOrders(employee.clothOrders);
+            displayClothes(box);
+            console.log(employee.acceptedClothes);
+            displayAcceptedClothes(employee.acceptedClothes);
+            displayOrders(employee.clothOrders);
         }
     })
 }
 
-$("#button-load-employee").click(function() {
+function loadEmployee() {
     let departmentId = $('#select-department').val();
-    $.ajax({
-        url: `http://localhost:8080/scrap/load-employee/${departmentId}${boxId}`,
-        method: "get",
-        success: function(box) {
-            displayClothes(box);
-        }
-    })
-})
-
-$("#refresh-button").click(function () {
-    $.ajax({
-        url: `http://localhost:8080/scrap/update-clothes/${boxId}`,
-        method: "get",
-        success: function (box) {
-            displayClothes(box);
-        }
-    })
-});
+    if (departmentId == 0) {
+        alert("Nie wybrano oddziału.")
+    } else if (boxStatus == "Zajęta") {
+        alert("Pracownik został już wczytany.")
+    } else {
+        $.ajax({
+            url: `http://localhost:8080/scrap/load-employee/${departmentId}/${boxId}`,
+            method: "get",
+            success: function (box) {
+                console.log(box);
+                location.reload();
+            }
+        })
+    }
+};
 
 function displayClothes(box) {
     $("#table-of-clothes-body > tr:not(#row-template)").remove();
@@ -61,7 +141,7 @@ function displayClothes(box) {
     clothes.sort(function (a, b) {
         return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
     });
-    for(let i = 0; i < clothes.length; i++) {
+    for (let i = 0; i < clothes.length; i++) {
         let cloth = clothes[i];
         let $row = $rowTemplate.clone();
         let assignmentDate = formatDate(cloth.assignment);
@@ -83,13 +163,13 @@ function displayClothes(box) {
 function displayAcceptedClothes(acceptedClothes) {
     $("#table-of-accepted-clothes-body > tr:not(#row-template-accepted-clothes)").remove();
     let $rowTemplate = $("#row-template-accepted-clothes");
-    if(acceptedClothes !== undefined) {
+    if (acceptedClothes !== undefined) {
         acceptedClothes.sort(function (a, b) {
             return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
         });
         for (let i = 0; i < acceptedClothes.length; i++) {
             let cloth = acceptedClothes[i];
-            console.log(cloth);``
+            console.log(cloth);
             let $row = $rowTemplate.clone();
             let acceptedDate = formatDate(cloth.acceptedForExchangeDate);
             $row.css("display", "table-row");
@@ -105,8 +185,8 @@ function displayAcceptedClothes(acceptedClothes) {
 }
 
 function formatDate(date) {
-    date = date.substring(0,10);
-    if(date == "1970-01-01"){
+    date = date.substring(0, 10);
+    if (date == "1970-01-01") {
         return "";
     } else {
         return date;
@@ -114,6 +194,9 @@ function formatDate(date) {
 }
 
 function displayOrders(clothOrders) {
+    if(clothOrders === undefined) {
+        clothOrders = loadOrders();
+    }
     $("#table-of-orders-body > tr:not(#row-order-template)").remove();
     const $rowTemplate = $("#row-order-template");
     clothOrders.sort(function (a, b) {
@@ -121,13 +204,14 @@ function displayOrders(clothOrders) {
             || a.orderStatus - b.orderStatus
             || a.cloth.ordinalNumber - b.cloth.ordinalNumber;
     });
-    for(let i = 0; i < clothOrders.length; i++) {
-        if(clothOrders[i].isCancelled == true) {
+    for (let i = 0; i < clothOrders.length; i++) {
+        if (clothOrders[i].isCancelled == true) {
             continue;
         }
         const $row = $rowTemplate.clone();
         let order = clothOrders[i];
         $row.css("display", "table-row");
+        $row.attr("id", "id-row-order-" + i);
         $row.find(".cell-order-type").text(order.orderType);
         $row.find(".cell-order-status").text(order.orderStatus);
         $row.find(".cell-id-cloth-order").text(order.id);
@@ -139,60 +223,15 @@ function displayOrders(clothOrders) {
     }
 }
 
-function isValueNullOrFalse(val) {
-    return !val;
+function loadOrders() {
+    let clothOrders;
+    $.ajax({
+        url: `http://localhost:8080/order/get-by-employee/${employeeId}`,
+        method: "get",
+        success: function (actualClothOrders) {
+            clothOrders = actualClothOrders;
+        }
+    });
+    return clothOrders;
 }
 
-// var rows = $( client_table.$('input[type="checkbox"]').map(function () {
-//     return $(this).closest('tr');
-// } ) );
-
-$('#button-confirm-action-on-orders').click(function() {
-    let actionType = $('#select-action-on-orders').val();
-    let orderIds = new Array;
-    $('#table-of-orders-body').find('input[type="checkbox"]:checked').each(function () {
-        let orderId = parseInt($(this).closest('tr').find('.cell-id-cloth-order').text());
-        orderIds.push(orderId);
-    });
-    $.ajax({
-        url: `http://localhost:8080/order/action/${actionType}/${userId}`,
-        method: "post",
-        contentType: "application/json",
-        data: JSON.stringify(orderIds),
-        success: function(response) {
-            console.log(response);
-        }
-    });
-});
-
-$('#button-confirm-order').click(function () {
-    let clothIds = new Array;
-    let orderType = $("#select-order-type").val();
-    $('#table-of-clothes-body').find('input[type="checkbox"]:checked').each(function () {
-        let clothId = parseInt($(this).closest('tr').find('.cell-id-bar-code').text());
-        clothIds.push(clothId);
-    });
-    let articleNumber = $('input[name="cloth"]:checked').val();
-    if(typeof articleNumber === "undefined"){
-        articleNumber = 0;
-    }
-    let size = $('input[name="size"]:checked').val();
-    if(typeof size === "undefined"){
-        size = "SIZE_DEFAULT";
-    }
-    $.ajax({
-        url: `http://localhost:8080/order/place/${articleNumber}/${size}/${orderType}/${userId}`,
-        method: "post",
-        contentType: "application/json",
-        data: JSON.stringify(clothIds),
-        success: function (response) {
-            // $('.answer').html(response);
-            console.log(response);
-        }
-    });
-    console.log(clothIds);
-    console.log(orderType);
-});
-
-reloadEmployee();
-loadDepartments();

@@ -29,7 +29,7 @@ public class Cloth {
     @JsonView(Views.Public.class)
     protected int ordinalNumber;
 
-    @JsonView(Views.InternalForBoxes.class)
+    @JsonView({Views.InternalForBoxes.class, Views.InternalForClothOrders.class})
     @ManyToOne(cascade = CascadeType.ALL)
     protected Article article;
 

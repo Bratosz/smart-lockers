@@ -26,7 +26,7 @@ public class OrderController {
     }
 
     @JsonView(Views.InternalForClothOrders.class)
-    @GetMapping("/get_by_employee/{employeeId}")
+    @GetMapping("/get-by-employee/{employeeId}")
     public Set<ClothOrder> getByEmployeeId(@PathVariable long employeeId) {
         return orderService.getByEmployeeId(employeeId);
     }

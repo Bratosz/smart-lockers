@@ -21,10 +21,19 @@ public class LockerCreator {
             Plant plant = client.getPlantByNumber(row.getPlantNumber());
             Location location = client.getLocationByName(row.getLocationName());
             Department department = client.getDepartmentByName(row.getDepartmentName());
+
+            Locker locker = new Locker();
+            locker.setCapacity(capacity);
             BoxCreator boxCreator = new BoxCreator();
-            List<Box> boxes = boxCreator.createBoxesForLocker(capacity);
-            return new Locker(lockerNumber, capacity, plant,
-                    department, location, boxes);
+            List<Box> boxes = boxCreator.createBoxesForLocker(locker);
+
+            locker.setLockerNumber(lockerNumber);
+            locker.setPlant(plant);
+            locker.setDepartment(department);
+            locker.setLocation(location);
+            locker.setBoxes(boxes);
+
+            return locker;
         } catch (NoSuchElementException e) {
             throw new EmptyElementException("Locker #" + lockerNumber + " has not been created.\n" + row.getLocationName() + "\n"+ row.getLastName());
         }

@@ -27,7 +27,7 @@ public class Employee extends EmployeeGeneral {
 
     @JsonView(Views.InternalForEmployees.class)
     @OneToMany(mappedBy = "withdrawnOwner", cascade = CascadeType.ALL)
-    private Set<Cloth> withdrawnClothesz;
+    private Set<Cloth> withdrawnClothes;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Department department;
@@ -78,16 +78,21 @@ public class Employee extends EmployeeGeneral {
         return clothing;
     }
 
-    public void setClothing(Set<Cloth> clothing) {
+    private void setClothing(Set<Cloth> clothing) {
         this.clothing = clothing;
     }
 
-    public Set<Cloth> getWithdrawnClothesz() {
-        return withdrawnClothesz;
+    public void addClothes(Set<Cloth> clothing) {
+        clothing.stream().forEach(c -> c.setEmployee(this));
+        setClothing(clothing);
     }
 
-    public void setWithdrawnClothesz(Set<Cloth> withdrawnClothesz) {
-        this.withdrawnClothesz = withdrawnClothesz;
+    public Set<Cloth> getWithdrawnClothes() {
+        return withdrawnClothes;
+    }
+
+    public void setWithdrawnClothes(Set<Cloth> withdrawnClothes) {
+        this.withdrawnClothes = withdrawnClothes;
     }
 
     public Department getDepartment() {

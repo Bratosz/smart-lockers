@@ -15,30 +15,30 @@ import java.util.List;
 @Repository
 public interface LockersRepository extends JpaRepository<Locker, Long> {
 
-    @Query("select l from Locker l where l.plant.client.id = :clientId order by l.plantNumber, l.lockerNumber ")
+    @Query("select l from Locker l where l.plant.client.id = :clientId order by l.plant.plantNumber, l.lockerNumber ")
     List<Locker> getAllByClientId(@Param("clientId") long clientId);
 
     @Query("select l from Locker l where " +
-            "l.plantNumber = :plantNumber " +
+            "l.plant.plantNumber = :plantNumber " +
             "order by l.lockerNumber")
     List<Locker> findAllByPlantNumber(int plantNumber);
 
 
-    @Query("select count(l.plantNumber) from Locker l where l.plant.id = :plantId ")
+    @Query("select count(l.plant.id) from Locker l where l.plant.id = :plantId ")
     int getAmountOfLockersByPlantId(@Param("plantId") long plantId);
 
     Locker deleteLockerById(Long id);
 
     @Query("select l from Locker l where l.lockerNumber = :lockerNumber " +
             "and " +
-            "l.plantNumber = :plantNumber " +
+            "l.plant.plantNumber = :plantNumber " +
             "and " +
             "l.location = :location ")
     Locker getLockerByParameters(@Param("lockerNumber") Integer lockerNumber,
                                  @Param("plant") int plantNumber,
                                  @Param("location") Location location);
 
-    @Query("select l from Locker l where l.plantNumber = :plantNumber " +
+    @Query("select l from Locker l where l.plant.plantNumber = :plantNumber " +
             "and " +
             "(l.lockerNumber between :firstLocker and :lastLocker) " +
             "order by l.lockerNumber ")

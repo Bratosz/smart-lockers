@@ -103,9 +103,9 @@ public class OrderService {
         Date actualDate = new Date();
         switch (actionType) {
             case ACCEPT:
-                return acceptOrders(clothOrders, user, actualDate);
+                acceptOrders(clothOrders, user, actualDate);
             case CANCEL:
-                return cancelOrders(clothOrders, user, actualDate);
+                cancelOrders(clothOrders, user, actualDate);
             default:
                 return clothOrders;
         }

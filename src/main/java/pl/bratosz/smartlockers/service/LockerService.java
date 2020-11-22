@@ -52,12 +52,18 @@ public class LockerService {
             int plantNumber,
             String departmentName,
             String locationName) {
-        List<Box> boxes = boxesService.createBoxesForLocker(capacity);
+        Locker locker = new Locker();
+        locker.setCapacity(capacity);
+        List<Box> boxes = boxesService.createBoxesForLocker(locker);
+
         Plant plant = plantService.getByNumber(plantNumber);
         Department department = departmentService.getByNameAndPlantNumber(departmentName, plantNumber);
         Location location = locationService.getByNameAndPlantNumber(locationName, plantNumber);
-        Locker locker = new Locker(
-                lockerNumber, capacity, plant, department, location, boxes);
+
+        locker.setLockerNumber(lockerNumber);
+        locker.setPlant(plant);
+        locker.setDepartment(department);
+        locker.setLocation(location);
         locker.setBoxes(boxes);
         return lockersRepository.save(locker);
     }
@@ -66,7 +72,7 @@ public class LockerService {
         Plant plant = plantService.getById(plantId);
         Department department = departmentService.getById(departmentId);
         Location location = locationService.getById(locationId);
-        List<Box> boxes = boxesService.createBoxesForLocker(locker.getCapacity());
+        List<Box> boxes = boxesService.createBoxesForLocker(locker);
         locker.setBoxes(boxes);
         locker.setPlant(plant);
         locker.setDepartment(department);

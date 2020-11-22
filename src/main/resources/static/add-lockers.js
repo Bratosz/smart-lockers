@@ -1,14 +1,14 @@
 $("#button-add-locker").click(function () {
-    const plantId = $("#select-plant").val();
+    let plantId = $("#select-plant").val();
     $.ajax({
         url: `http://localhost:8080/lockers/quantity/${plantId}`,
         method: "get",
         success: function (lockersQuantity) {
             const amount = $("#input-lockers-amount").val();
             for (let i = 0; i < amount; i++) {
-                const capacity = $("#select-locker-capacity").val();
-                const departmentId = $("#select-department").val();
-                const locationId = $("#select-locker-location").val();
+                let capacity = $("#select-locker-capacity").val();
+                let departmentId = $("#select-department").val();
+                let locationId = $("#select-locker-location").val();
 
                 lockersQuantity++;
 

@@ -21,7 +21,7 @@ public class Box {
     private BoxStatus boxStatus;
 
     @JsonView({Views.InternalForLockers.class, Views.InternalForBoxes.class})
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL)
     private EmployeeGeneral employee;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -38,7 +38,6 @@ public class Box {
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class, Views.InternalForClothes.class})
     @ManyToOne
-    @JoinColumn(name="locker_id")
     private Locker locker;
 
     public Box() {

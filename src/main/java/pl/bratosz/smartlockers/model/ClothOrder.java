@@ -30,23 +30,23 @@ public class ClothOrder {
 
     private Date requestDate;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private User requestedBy;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private User confirmedBy;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private User acceptedBy;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private UserOurStaff inRealizationBy;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private UserOurStaff preparedBy;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private UserOurStaff defferedBy;
+    @ManyToOne
+    private User defferedBy;
 
     @JsonView(Views.Public.class)
     private Date acceptDate;
@@ -144,43 +144,6 @@ public class ClothOrder {
                 setActive(false);
                 setCancelled(true);
         }
-    }
-
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Article getArticle() {
-        return article;
-    }
-
-    public void setArticle(Article article) {
-        this.article = article;
-    }
-
-    public ClothSize getSize() {
-        return size;
-    }
-
-    public void setSize(ClothSize size) {
-        this.size = size;
-    }
-
-    public Cloth getCloth() {
-        return cloth;
-    }
-
-    public void setCloth(Cloth cloth) {
-        this.cloth = cloth;
-    }
-
-    public OrderStatus getOrderStatus() {
-        return orderStatus;
     }
 
     public void setOrderStatus(
@@ -324,6 +287,46 @@ public class ClothOrder {
         isDeffered = deffered;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Article getArticle() {
+        return article;
+    }
+
+    public void setArticle(Article article) {
+        this.article = article;
+    }
+
+    public ClothSize getSize() {
+        return size;
+    }
+
+    public void setSize(ClothSize size) {
+        this.size = size;
+    }
+
+    public Cloth getCloth() {
+        return cloth;
+    }
+
+    public void setCloth(Cloth cloth) {
+        this.cloth = cloth;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public User getDefferedBy() {
+        return defferedBy;
+    }
+
     public Date getDefferedCancelDate() {
         return defferedCancelDate;
     }
@@ -338,24 +341,6 @@ public class ClothOrder {
 
     public void setNote(String note) {
         this.note = note;
-    }
-
-    public UserOurStaff getDefferedBy() {
-        return defferedBy;
-    }
-
-    public void setDefferedBy(User user) {
-        if (user.getClass().isInstance(UserOurStaff.class)) {
-            this.defferedBy = (UserOurStaff) user;
-        } else {
-            String msg = "Użytkownik nie ma uprawnień";
-            try {
-                throw new UserPermissionException(msg);
-            } catch (UserPermissionException e) {
-                e.getMessage();
-                e.printStackTrace();
-            }
-        }
     }
 
     public Date getSetAsDeffered() {
@@ -382,7 +367,7 @@ public class ClothOrder {
         this.estimatedDateOfExecution = estimatedDateOfExecution;
     }
 
-    public void setDefferedBy(UserOurStaff defferedBy) {
+    public void setDefferedBy(User defferedBy) {
         this.defferedBy = defferedBy;
     }
 

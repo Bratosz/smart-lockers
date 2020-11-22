@@ -66,11 +66,11 @@ public class ScrapingService {
 
         String firstName = scrapper.getEmployeeFirstName();
         String lastName = scrapper.getEmployeeLastName();
-        Set<Cloth> actualClothes = scrapper.getClothes();
+        Set<Cloth> clothes = scrapper.getClothes();
 
-        Employee employee = employeeService.createEmployee(
-                plant.getId(), departmentId, lockerNumber, boxNumber, firstName, lastName);
-        clothService.updateClothes(actualClothes, employee);
+
+        employeeService.createEmployee(
+                clothes, departmentId, box, firstName, lastName);
         return boxService.getBoxById(boxId);
     }
 

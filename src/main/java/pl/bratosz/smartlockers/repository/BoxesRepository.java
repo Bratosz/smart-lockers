@@ -20,7 +20,7 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
     @Query("select b from Box b join b.locker l where " +
             "b.boxStatus = :boxStatus and " +
             "(l.department = :department or :department is null) and " +
-            "(l.plantNumber = :plantNumber or :plantNumber is null) and " +
+            "(l.plant.plantNumber = :plantNumber or :plantNumber is null) and " +
             "(l.location = :location or :location is null) order by l.lockerNumber, b.boxNumber ")
     List<Box> getBoxesByParameters(@Param("department") Department department,
                                    @Param("plant") int plantNumber,
@@ -32,7 +32,7 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             "b.boxNumber = :boxNumber and " +
             "l.lockerNumber = :lockerNumber and " +
             "l.location = :location and " +
-            "l.plantNumber = :plantNumber ")
+            "l.plant.plantNumber = :plantNumber ")
     Box getBox(int lockerNumber, int boxNumber, Location location, int plantNumber);
 
     Box getBoxById(long id);
@@ -44,7 +44,7 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
     Box getBox(long plantId, int lockerNumber, int boxNumber);
 
     @Query("select b from Box b join b.locker l where " +
-            "l.plantNumber = :plantNumber " +
+            "l.plant.plantNumber = :plantNumber " +
             "and " +
             "(l.lockerNumber between :firstLocker and :lastLocker) " +
             "order by l.lockerNumber, b.boxNumber ")

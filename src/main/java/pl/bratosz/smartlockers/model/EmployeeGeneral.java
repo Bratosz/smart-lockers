@@ -52,9 +52,14 @@ public abstract class EmployeeGeneral {
         return box;
     }
 
-    public void setBox(Box box) {
+    protected void setBox(Box box) {
         this.box = box;
     }
+
+   public void addToBox(Box box) {
+        box.setEmployee(this);
+        this.setBox(box);
+   }
 
     public boolean isDummy() {
         return dummy;
