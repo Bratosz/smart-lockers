@@ -30,7 +30,7 @@ public class FileStorageService {
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
-            throw new FileStorageException("Could not create the directory where the uploaded files will" +
+            throw new FileStorageException("Could not createOrders the directory where the uploaded files will" +
                     "be stored.", ex);
         }
     }

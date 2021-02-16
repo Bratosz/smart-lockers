@@ -2,6 +2,9 @@ package pl.bratosz.smartlockers.model;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.model.clothes.Cloth;
+import pl.bratosz.smartlockers.model.clothes.RotationalCloth;
+import pl.bratosz.smartlockers.model.users.UserEmployee;
 
 import javax.persistence.*;
 import java.util.List;
@@ -9,25 +12,14 @@ import java.util.Set;
 
 @Entity
 public class Employee extends EmployeeGeneral {
-    @JsonView(Views.DismissedEmployees.class)
-    @ManyToMany(mappedBy = "dismissedEmployees")
-    private List<Box> boxesOccupiedInPast;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private Set<Cloth> clothing;
+    private Set<Cloth> clothes;
 
     @JsonView(Views.InternalForEmployees.class)
-    @OneToMany(mappedBy = "rotationOwner", cascade = CascadeType.ALL)
-    private Set<Cloth> rotationalClothes;
-
-    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
-    @OneToMany(mappedBy = "acceptedOwner", cascade = CascadeType.ALL)
-    private Set<Cloth> acceptedClothes;
-
-    @JsonView(Views.InternalForEmployees.class)
-    @OneToMany(mappedBy = "withdrawnOwner", cascade = CascadeType.ALL)
-    private Set<Cloth> withdrawnClothes;
+    @OneToMany(mappedBy = "rotationTemporaryOwner", cascade = CascadeType.ALL)
+    private Set<RotationalCloth> rotationalClothes;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Department department;
@@ -35,12 +27,14 @@ public class Employee extends EmployeeGeneral {
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
     private UserEmployee userEmployee;
 
-    @JsonView(Views.InternalForBoxes.class)
-    @OneToMany(mappedBy = "employee")
-    private Set<ClothOrder> clothOrders;
-
     @JsonView(Views.Public.class)
     private boolean active;
+
+    @JsonView(Views.Public.class)
+    private String note;
+
+    @ManyToMany(mappedBy = "releasedEmployees", fetch = FetchType.LAZY)
+    private List<Box> pastBoxes;
 
     public Employee() {
     }
@@ -52,47 +46,20 @@ public class Employee extends EmployeeGeneral {
         setActive(active);
     }
 
-    public Employee(boolean empty, String firstName, String lastName) {
-//        setEmpty(empty);
-//        setFirstName(firstName);
-//        setLastName(lastName);
-    }
-
-    public List<Box> getBoxesOccupiedInPast() {
-        return boxesOccupiedInPast;
-    }
-
-    public void setBoxesOccupiedInPast(List<Box> boxesOccupiedInPast) {
-        this.boxesOccupiedInPast = boxesOccupiedInPast;
-    }
-
-    public Set<Cloth> getRotationalClothes() {
+    public Set<RotationalCloth> getRotationalClothes() {
         return rotationalClothes;
     }
 
-    public void setRotationalClothes(Set<Cloth> rotationalClothes) {
+    public void setRotationalClothes(Set<RotationalCloth> rotationalClothes) {
         this.rotationalClothes = rotationalClothes;
     }
 
-    public Set<Cloth> getClothing() {
-        return clothing;
+    public Set<Cloth> getClothes() {
+        return clothes;
     }
 
-    private void setClothing(Set<Cloth> clothing) {
-        this.clothing = clothing;
-    }
-
-    public void addClothes(Set<Cloth> clothing) {
-        clothing.stream().forEach(c -> c.setEmployee(this));
-        setClothing(clothing);
-    }
-
-    public Set<Cloth> getWithdrawnClothes() {
-        return withdrawnClothes;
-    }
-
-    public void setWithdrawnClothes(Set<Cloth> withdrawnClothes) {
-        this.withdrawnClothes = withdrawnClothes;
+    public void setClothes(Set<Cloth> clothes) {
+        this.clothes = clothes;
     }
 
     public Department getDepartment() {
@@ -111,14 +78,6 @@ public class Employee extends EmployeeGeneral {
         this.userEmployee = userEmployee;
     }
 
-    public Set<ClothOrder> getClothOrders() {
-        return clothOrders;
-    }
-
-    public void setClothOrders(Set<ClothOrder> clothOrders) {
-        this.clothOrders = clothOrders;
-    }
-
     public boolean isActive() {
         return active;
     }
@@ -127,12 +86,30 @@ public class Employee extends EmployeeGeneral {
         this.active = active;
     }
 
-    public Set<Cloth> getAcceptedClothes() {
-        return acceptedClothes;
+    public String getNote() {
+        return note;
     }
 
-    public void setAcceptedClothes(Set<Cloth> acceptedClothes) {
-        this.acceptedClothes = acceptedClothes;
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public List<Box> getPastBoxes() {
+        return pastBoxes;
+    }
+
+    public void setPastBoxes(List<Box> pastBoxes) {
+        this.pastBoxes = pastBoxes;
+    }
+
+    public void setAsPastBox(Box box) {
+        pastBoxes.add(box);
+        this.box = null;
+    }
+
+    public Box getLastBox() {
+        int last = pastBoxes.size() - 1;
+        return pastBoxes.get(last);
     }
 
     @Override

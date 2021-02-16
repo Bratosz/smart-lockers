@@ -30,11 +30,10 @@ public class Box {
     @JsonView(Views.DismissedEmployees.class)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "dismissed_employees",
+            name = "boxes_occupied_in_past",
             joinColumns = @JoinColumn(name = "box_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id"))
-
-    private List<Employee> dismissedEmployees;
+    private List<Employee> releasedEmployees;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class, Views.InternalForClothes.class})
     @ManyToOne
@@ -93,12 +92,12 @@ public class Box {
         this.employeeDummy = employeeDummy;
     }
 
-    public List<Employee> getDismissedEmployees() {
-        return dismissedEmployees;
+    public List<Employee> getReleasedEmployees() {
+        return releasedEmployees;
     }
 
-    public void setDismissedEmployees(List<Employee> dismissedEmployees) {
-        this.dismissedEmployees = dismissedEmployees;
+    public void setReleasedEmployees(List<Employee> releasedEmployees) {
+        this.releasedEmployees = releasedEmployees;
     }
 
     public Locker getLocker() {
@@ -119,8 +118,6 @@ public class Box {
 //            setBoxStatus(BoxStatus.OCCUPY);
 //        }
 //    }
-
-
 
     public enum BoxStatus {
         OCCUPY("Zajęta"),
@@ -144,11 +141,5 @@ public class Box {
 
 
 
-//    private void setEmptyEmployee(Employee emptyEmployee) {
-//        if(emptyEmployee.isEmpty()) {
-//            this.emptyEmployee = emptyEmployee;
-//        } else {
-//            throw new InvalidEmployeeException("Empty employee is not empty");
-//        }
-//    }
+
 }

@@ -57,12 +57,6 @@ public class EmployeeController {
         return employeeService.createEmployeeAndAssignToBox(plantNumber, department, location, employee);
     }
 
-    @JsonView(Views.Public.class)
-    @DeleteMapping("/{id}")
-    public void deleteFromBoxEmployeeById(@PathVariable Long id) {
-        employeeService.dismissById(id);
-    }
-
     @JsonView(Views.InternalForEmployees.class)
     @GetMapping("/find/{firstName}/{lastName}")
     public List<Employee> getByFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName) {
@@ -84,33 +78,26 @@ public class EmployeeController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/change_box/{lockerNumber}/{boxNumber}/{plantNumber}/{targetLockerNumber}/{targetBoxNumber}/{targetPlantNumber}")
-    public Box changeEmployeeBox(@PathVariable int lockerNumber, @PathVariable int boxNumber,
-                                 @PathVariable int plantNumber, @PathVariable int targetLockerNumber,
-                                 @PathVariable int targetBoxNumber, @PathVariable int targetPlantNumber) {
-        return employeeService.changeEmployeeBox(lockerNumber, boxNumber, plantNumber, targetLockerNumber,
+    @PostMapping("/change_box/{userId}/{lockerNumber}/{boxNumber}/{plantNumber}/{targetLockerNumber}/{targetBoxNumber}/{targetPlantNumber}")
+    public Box changeEmployeeBox(
+            @PathVariable long userId,
+            @PathVariable int lockerNumber,
+            @PathVariable int boxNumber,
+            @PathVariable int plantNumber,
+            @PathVariable int targetLockerNumber,
+            @PathVariable int targetBoxNumber,
+            @PathVariable int targetPlantNumber) {
+        return employeeService.changeEmployeeBox(userId, lockerNumber, boxNumber, plantNumber, targetLockerNumber,
                 targetBoxNumber, targetPlantNumber);
 
     }
 
-    @JsonView(Views.InternalForBoxes.class)
-    @PostMapping("/change_box_next/{lockerNumber}/{boxNumber}/{plantNumber}/{targetDep}/{targetLocation}/{targetPlantNumber}")
-    public Box changeEmployeeBoxOnNextAvaliable(
-            @PathVariable int lockerNumber, @PathVariable int boxNumber,
-            @PathVariable int plantNumber, @PathVariable Department targetDep,
-            @PathVariable Location targetLocation, @PathVariable int targetPlantNumber) {
-        return employeeService.changeEmployeeBoxOnNextFree(lockerNumber, boxNumber, plantNumber, targetDep,
-                targetLocation, targetPlantNumber);
-    }
-
-    public List<Employee> sortByPlantLockerAndBox(List<Employee> employees) {
-        return employeeService.sortByPlantBoxAndLocker(employees);
-    }
-
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/dismiss_by_id/{id}")
-    public Box dismissById(@PathVariable Long id) {
-        return employeeService.dismissById(id);
+    @PostMapping("/dismiss_by_id/{employeeId}/{userId}")
+    public Employee dismissById(
+            @PathVariable long employeeId,
+            @PathVariable long userId) {
+        return employeeService.dismissById(employeeId, userId);
     }
 
     @JsonView(Views.InternalForEmployees.class)

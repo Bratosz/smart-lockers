@@ -1,3 +1,10 @@
+const userId = 1;
+
+loadPlants();
+loadDepartments();
+loadLocations();
+reloadTableRows();
+
 function reloadTableRows() {
     $.ajax({
         url: `http://localhost:8080/lockers/${clientId}`,
@@ -14,7 +21,7 @@ function reloadTableRows() {
 
 function dismissEmployee(employeeId) {
     $.ajax({
-        url: `http://localhost:8080/employees/dismiss_by_id/${employeeId}`,
+        url: `http://localhost:8080/employees/dismiss_by_id/${userId}/${employeeId}`,
         method: "post",
         success: function (box) {
             console.log("Zwolniono pracownika");
@@ -144,12 +151,6 @@ function displayEmployees(employees) {
             $("#table-rows").append($row);
     }
 }
-
-
-loadPlants();
-loadDepartments();
-loadLocations();
-reloadTableRows();
 
 
 

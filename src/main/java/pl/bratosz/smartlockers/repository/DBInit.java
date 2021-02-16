@@ -45,7 +45,7 @@
 //                dismissedEmployees.add(dismissedEmp);
 //
 //                box.setEmployee(employee);
-//                box.setDismissedEmployees(dismissedEmployees);
+//                box.setReleasedEmployees(dismissedEmployees);
 //                boxes.add(box);
 //
 //            }

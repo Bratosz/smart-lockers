@@ -1,7 +1,7 @@
 package pl.bratosz.smartlockers.resolvers;
 
 
-import pl.bratosz.smartlockers.model.ClothType;
+import pl.bratosz.smartlockers.model.clothes.ClothType;
 
 import java.util.HashMap;
 import java.util.Map;

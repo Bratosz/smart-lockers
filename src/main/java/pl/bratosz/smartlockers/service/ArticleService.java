@@ -2,8 +2,8 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.exception.ArticleNotExistException;
-import pl.bratosz.smartlockers.model.Article;
-import pl.bratosz.smartlockers.model.ClothType;
+import pl.bratosz.smartlockers.model.clothes.Article;
+import pl.bratosz.smartlockers.model.clothes.ClothType;
 import pl.bratosz.smartlockers.repository.ArticlesRepository;
 import pl.bratosz.smartlockers.resolvers.ClothTypeResolver;
 
@@ -15,7 +15,7 @@ public class ArticleService {
         this.articlesRepository = articlesRepository;
     }
 
-    public Article getByArticleNumber(int articleNumber) {
+    public Article get(int articleNumber) {
         return articlesRepository.getByArticleNumber(articleNumber);
     }
 
@@ -30,8 +30,8 @@ public class ArticleService {
         if(articleNumber == 0) {
             return article;
         } else{
-             Article a = getByArticleNumber(articleNumber);
-             if(a == null) {
+             Article a = get(articleNumber);
+             if(a.equals(null)) {
                  throw new ArticleNotExistException("Article number: " + articleNumber);
              } else {
                  return a;

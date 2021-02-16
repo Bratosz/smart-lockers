@@ -16,7 +16,7 @@ $("#button-load-employee").click(function () {
 });
 
 $("#refresh-button").click(function () {
-    if(boxStatus == "Wolna") {
+    if (boxStatus == "Wolna") {
         loadEmployee();
     } else {
         updateClothes();
@@ -31,6 +31,17 @@ $('#button-add-order').click(function () {
     addOrder();
 
 });
+
+function refreshOrders() {
+    $.ajax({
+            url: `http://localhost:8080/orders/get-by-employee/${employeeId}`,
+            method: "get",
+            success: function (actualOrders) {
+                displayOrders(actualOrders);
+            }
+        }
+    )
+}
 
 function addOrder() {
     let clothIds = new Array;
@@ -48,14 +59,12 @@ function addOrder() {
         size = "SIZE_DEFAULT";
     }
     $.ajax({
-        url: `http://localhost:8080/order/place/${articleNumber}/${size}/${orderType}/${userId}`,
+        url: `http://localhost:8080/orders/place/${articleNumber}/${size}/${orderType}/${userId}`,
         method: "post",
         contentType: "application/json",
         data: JSON.stringify(clothIds),
-        success: function (clothOrders) {
-            console.log("Cloth orders:");
-            console.log(clothOrders);
-            displayOrders(clothOrders)
+        success: function () {
+            refreshOrders();
         }
     });
 }
@@ -68,13 +77,13 @@ function performActionOnOrders() {
         orderIds.push(orderId);
     });
     $.ajax({
-        url: `http://localhost:8080/order/action/${actionType}/${userId}`,
+        url: `http://localhost:8080/orders/action/${actionType}/${userId}`,
         method: "post",
         contentType: "application/json",
         data: JSON.stringify(orderIds),
         success: function (clothOrders) {
             console.log(clothOrders);
-            displayOrders();
+            displayOrders(clothOrders);
         }
     });
 }
@@ -94,7 +103,6 @@ function reloadPage() {
         url: `http://localhost:8080/boxes/${boxId}`,
         method: "get",
         success: function (box) {
-            console.log(box);
             lockerNumber = box.locker.lockerNumber;
             boxNumber = box.boxNumber;
             boxStatus = box.boxStatus;
@@ -194,9 +202,6 @@ function formatDate(date) {
 }
 
 function displayOrders(clothOrders) {
-    if(clothOrders === undefined) {
-        clothOrders = loadOrders();
-    }
     $("#table-of-orders-body > tr:not(#row-order-template)").remove();
     const $rowTemplate = $("#row-order-template");
     clothOrders.sort(function (a, b) {
@@ -221,17 +226,5 @@ function displayOrders(clothOrders) {
         $row.find(".cell-accept-date").text(order.acceptDate);
         $("#table-of-orders-body").append($row);
     }
-}
-
-function loadOrders() {
-    let clothOrders;
-    $.ajax({
-        url: `http://localhost:8080/order/get-by-employee/${employeeId}`,
-        method: "get",
-        success: function (actualClothOrders) {
-            clothOrders = actualClothOrders;
-        }
-    });
-    return clothOrders;
 }
 

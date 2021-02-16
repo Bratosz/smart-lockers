@@ -6,10 +6,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import pl.bratosz.smartlockers.date.FormatDate;
-import pl.bratosz.smartlockers.exception.ArticleNotExistException;
-import pl.bratosz.smartlockers.model.Article;
-import pl.bratosz.smartlockers.model.Cloth;
-import pl.bratosz.smartlockers.model.ClothSize;
+import pl.bratosz.smartlockers.model.clothes.Article;
+import pl.bratosz.smartlockers.model.clothes.Cloth;
+import pl.bratosz.smartlockers.model.clothes.ClothSize;
 
 import pl.bratosz.smartlockers.service.ArticleService;
 import pl.bratosz.smartlockers.strings.MyString;
@@ -63,8 +62,13 @@ public class Scrapper {
         for(int i = 1; i < elements.size(); i++) {
             Elements td = elements.get(i).select("td");
             Cloth cloth = new Cloth(
-                    getId(td), getAssignment(td), getLastWashing(td),
-                    getRelease(td), getOrdinalNo(td), getArticleByArticleNumber(td), getSize(td));
+                    getId(td),
+                    getAssignment(td),
+                    getLastWashing(td),
+                    getRelease(td),
+                    getOrdinalNo(td),
+                    getArticleByArticleNumber(td),
+                    getSize(td));
             clothes.add(cloth);
         }
         return clothes;
@@ -115,7 +119,7 @@ public class Scrapper {
 
     private Article getArticleByArticleNumber(Elements td) {
         int articleNumber = Integer.parseInt(td.get(1).text());
-        Article article = articleService.getByArticleNumber(articleNumber);
+        Article article = articleService.get(articleNumber);
         if (article == null) {
             String articleName = td.get(2).text();
             return articleService.addNewArticle(articleNumber, articleName);

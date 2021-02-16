@@ -35,7 +35,6 @@ public abstract class EmployeeGeneral {
         return firstName;
     }
 
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -52,7 +51,7 @@ public abstract class EmployeeGeneral {
         return box;
     }
 
-    protected void setBox(Box box) {
+    public void setBox(Box box) {
         this.box = box;
     }
 

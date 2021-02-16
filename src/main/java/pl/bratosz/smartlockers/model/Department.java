@@ -1,7 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import org.hibernate.annotations.DynamicUpdate;
+import pl.bratosz.smartlockers.model.users.UserClient;
 
 import javax.persistence.*;
 import java.util.Set;

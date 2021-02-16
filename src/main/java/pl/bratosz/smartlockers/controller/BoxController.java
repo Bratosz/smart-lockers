@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.EmployeeGeneral;
-import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.service.BoxService;
 import java.util.List;
@@ -22,13 +21,6 @@ public class BoxController {
     @GetMapping
     public List<Box> getAll() {
         return boxesService.findAll();
-    }
-
-    @JsonView(Views.InternalForLockers.class)
-    @PostMapping("/dismiss_employee")
-    public Box dismissEmployeeByBox(@RequestBody Box b) {
-        EmployeeGeneral e = b.getEmployee();
-        return boxesService.dismissEmployee(b, e);
     }
 
     @JsonView(Views.InternalForBoxes.class)

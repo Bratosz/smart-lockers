@@ -2,6 +2,7 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.*;
+import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.scraping.Scrapper;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class ScrapingService {
         Box box = boxService.getBoxById(boxId);
         Plant plant = box.getLocker().getPlant();
         Employee employee = (Employee) box.getEmployee();
-        currentClothes = employee.getClothing();
+        currentClothes = employee.getClothes();
 
         String login = plant.getLogin();
         String password = plant.getPassword();

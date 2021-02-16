@@ -3,8 +3,8 @@ package pl.bratosz.smartlockers.service.exels;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import pl.bratosz.smartlockers.model.*;
-import pl.bratosz.smartlockers.service.creators.EmployeeCreator;
-import pl.bratosz.smartlockers.service.creators.LockerCreator;
+import pl.bratosz.smartlockers.service.managers.creators.EmployeeCreator;
+import pl.bratosz.smartlockers.service.managers.creators.LockerCreator;
 
 import java.util.*;
 

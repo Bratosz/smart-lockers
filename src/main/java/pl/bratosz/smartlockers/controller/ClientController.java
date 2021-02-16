@@ -11,9 +11,6 @@ import pl.bratosz.smartlockers.service.UserService;
 import pl.bratosz.smartlockers.service.exels.LoadType;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/client")
@@ -84,7 +81,7 @@ public class ClientController {
 
         locationController.assignToPlant(id7, 386);
 
-        userService.create("Admin", "Admin", Permissions.STAFF_ADVANCED);
+        userService.create("Admin", "Admin");
 
         return client;
     }

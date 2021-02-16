@@ -6,10 +6,15 @@ import pl.bratosz.smartlockers.comparators.PlantNumberSorter;
 import pl.bratosz.smartlockers.comparators.LockerNumberSorter;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.*;
+import pl.bratosz.smartlockers.model.clothes.Cloth;
+import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.EmployeeGeneralRepository;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
+import pl.bratosz.smartlockers.service.managers.EmployeeManager;
 
 import java.util.*;
+
+import static pl.bratosz.smartlockers.model.Box.BoxStatus.OCCUPY;
 
 @Service
 public class EmployeeService {
@@ -18,14 +23,28 @@ public class EmployeeService {
     private BoxService boxService;
     private PlantService plantService;
     private DepartmentService departmentService;
+    private UserService userService;
+    private User user;
+    private EmployeeManager employeeManager;
 
     public EmployeeService(EmployeesRepository employeesRepository, EmployeeGeneralRepository employeeGeneralRepository, BoxService boxesService,
-                           PlantService plantService, DepartmentService departmentService) {
+                           PlantService plantService, DepartmentService departmentService, UserService userService) {
         this.employeesRepository = employeesRepository;
         this.employeeGeneralRepository = employeeGeneralRepository;
         this.boxService = boxesService;
         this.plantService = plantService;
         this.departmentService = departmentService;
+        this.userService = userService;
+    }
+
+    public void loadManagerAndUser(long userId) {
+        user = userService.getUserById(userId);
+        employeeManager = new EmployeeManager(user);
+    }
+
+    public void loadManagerAndUser(User user) {
+        this.user = user;
+        employeeManager = new EmployeeManager(user);
     }
 
     public List<Employee> getAllEmployees() {
@@ -40,7 +59,7 @@ public class EmployeeService {
                                    int boxNumber, String firstName, String lastName) throws BoxNotAvailableException {
         Department department = departmentService.getById(departmentId);
         Box box = boxService.getBox(plantId, lockerNumber, boxNumber);
-        if (box.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
+        if (box.getBoxStatus().equals(OCCUPY)) {
             throw new BoxNotAvailableException("Nie udało się dodać pracownika " +
                     " bo szafka o numerze " + lockerNumber + "/" + boxNumber + " jest zajęta");
         }
@@ -52,13 +71,13 @@ public class EmployeeService {
     public Employee createEmployee(
             Set<Cloth> clothes, long departmentId, Box box, String firstName, String lastName) {
         Department department = departmentService.getById(departmentId);
-        if(box.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
+        if(box.getBoxStatus().equals(OCCUPY)) {
             throw new BoxNotAvailableException("Box is occupy by"
                     + box.getEmployee().getLastName() + " " + box.getEmployee().getFirstName());
         }
         Employee employee = new Employee(firstName, lastName, department, true);
         employee.addToBox(box);
-        employee.addClothes(clothes);
+        employee.setClothes(clothes);
         return employeesRepository.save(employee);
     }
 
@@ -67,7 +86,7 @@ public class EmployeeService {
         Plant plant = plantService.getByNumber(plantNumber);
         Department department = departmentService.getByNameAndPlantNumber(departmentName, plantNumber);
         Box box = boxService.getBox(plant.getId(), lockerNumber, boxNumber);
-        box.setBoxStatus(Box.BoxStatus.OCCUPY);
+        box.setBoxStatus(OCCUPY);
         Employee employee = new Employee();
         employee.setDepartment(department);
         employee.setFirstName(firstName);
@@ -85,7 +104,7 @@ public class EmployeeService {
             e.getMessage();
             return null;
         }
-        emptyBox.setBoxStatus(Box.BoxStatus.OCCUPY);
+        emptyBox.setBoxStatus(OCCUPY);
         employee.addToBox(emptyBox);
 
         return employeesRepository.save(employee);
@@ -118,35 +137,19 @@ public class EmployeeService {
         return employeesToSort;
     }
 
-    public Box changeEmployeeBoxOnNextFree(int lockerNumber, int boxNumber,
-                                           long plantId, Department targetDep,
-                                           Location targetLocation, int targetPlantNumber) {
-        Box oldBox = boxService.getBox(plantId, lockerNumber, boxNumber);
-        Box freeBox = boxService.findNextFreeBox(targetDep, targetPlantNumber, targetLocation);
-        Employee employee = boxService.getEmployeeToChangeBox(oldBox);
-        return boxService.setEmployee(employee, freeBox);
-    }
 
-    public Box changeEmployeeBox(int lockerNumber, int boxNumber, long plantId,
-                                 int targetLockerNumber, int targetBoxNumber,
-                                 long targetPlantId) throws BoxNotAvailableException {
-        Box newBox = boxService.getBox(targetPlantId, targetLockerNumber, targetBoxNumber);
 
-        if (newBox.getBoxStatus().equals(Box.BoxStatus.OCCUPY)) {
-            throw new BoxNotAvailableException("Szafka o numerze: " + targetLockerNumber + "/" + targetBoxNumber
-                    + "jest niedostępna");
+    public Employee dismissById(long employeeId, long userId) {
+        user = userService.getUserById(userId);
+        Employee employee = getEmployeeById(employeeId);
+        Box box = employee.getBox();
+
+        if(box.getBoxStatus().equals(OCCUPY)) {
+            employee = employeeManager.dismiss(employee);
+            return employeesRepository.save(employee);
         } else {
-            Box box = boxService.getBox(plantId, lockerNumber, boxNumber);
-            Employee employee = boxService.getEmployeeToChangeBox(box);
-            return boxService.setEmployee(employee, newBox);
+            return employee;
         }
-    }
-
-    public Box dismissById(long id) {
-        EmployeeGeneral empToDismiss = getGeneralEmployeeById(id);
-        Box box = empToDismiss.getBox();
-        Box releasedBox = boxService.dismissEmployee(box, empToDismiss);
-        return releasedBox;
     }
 
     public Employee save(Employee employee) {
@@ -216,5 +219,9 @@ public class EmployeeService {
 
     public List<Employee> getEmployeesByFirstName(String firstName) {
         return employeesRepository.getEmployeesByFirstName(firstName);
+    }
+
+    public Box changeEmployeeBox(long userId, int lockerNumber, int boxNumber, int plantNumber, int targetLockerNumber, int targetBoxNumber, int targetPlantNumber) {
+        return new Box();
     }
 }

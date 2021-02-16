@@ -2,12 +2,20 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.bratosz.smartlockers.exception.ArticleNotExistException;
-import pl.bratosz.smartlockers.model.*;
+import pl.bratosz.smartlockers.model.Employee;
+import pl.bratosz.smartlockers.model.clothes.Article;
+import pl.bratosz.smartlockers.model.clothes.Cloth;
+import pl.bratosz.smartlockers.model.clothes.ClothSize;
+import pl.bratosz.smartlockers.model.orders.ActionType;
+import pl.bratosz.smartlockers.model.orders.parameters.basic.BasicOrderParameters;
+import pl.bratosz.smartlockers.model.orders.ClothOrder;
+import pl.bratosz.smartlockers.model.orders.OrderType;
+import pl.bratosz.smartlockers.model.orders.parameters.basic.ParametersForExchangeAndRelease;
+import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.OrdersRepository;
+import pl.bratosz.smartlockers.service.managers.OrderManager;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 @Service
 public class OrderService {
@@ -16,7 +24,9 @@ public class OrderService {
     private ArticleService articleService;
     @Autowired
     private ClothService clothesService;
-
+    private OrderManager orderManager;
+    private User user;
+    private Date date;
 
     public OrderService(OrdersRepository ordersRepository, UserService userService,
                         ArticleService articleService) {
@@ -25,132 +35,67 @@ public class OrderService {
         this.articleService = articleService;
     }
 
-    public List<ClothOrder> place(int articleNumber, ClothSize size, OrderType orderType, long userId, long[] clothIds) {
-        User user = userService.getOurUserById(userId);
-        Permissions permissions = user.getPermissions();
-        OrderStatus orderStatus = resolveInitialOrderStatusByUserPermissions(permissions);
-        List<Cloth> clothes = clothesService.getClothesByIds(clothIds);
-        try {
-            return createOrders(orderType, articleNumber, size, orderStatus, clothes, user);
-        } catch (ArticleNotExistException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public void loadUserAndManager(long userId) {
+        user = userService.getUserById(userId);
+        date = new Date();
+        orderManager = new OrderManager(user, date);
     }
 
-    private List<ClothOrder> createOrders(
-            OrderType orderType, int articleNumber, ClothSize size,
-            OrderStatus orderStatus, List<Cloth> clothes, User user) throws ArticleNotExistException {
+    public List<ClothOrder> placeMany(
+            OrderType orderType,
+            int articleNumber,
+            ClothSize size,
+            long[] clothIds,
+            long userId) {
+        List<Cloth> clothesForExchange = clothesService.getClothesByIds(clothIds);
+        Article article = articleService.get(articleNumber);
         List<ClothOrder> clothOrders = new LinkedList<>();
-        Date date = new Date();
-        for (Cloth cloth : clothes) {
-            ClothOrder order = create(cloth, orderType, articleNumber, size, orderStatus, date, user);
-            clothOrders.add(order);
-        }
+        clothesForExchange.stream().forEach(clothToExchange -> {
+            ClothOrder order = placeOne(
+                    clothToExchange,
+                    orderType,
+                    article,
+                    size);
+            ((LinkedList<ClothOrder>) clothOrders).push(order);
+        });
         return clothOrders;
     }
 
-    public ClothOrder create(
-            Cloth cloth, OrderType orderType, int articleNumber,
-            ClothSize size, OrderStatus orderStatus, Date date, User user) throws ArticleNotExistException {
-        Employee employee = cloth.getEmployee();
-        Article article = articleService.determineDesiredArticle(articleNumber, cloth.getArticle());
-        ClothSize desiredSize = clothesService.determineDesiredSize(size, cloth.getSize());
-        ClothOrder order = new ClothOrder(employee, cloth, orderType, article, desiredSize, orderStatus, date, user);
+    public ClothOrder placeOne(Cloth clothForExchange,
+                               OrderType orderType,
+                               Article article,
+                               ClothSize size) {
+        Employee employee = clothForExchange.getEmployee();
+        Cloth clothForRelease = clothesService.createNewInstead(
+                clothForExchange.getOrdinalNumber(),
+                article,
+                size,
+                employee,
+                user);
+        ParametersForExchangeAndRelease basicParameters = BasicOrderParameters.createForClothExchange(
+                clothForExchange,
+                clothForRelease,
+                orderType,
+                user);
+        ClothOrder order = user.getUserRole().createOrder(basicParameters);
         return ordersRepository.save(order);
     }
 
-    public ClothOrder createOrderForChangeSize(Cloth cloth, ClothSize size, OrderStatus orderStatus,
-                                               Date date, long userId) {
-        User user = userService.getUserById(userId);
-        OrderType orderType = OrderType.CHANGE_SIZE;
-        Employee employee = cloth.getEmployee();
-        Article article = cloth.getArticle();
-        ClothSize desiredSize = size;
-        ClothOrder order = new ClothOrder(employee, cloth, orderType, article, desiredSize,
-                 orderStatus, date, user);
-        return ordersRepository.save(order);
-    }
-
-    public ClothOrder createOrderForExchangeForNewOne(Cloth cloth, OrderStatus orderStatus,
-                                                      Date date, long userId) {
-        User user = userService.getUserById(userId);
-        OrderType orderType = OrderType.EXCHANGE_FOR_A_NEW_ONE;
-        Employee employee = cloth.getEmployee();
-        Article article = cloth.getArticle();
-        ClothSize size = cloth.getSize();
-        ClothOrder order = new ClothOrder(employee, cloth, orderType, article, size,
-                orderStatus, date, user);
-        return ordersRepository.save(order);
-    }
-
-    public ClothOrder createOrderForChangeArticle(Cloth cloth, int articleNumber, ClothSize desiredSize,
-                                                  OrderStatus orderStatus,
-                                                  Date date, long userId) {
-        User user = userService.getUserById(userId);
-        OrderType orderType = OrderType.CHANGE_ARTICLE;
-        Employee employee = cloth.getEmployee();
-        Article desiredArticle = articleService.getByArticleNumber(articleNumber);
-        ClothOrder order = new ClothOrder(employee, cloth, orderType, desiredArticle, desiredSize,
-                orderStatus, date, user);
-        return ordersRepository.save(order);
-    }
-
-    public Set<ClothOrder> performActionOnOrders(
-            ActionType actionType, long userId, long[] clothOrdersIds) {
-        Set<ClothOrder> clothOrders = getClothOrders(clothOrdersIds);
-        User user = userService.getUserById(userId);
-        Date actualDate = new Date();
-        switch (actionType) {
-            case ACCEPT:
-                acceptOrders(clothOrders, user, actualDate);
-            case CANCEL:
-                cancelOrders(clothOrders, user, actualDate);
-            default:
-                return clothOrders;
-        }
-    }
-
-    private OrderStatus resolveInitialOrderStatusByUserPermissions(Permissions permissions) {
-        switch (permissions) {
-            case CLIENT_BASIC:
-                return OrderStatus.REQUESTED_AND_PENDING_FOR_CONFIRMATION;
-            case CLIENT_MEDIUM:
-                return OrderStatus.CONFIRMED_AND_PENDING_FOR_ACCEPTANCE;
-            case CLIENT_FULL:
-                return OrderStatus.ACCEPTED_AND_PENDING_FOR_REALIZATION;
-            default:
-                return OrderStatus.CONFIRMED_AND_PENDING_FOR_ACCEPTANCE;
-        }
+    public List<ClothOrder> performActionOnOrders(
+            ActionType actionType,
+            long[] clothOrdersIds,
+            long userId) {
+        List<ClothOrder> clothOrders = getClothOrders(clothOrdersIds);
+        clothOrders = orderManager.perform(actionType, clothOrders);
+        return ordersRepository.saveAll(clothOrders);
     }
 
     public Set<ClothOrder> getByEmployeeId(long employeeId) {
         return ordersRepository.getByEmployeeId(employeeId);
     }
 
-    private Set<ClothOrder> cancelOrders(
-            Set<ClothOrder> clothOrders, User user, Date actualDate) {
-        Consumer<ClothOrder> cancel = c -> {
-            c.setOrderStatus(OrderStatus.CANCELLED, user, actualDate, actualDate);
-            ordersRepository.save(c);
-        };
-        clothOrders.forEach(cancel);
-        return clothOrders;
-    }
-
-    private Set<ClothOrder> acceptOrders(
-            Set<ClothOrder> clothOrders, User user, Date actualDate) {
-        Consumer<ClothOrder> accept = c -> {
-            c.setOrderStatus(OrderStatus.ACCEPTED_AND_PENDING_FOR_REALIZATION,
-                    user, actualDate, actualDate);
-            ordersRepository.save(c);
-        };
-        clothOrders.forEach(accept);
-        return clothOrders;
-    }
-
-    private Set<ClothOrder> getClothOrders(long[] clothOrdersIds) {
-        Set<ClothOrder> clothOrders = new HashSet<>();
+    private List<ClothOrder> getClothOrders(long[] clothOrdersIds) {
+        List<ClothOrder> clothOrders = new LinkedList<>();
         for (int i = 0; i < clothOrdersIds.length; i++) {
             long id = clothOrdersIds[i];
             ClothOrder clothOrder = ordersRepository.getById(id);
@@ -158,6 +103,5 @@ public class OrderService {
         }
         return clothOrders;
     }
-
 
 }

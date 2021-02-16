@@ -3,13 +3,17 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.*;
+import pl.bratosz.smartlockers.model.clothes.ClothSize;
+import pl.bratosz.smartlockers.model.orders.ActionType;
+import pl.bratosz.smartlockers.model.orders.ClothOrder;
+import pl.bratosz.smartlockers.model.orders.OrderType;
 import pl.bratosz.smartlockers.service.OrderService;
 
 import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/orders")
 public class OrderController {
     private OrderService orderService;
 
@@ -19,10 +23,19 @@ public class OrderController {
 
     @JsonView(Views.InternalForClothOrders.class)
     @PostMapping("/place/{articleNumber}/{size}/{orderType}/{userId}")
-    public List<ClothOrder> place(@PathVariable int articleNumber, @PathVariable ClothSize size,
-                                  @PathVariable OrderType orderType, @PathVariable long userId,
-                                  @RequestBody long[] clothIds) {
-        return orderService.place(articleNumber, size, orderType, userId, clothIds);
+    public List<ClothOrder> place(@PathVariable int articleNumber,
+                                  @PathVariable ClothSize size,
+                                  @PathVariable OrderType orderType,
+                                  @RequestBody long[] clothIds,
+                                  @PathVariable long userId
+    ) {
+        return orderService.placeMany(
+                orderType,
+                articleNumber,
+                size,
+                clothIds,
+                userId
+        );
     }
 
     @JsonView(Views.InternalForClothOrders.class)
@@ -33,9 +46,15 @@ public class OrderController {
 
     @PostMapping("/action/{actionType}/{userId}")
     @JsonView(Views.InternalForClothOrders.class)
-    public Set<ClothOrder> performActionOnOrders(
-            @PathVariable ActionType actionType, @PathVariable long userId,
-            @RequestBody long[] clothOrderIds) {
-        return orderService.performActionOnOrders(actionType, userId, clothOrderIds);
+    public List<ClothOrder> performActionOnOrders(
+            @PathVariable ActionType actionType,
+            @RequestBody long[] clothOrderIds,
+            @PathVariable long userId
+    ) {
+        return orderService.performActionOnOrders(
+                actionType,
+                clothOrderIds,
+                userId
+        );
     }
 }

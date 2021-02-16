@@ -177,8 +177,10 @@ public class FileController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/dismiss_by_id")
-    public List<Box> dismissEmployeesFromFileByID(@RequestParam("file") MultipartFile employeesToDelete) throws IOException {
+    @PostMapping("/dismiss_by_id/{userId}")
+    public List<Box> dismissEmployeesFromFileByID(
+            @PathVariable long userId,
+            @RequestParam("file") MultipartFile employeesToDelete) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(employeesToDelete.getInputStream());
         XSSFSheet sheet = workbook.getSheetAt(0);
 
@@ -188,8 +190,8 @@ public class FileController {
 
             //Adding employee to raport list of deleted employees
             Employee employee = employeeService.getEmployeeById(id);
-            Box box = employee.getBox();
-                releasedBoxes.add(boxesService.dismissEmployee(box, employee));
+            long boxId = employee.getBox().getId();
+                releasedBoxes.add(boxesService.releaseBoxAndDismissEmployee(boxId, userId));
 
         }
         return releasedBoxes;

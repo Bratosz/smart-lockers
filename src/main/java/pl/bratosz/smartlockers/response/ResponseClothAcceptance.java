@@ -1,6 +1,9 @@
 package pl.bratosz.smartlockers.response;
 
-import pl.bratosz.smartlockers.model.*;
+import pl.bratosz.smartlockers.model.clothes.Cloth;
+import pl.bratosz.smartlockers.model.clothes.ClothAcceptanceType;
+import pl.bratosz.smartlockers.model.orders.ClothOrder;
+import pl.bratosz.smartlockers.model.orders.OrderType;
 
 public class ResponseClothAcceptance {
     private boolean isFound;

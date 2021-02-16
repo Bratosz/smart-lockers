@@ -1,10 +1,9 @@
 package pl.bratosz.smartlockers.service;
 
-
 import org.springframework.stereotype.Service;
-import pl.bratosz.smartlockers.model.Permissions;
-import pl.bratosz.smartlockers.model.User;
-import pl.bratosz.smartlockers.model.UserOurStaff;
+import pl.bratosz.smartlockers.model.users.User;
+import pl.bratosz.smartlockers.model.users.UserOurStaff;
+import pl.bratosz.smartlockers.model.users.roles.StaffServiceman;
 import pl.bratosz.smartlockers.repository.UsersOurStaffRepository;
 import pl.bratosz.smartlockers.repository.UsersRepository;
 
@@ -18,16 +17,11 @@ public class UserService {
         this.usersOurStaffRepository = usersOurStaffRepository;
     }
 
-
-    public User getById(long userId) {
-        return usersRepository.getOne(userId);
-    }
-
-    public UserOurStaff create(String firstName, String lastName, Permissions permissions) {
+    public UserOurStaff create(String firstName, String lastName) {
         UserOurStaff user = new UserOurStaff();
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setPermissions(permissions);
+        user.setUserRole(new StaffServiceman());
         return usersRepository.save(user);
     }
 
