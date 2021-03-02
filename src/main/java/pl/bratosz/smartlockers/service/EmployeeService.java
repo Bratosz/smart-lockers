@@ -69,7 +69,7 @@ public class EmployeeService {
     }
 
     public Employee createEmployee(
-            Set<Cloth> clothes, long departmentId, Box box, String firstName, String lastName) {
+            List<Cloth> clothes, long departmentId, Box box, String firstName, String lastName) {
         Department department = departmentService.getById(departmentId);
         if(box.getBoxStatus().equals(OCCUPY)) {
             throw new BoxNotAvailableException("Box is occupy by"
@@ -77,7 +77,7 @@ public class EmployeeService {
         }
         Employee employee = new Employee(firstName, lastName, department, true);
         employee.addToBox(box);
-        employee.setClothes(clothes);
+        employee.addClothes(clothes);
         return employeesRepository.save(employee);
     }
 

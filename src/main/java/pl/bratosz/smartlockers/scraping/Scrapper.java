@@ -1,8 +1,5 @@
 package pl.bratosz.smartlockers.scraping;
 
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import pl.bratosz.smartlockers.date.FormatDate;
@@ -20,49 +17,80 @@ import java.util.*;
 public class Scrapper {
     private ArticleService articleService;
     private OnlineConnection oc;
+    private String login;
+    private String password;
 
     public Scrapper(ArticleService articleService) {
         this.articleService = articleService;
+        login = "";
+        password = "";
     }
 
     public void createConnection(String login, String password) {
-        oc = new OnlineConnection(login, password);
+        if(itIsSamePlant(login, password) && oc != null) {
+            try {
+                oc.checkConnection();
+            } catch (IOException e) {
+                updateActualLoginData(login, password);
+                oc = new OnlineConnection(login, password);
+            }
+        } else {
+            updateActualLoginData(login, password);
+            oc = new OnlineConnection(login, password);
+        }
+    }
+
+    private void updateActualLoginData(String login, String password) {
+        this.login = login;
+        this.password = password;
+    }
+
+    private boolean itIsSamePlant(String login, String password) {
+        if(this.login.equals(login) && this.password.equals(password)) return true;
+        return false;
     }
 
     public void findByLockerAndBox(Integer lockerNo, Integer boxNo) {
-        try {
-            oc.getFormParameters(oc.getMainPage().parse());
-            putLockerNoAndBoxNoToForm(lockerNo.toString(), boxNo.toString());
-            Document doc = standardPost().parse();
-            oc.getFormParameters(doc);
-            oc.setMainPage(clickViewButton());
-            oc.setActualPage(getMainPage().parse());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            searchByLockerNoAndBoxNo(lockerNo, boxNo);
+            clickViewButton();
+    }
+
+    private void searchByLockerNoAndBoxNo(Integer lockerNo, Integer boxNo) {
+        putLockerNoAndBoxNoToForm(lockerNo.toString(), boxNo.toString());
+        oc.standardPost();
+
+    }
+
+    public String getEmployeeDepartment() {
+        MyString employeeDepartment = MyString.create(oc.getActualPage().select(
+                "#ctl00_MainContent_GridView102 > tbody > " +
+                        "tr:nth-child(2) > td:nth-child(1)").text());
+        return employeeDepartment.get();
     }
 
     public String getEmployeeLastName() {
         MyString lastName = MyString.create(oc.getActualPage().select(
-                "#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(3)").text());
+                "#ctl00_MainContent_GridView102 > tbody > " +
+                        "tr:nth-child(2) > td:nth-child(3)").text());
         return lastName.get();
     }
 
 
     public String getEmployeeFirstName() {
         MyString firstName = MyString.create(oc.getActualPage().select(
-                "#ctl00_MainContent_GridView1 > tbody > tr:nth-child(2) > td:nth-child(2)").text());
+                "#ctl00_MainContent_GridView102 > tbody > tr:nth-child(2) > td:nth-child(2)").text());
         return firstName.get();
     }
 
 
-    public Set<Cloth> getClothes() {
-        Elements elements = oc.getActualPage().select("#ctl00_MainContent_GridView2 > tbody > tr");
-        Set<Cloth> clothes = new HashSet<>();
+    public List<Cloth> getClothes() {
+        Elements elements = oc.getActualPage().select(
+                "#ctl00_MainContent_GridView2 > tbody > tr");
+        List<Cloth> clothes = new LinkedList<>();
         for(int i = 1; i < elements.size(); i++) {
             Elements td = elements.get(i).select("td");
             Cloth cloth = new Cloth(
-                    getId(td),
+                    getBarcode(td),
                     getAssignment(td),
                     getLastWashing(td),
                     getRelease(td),
@@ -74,43 +102,22 @@ public class Scrapper {
         return clothes;
     }
 
-    private Connection.Response clickViewButton() {
+    private void clickViewButton() {
         updateFormWithClick();
-        try {
-            return standardPost();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        oc.standardPost();
     }
 
     private void updateFormWithClick() {
-        oc.formParameters.put("__EVENTTARGET", "ctl00$MainContent$GridView1");
+        oc.formParameters.put("__EVENTTARGET", "ctl00$MainContent$GridView102");
         oc.formParameters.put("__EVENTARGUMENT", "Select$0");
     }
 
-    private Connection.Response standardPost() throws IOException {
-        return Jsoup.connect(oc.baseURL)
-                .method(Connection.Method.POST)
-                .userAgent(oc.userAgentChrome)
-                .referrer(oc.referrer)
-                .timeout(10 * 1000)
-                .cookies(oc.cookies)
-                .data(oc.formParameters)
-                .followRedirects(true)
-                .execute();
-    }
-
-    public Connection.Response getMainPage(){
-        return  oc.mainPage;
-    }
-
-
 
     private void putLockerNoAndBoxNoToForm(String lockerNo, String boxNo) {
-        oc.formParameters.put("ctl00$MainContent$szafa", lockerNo);
-        oc.formParameters.put("ctl00$MainContent$box", boxNo);
-        oc.formParameters.put("__EVENTTARGET", "ctl00$MainContent$szafa");
+        oc.setFormParameters(new HashMap<String, String>());
+        oc.formParameters.put("ctl00$MainContent$szafa_akt", lockerNo);
+        oc.formParameters.put("ctl00$MainContent$box_akt", boxNo);
+        oc.formParameters.put("__EVENTTARGET", "ctl00$MainContent$box_akt");
     }
 
     private int getOrdinalNo(Elements td) {
@@ -137,7 +144,7 @@ public class Scrapper {
         return FormatDate.getDate(date);
     }
 
-    private long getId(Elements td) {
+    private long getBarcode(Elements td) {
         return Long.parseLong(td.get(5).text());
     }
 

@@ -14,6 +14,7 @@ import pl.bratosz.smartlockers.model.Locker;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EmployeeControllerTest {
 
+
     private Employee employee;
     private Integer boxNumber = 1;
     private Integer lockerNumber = 2;

@@ -3,8 +3,13 @@ package pl.bratosz.smartlockers.service;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.LockersRepository;
+import pl.bratosz.smartlockers.service.managers.creators.LockerCreator;
 
+import java.util.LinkedList;
 import java.util.List;
+
+import static pl.bratosz.smartlockers.model.Box.*;
+import static pl.bratosz.smartlockers.model.Box.BoxStatus.ALL;
 
 @Service
 public class LockerService {
@@ -37,7 +42,8 @@ public class LockerService {
         return lockersRepository.save(locker);
     }
 
-    public Locker getLockerByParameters(Integer lockerNumber, int plantNumber,
+    public Locker getLockerByParameters(Integer lockerNumber,
+                                        int plantNumber,
                                         Location location) {
         return lockersRepository.getLockerByParameters(lockerNumber, plantNumber, location);
     }
@@ -52,32 +58,32 @@ public class LockerService {
             int plantNumber,
             String departmentName,
             String locationName) {
-        Locker locker = new Locker();
-        locker.setCapacity(capacity);
-        List<Box> boxes = boxesService.createBoxesForLocker(locker);
-
         Plant plant = plantService.getByNumber(plantNumber);
         Department department = departmentService.getByNameAndPlantNumber(departmentName, plantNumber);
         Location location = locationService.getByNameAndPlantNumber(locationName, plantNumber);
 
-        locker.setLockerNumber(lockerNumber);
-        locker.setPlant(plant);
-        locker.setDepartment(department);
-        locker.setLocation(location);
-        locker.setBoxes(boxes);
+        Locker locker = LockerCreator.create(
+                lockerNumber, capacity, plant, department, location);
         return lockersRepository.save(locker);
     }
 
-    public Locker create(Locker locker, long plantId, long departmentId, long locationId) {
+    public List<Locker> create(
+            int startingLockerNumber,
+            int endingLockerNumber,
+            int capacity,
+            long plantId,
+            long departmentId,
+            long locationId) {
         Plant plant = plantService.getById(plantId);
         Department department = departmentService.getById(departmentId);
         Location location = locationService.getById(locationId);
-        List<Box> boxes = boxesService.createBoxesForLocker(locker);
-        locker.setBoxes(boxes);
-        locker.setPlant(plant);
-        locker.setDepartment(department);
-        locker.setLocation(location);
-        return lockersRepository.save(locker);
+        List<Locker> lockers = new LinkedList<>();
+        for(int i = startingLockerNumber; i <= endingLockerNumber; i++) {
+            lockers.add(
+                    LockerCreator.create(
+                    i, capacity, plant, department, location));
+        }
+        return lockersRepository.saveAll(lockers);
     }
 
     public Locker create(Locker locker) {
@@ -98,8 +104,43 @@ public class LockerService {
     }
 
     public List<Locker> getLockersByPlantAndNumber(
-            long plantId, int lockerNumber)
-    {
-       return lockersRepository.getLockersByPlantAndNumber(plantId, lockerNumber);
+            long plantId,
+            int lockerNumber) {
+        return lockersRepository.getLockersByPlantAndNumber(plantId, lockerNumber);
+    }
+
+    public List<Locker> getFiltered(
+            long plantId,
+            long departmentId,
+            long locationId) {
+        Plant plant = plantService.getById(plantId);
+        Department department = departmentService.getById(departmentId);
+        Location location = locationService.getById(locationId);
+        return lockersRepository.getFiltered(
+                plant, department, location);
+    }
+
+    public List<Locker> getFiltered(
+            long plantId,
+            long departmentId,
+            long locationId,
+            BoxStatus boxStatus) {
+        List<Locker> lockers = getFiltered(
+                plantId, departmentId, locationId);
+        for (Locker locker : lockers) {
+            List<Box> boxes = locker.getBoxes();
+            List<Box> filteredBoxes = new LinkedList<>();
+            for (Box b : boxes) {
+                if(boxStatus.equals(ALL) || b.getBoxStatus().equals(boxStatus)) {
+                    filteredBoxes.add(b);
+                }
+            }
+            locker.setBoxes(filteredBoxes);
+        }
+        if(lockers.size() <= 50) {
+            return lockers;
+        } else {
+            return lockers.subList(0, 49);
+        }
     }
 }

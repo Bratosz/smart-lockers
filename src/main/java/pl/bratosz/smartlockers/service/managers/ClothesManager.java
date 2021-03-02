@@ -5,9 +5,7 @@ import pl.bratosz.smartlockers.model.clothes.*;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.users.User;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static pl.bratosz.smartlockers.model.clothes.ClothActualStatus.*;
 import static pl.bratosz.smartlockers.model.clothes.ClothDestination.*;
@@ -61,8 +59,8 @@ public class ClothesManager {
 
     }
 
-    public Set<Cloth> set(ClothDestination destiny, Set<Cloth> clothes) {
-        Set<Cloth> updatedClothes = new HashSet<>();
+    public List<Cloth> set(ClothDestination destiny, List<Cloth> clothes) {
+        List<Cloth> updatedClothes = new LinkedList<>();
         for(Cloth c : clothes) {
             c = updateCloth(destiny, c);
             updatedClothes.add(c);

@@ -1,18 +1,16 @@
-let clientId = 1;
-function loadPlants() {
+function loadPlants(clientId) {
     $.ajax({
         url: `http://localhost:8080/plant/get_all/${clientId}`,
         method: `get`,
         success: function (plants) {
             console.log(plants);
             let select = $("#select-plant");
-            // select.append(createSelectPlaceholder("Wybierz zakład"));
             appendOptionsToSelect(plants, select)
         }
     })
 }
 
-function loadDepartments() {
+function loadDepartments(clientId) {
     $.ajax({
         url: `http://localhost:8080/department/get_all/${clientId}`,
         method: `get`,
@@ -25,17 +23,21 @@ function loadDepartments() {
     })
 }
 
-function loadLocations() {
+function loadLocations(clientId) {
     $.ajax({
         url: `http://localhost:8080/location/get_all/${clientId}`,
         method: `get`,
         success: function (locations) {
             console.log(locations);
-            let select = $("#select-locker-location");
+            let select = $("#select-location");
             select.append(createSelectPlaceholder("Wybierz lokalizację"));
             appendOptionsToSelect(locations, select);
         }
     })
+}
+
+function removeActualTableRowsLockers() {
+    $("#table-rows-lockers > tr:not(#row-template-lockers)").remove();
 }
 
 function appendOptionsToSelect(collection, select) {

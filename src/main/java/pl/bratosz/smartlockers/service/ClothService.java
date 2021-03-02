@@ -106,8 +106,8 @@ public class ClothService {
 
 
     public void updateClothes(
-            Set<Cloth> currentClothes, Set<Cloth> actualClothes, Employee employee) {
-        Set<Cloth> newClothes = new HashSet<>();
+            List<Cloth> currentClothes, List<Cloth> actualClothes, Employee employee) {
+        List<Cloth> newClothes = new LinkedList<>();
         if (currentClothes.isEmpty()) {
             for (Cloth cloth : actualClothes) {
                 cloth.setEmployee(employee);

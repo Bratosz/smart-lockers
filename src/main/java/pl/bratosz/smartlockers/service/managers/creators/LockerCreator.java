@@ -14,6 +14,23 @@ public class LockerCreator {
         this.client = client;
     }
 
+    public LockerCreator() {
+    }
+
+    public static Locker create(int lockerNumber,
+                                int lockerCapacity,
+                                Plant plant,
+                                Department department,
+                                Location location) {
+        Locker locker = new Locker(lockerNumber, lockerCapacity);
+        List<Box> boxes = BoxCreator.createBoxesForLocker(locker);
+        locker.setBoxes(boxes);
+        locker.setPlant(plant);
+        locker.setDepartment(department);
+        locker.setLocation(location);
+        return locker;
+    }
+
     public Locker createFromRowWithBoxes(RowForBasicDataBaseUpload row) {
         int lockerNumber = row.getLockerNumber();
         int capacity = row.getCapacity();
@@ -35,7 +52,7 @@ public class LockerCreator {
 
             return locker;
         } catch (NoSuchElementException e) {
-            throw new EmptyElementException("Locker #" + lockerNumber + " has not been created.\n" + row.getLocationName() + "\n"+ row.getLastName());
+            throw new EmptyElementException("Locker #" + lockerNumber + " has not been created.\n" + row.getLocationName() + "\n" + row.getLastName());
         }
 
     }

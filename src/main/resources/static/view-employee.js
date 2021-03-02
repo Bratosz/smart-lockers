@@ -114,7 +114,7 @@ function reloadPage() {
             $("#employee").text(lockerNumber + "/" + boxNumber
                 + " " + firstName + " " + lastName);
 
-            displayClothes(box);
+            displayClothes(box.employee.clothes);
             console.log(employee.acceptedClothes);
             displayAcceptedClothes(employee.acceptedClothes);
             displayOrders(employee.clothOrders);
@@ -140,28 +140,29 @@ function loadEmployee() {
     }
 };
 
-function displayClothes(box) {
+function displayClothes(clothes) {
     $("#table-of-clothes-body > tr:not(#row-template)").remove();
     const $rowTemplate = $("#row-template");
+    console.log("table of clothes");
     console.log($rowTemplate);
-    const clothes = box.employee.clothing;
     console.log(clothes);
     clothes.sort(function (a, b) {
         return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
     });
     for (let i = 0; i < clothes.length; i++) {
         let cloth = clothes[i];
-        let $row = $rowTemplate.clone();
         let assignmentDate = formatDate(cloth.assignment);
         let releaseDate = formatDate(cloth.releaseDate);
         let lastWashingDate = formatDate(cloth.lastWashing);
+        const $row = $rowTemplate.clone();
+        $row.removeAttr("id");
         $row.css("display", "table-row");
         $row.find(".cell-ordinal-number").text(cloth.ordinalNumber);
         $row.find(".cell-article-number").text(cloth.article.articleNumber);
         $row.find(".cell-article-name").text(cloth.article.name);
         $row.find(".cell-size").text(cloth.size);
         $row.find(".cell-assignment-date").text(assignmentDate);
-        $row.find(".cell-id-bar-code").text(cloth.id);
+        $row.find(".cell-id-bar-code").text(cloth.barCode);
         $row.find(".cell-release-date").text(releaseDate);
         $row.find(".cell-washing-date").text(lastWashingDate);
         $("#table-of-clothes-body").append($row);

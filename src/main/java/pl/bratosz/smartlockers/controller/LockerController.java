@@ -8,77 +8,91 @@ import pl.bratosz.smartlockers.service.BoxService;
 import pl.bratosz.smartlockers.service.LockerService;
 
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lockers")
 public class LockerController {
 
     private LockersRepository lockersRepository;
-    private LockerService lockerService;
+    private LockerService lockersService;
     private BoxService boxesService;
 
-    public LockerController(LockersRepository lockersRepository, LockerService lockerService, BoxService boxesService) {
+    public LockerController(LockersRepository lockersRepository, LockerService lockersService, BoxService boxesService) {
         this.lockersRepository = lockersRepository;
-        this.lockerService = lockerService;
+        this.lockersService = lockersService;
         this.boxesService = boxesService;
     }
 
     @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/{clientId}")
-    public List<Locker> getAll(@PathVariable long clientId) {
+    @GetMapping("/and_boxes/{clientId}")
+    public List<Locker> getAllWithBoxes(@PathVariable long clientId) {
         List<Locker> lockers = lockersRepository.getAllByClientId(clientId);
-        if (lockers.size() < 2) {
+        if (lockers.size() <= 3) {
             return lockers;
         } else {
         }
-        return lockers.subList(0, 1);
+        return lockers.subList(0, 2);
+    }
+
+    @JsonView(Views.Public.class)
+    @GetMapping("/{clientId}")
+    public List<Locker> getAll(
+            @PathVariable long clientId) {
+        return lockersRepository.getAllByClientId(clientId);
     }
 
     @JsonView(Views.InternalForLockers.class)
     @GetMapping("/filter/{plantId}/{lockerNumber}")
     public List<Locker> getLockersByPlantAndNumber(
-            @PathVariable long plantId, @PathVariable int lockerNumber)
-    {
-        return lockerService.getLockersByPlantAndNumber(plantId, lockerNumber);
+            @PathVariable long plantId,
+            @PathVariable int lockerNumber) {
+        return lockersService.getLockersByPlantAndNumber(plantId, lockerNumber);
     }
 
-    @GetMapping("/quantity/{plantId}")
-    public int getLockersQuantity(@PathVariable long plantId) {
-        return lockerService.getAmountOfLockersByPlantId(plantId);
+    @JsonView(Views.Public.class)
+    @GetMapping("/filter/{plantId}/{departmentId}/{locationId}")
+    public List<Locker> getFiltered(
+            @PathVariable long plantId,
+            @PathVariable long departmentId,
+            @PathVariable long locationId) {
+        return lockersService.getFiltered(
+                plantId,
+                departmentId,
+                locationId);
     }
 
-    @PostMapping("create/{plantId}/{departmentId}/{locationId}")
+    @PostMapping("/create" +
+            "/{startingLockerNumber}" +
+            "/{endingLockerNumber}" +
+            "/{capacity}" +
+            "/{plantId}" +
+            "/{departmentId}" +
+            "/{locationId}")
     @JsonView(Views.InternalForLockers.class)
-    public Locker create(@PathVariable long plantId, @PathVariable long departmentId,
-                         @PathVariable long locationId, @RequestBody Locker locker) {
-        return lockerService.create(locker, plantId, departmentId, locationId);
+    public List<Locker> create(
+            @PathVariable int startingLockerNumber,
+            @PathVariable int endingLockerNumber,
+            @PathVariable int capacity,
+            @PathVariable long plantId,
+            @PathVariable long departmentId,
+            @PathVariable long locationId) {
+        return lockersService.create(
+                startingLockerNumber,
+                endingLockerNumber,
+                capacity,
+                plantId,
+                departmentId,
+                locationId);
     }
 
     @JsonView(Views.InternalForLockers.class)
     @GetMapping("/filter/{plantId}/{departmentId}/{locationId}/{boxStatus}")
-    public List<Box> getFiltered(@PathVariable long plantId,
-                                    @PathVariable long departmentId,
-                                    @PathVariable long locationId,
-                                    @PathVariable Box.BoxStatus boxStatus) {
-        List<Locker> lockers = lockersRepository.filterAllByPlantAndDepartmentAndLocation(
-                plantId, departmentId, locationId);
-        List<Box> filteredBoxes = new LinkedList<>();
-        for (Locker locker : lockers) {
-            List<Box> boxes = locker.getBoxes();
-            for (Box b : boxes) {
-                if(b.getBoxStatus().equals(boxStatus)){
-                    filteredBoxes.add(b);
-                }
-            }
-            if(filteredBoxes.size() > 50) {
-
-                return filteredBoxes;
-            }
-        }
-        return filteredBoxes;
+    public List<Locker> getFiltered(@PathVariable long plantId,
+                                 @PathVariable long departmentId,
+                                 @PathVariable long locationId,
+                                 @PathVariable Box.BoxStatus boxStatus) {
+        return lockersService.getFiltered(plantId, departmentId, locationId, boxStatus);
     }
 
     @PostMapping("/create/{lockerNumber}/{capacity}/{plantNumber}/{department}/{location}")
@@ -88,7 +102,7 @@ public class LockerController {
             @PathVariable int plantNumber,
             @PathVariable String department,
             @PathVariable String location) {
-        return lockerService.createLocker(
+        return lockersService.createLocker(
                 lockerNumber, capacity, plantNumber, department, location);
     }
 
@@ -96,7 +110,7 @@ public class LockerController {
     @PostMapping("/change_location/{lockerNumber}/{plantNumber}/{location}/{desiredLocation}")
     public Locker changeLocation(@PathVariable Integer lockerNumber, @PathVariable int plantNumber,
                                  @PathVariable Location location, @PathVariable Location desiredLocation) {
-        return lockerService.changeLocation(lockerNumber, plantNumber, location, desiredLocation);
+        return lockersService.changeLocation(lockerNumber, plantNumber, location, desiredLocation);
     }
 
     @DeleteMapping("/{id}")
@@ -106,6 +120,6 @@ public class LockerController {
 
     @DeleteMapping("/deleteLockerById/{id}")
     public Locker deleteLockerByNumber(@PathVariable Long id) {
-        return lockerService.deleteLockerByNumber(id);
+        return lockersService.deleteLockerByNumber(id);
     }
 }

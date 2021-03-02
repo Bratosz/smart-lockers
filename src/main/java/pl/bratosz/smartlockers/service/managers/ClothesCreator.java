@@ -7,6 +7,7 @@ import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.users.User;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import static pl.bratosz.smartlockers.model.clothes.ClothActualStatus.*;
@@ -99,12 +100,12 @@ public class ClothesCreator {
 
     private void setOrdinalNumber() {
         int articleNumber = cloth.getArticle().getArticleNumber();
-        Set<Cloth> clothes = cloth.getEmployee().getClothes();
+        List<Cloth> clothes = cloth.getEmployee().getClothes();
         int ordinalNumber = resolveOrdinalNumber(clothes, articleNumber);
         cloth.setOrdinalNumber(ordinalNumber);
     }
 
-    private int resolveOrdinalNumber(Set<Cloth> clothes, int articleNumber) {
+    private int resolveOrdinalNumber(List<Cloth> clothes, int articleNumber) {
         int articlesAmount = (int) clothes.stream()
                 .filter(c -> c.getArticle().getArticleNumber() == articleNumber)
                 .count();

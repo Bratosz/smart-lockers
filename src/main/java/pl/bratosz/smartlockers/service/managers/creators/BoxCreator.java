@@ -10,7 +10,7 @@ import java.util.List;
 
 public class BoxCreator {
 
-    public List<Box> createBoxesForLocker(Locker locker) {
+    public static List<Box> createBoxesForLocker(Locker locker) {
         List<Box> boxes = new LinkedList<>();
         int lockerCapacity = locker.getCapacity();
         for (int i = 1; i <= lockerCapacity; i++) {

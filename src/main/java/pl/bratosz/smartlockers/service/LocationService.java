@@ -45,6 +45,9 @@ public class LocationService {
     }
 
     public Location getById(long id) {
+        if(id == 0){
+            return null;
+        }
         return locationRepository.getOne(id);
     }
 }

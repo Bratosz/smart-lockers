@@ -1,20 +1,18 @@
 const userId = 1;
+let clientId = 1;
 
-loadPlants();
-loadDepartments();
-loadLocations();
-reloadTableRows();
+loadPlants(clientId);
+loadDepartments(clientId);
+loadLocations(clientId);
+reloadBoxes(clientId);
 
-function reloadTableRows() {
+function reloadBoxes(clientId) {
     $.ajax({
-        url: `http://localhost:8080/lockers/${clientId}`,
+        url: `http://localhost:8080/lockers/and_boxes/${clientId}`,
         method: "get",
         success: function (lockers) {
-            $("#table-rows > tr:not(#row-template)").remove();
-            const $rowTemplate = $("#row-template");
-            console.log($rowTemplate);
-            console.log(lockers);
-            displayLockers(lockers);
+            removeActualTableRowsLockers();
+            displayBoxes(lockers);
         }
     });
 }
@@ -26,7 +24,7 @@ function dismissEmployee(employeeId) {
         success: function (box) {
             console.log("Zwolniono pracownika");
             console.log(box);
-            reloadTableRows();
+            reloadBoxes();
         }
     })
 }
@@ -34,14 +32,14 @@ function dismissEmployee(employeeId) {
 $("#button-filter").click(function () {
     let plantId = $("#select-plant").val();
     let departmentId = $("#select-department").val();
-    let locationId = $("#select-locker-location").val();
+    let locationId = $("#select-location").val();
     let boxStatus = $("#select-box-status").val();
     $.ajax({
-        url: `http://localhost:8080/boxes/filter/${plantId}/${departmentId}/${locationId}/${boxStatus}`,
+        url: `http://localhost:8080/lockers/filter/${plantId}/${departmentId}/${locationId}/${boxStatus}`,
         method: "get",
         success: function (lockers) {
             console.log(lockers);
-            displayLockers(lockers);
+            displayBoxes(lockers);
         }
     })
 });
@@ -67,7 +65,7 @@ $("#button-get-lockers-by-number").click(function () {
         method: "get",
         success: function (lockers) {
             console.log(lockers);
-            displayLockers(lockers);
+            displayBoxes(lockers);
         }
     })
 })
@@ -84,7 +82,7 @@ $("#button-input-first-name").click(function () {
     })
 });
 
-function displayLockers(lockers){
+function displayBoxes(lockers){
     $("#table-rows > tr:not(#row-template)").remove();
     const $rowTemplate = $("#row-template");
     console.log($rowTemplate);

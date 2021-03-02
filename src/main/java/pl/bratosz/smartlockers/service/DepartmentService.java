@@ -50,6 +50,9 @@ public class DepartmentService {
     }
 
     public Department getById(long id) {
+        if(id == 0) {
+            return null;
+        }
         return departmentsRepository.getOne(id);
     }
 }

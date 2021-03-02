@@ -62,6 +62,9 @@ public class PlantService {
     }
 
     public Plant getById(long id) {
+        if(id == 0) {
+            return null;
+        }
         return plantsRepository.getOne(id);
     }
 }

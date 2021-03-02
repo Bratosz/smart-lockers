@@ -1,11 +1,13 @@
 package pl.bratosz.smartlockers.service;
 
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.scraping.Scrapper;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -15,7 +17,7 @@ public class ScrapingService {
     private EmployeeService employeeService;
     private ClothService clothService;
     private Scrapper scrapper;
-    private Set<Cloth> currentClothes;
+    private List<Cloth> currentClothes;
 
     public ScrapingService(
             PlantService plantService, BoxService boxService, EmployeeService employeeService,
@@ -31,7 +33,7 @@ public class ScrapingService {
         Box box = boxService.getBoxById(boxId);
         Plant plant = box.getLocker().getPlant();
         Employee employee = (Employee) box.getEmployee();
-        currentClothes = employee.getClothes();
+        currentClothes = (List<Cloth>) employee.getClothes();
 
         String login = plant.getLogin();
         String password = plant.getPassword();
@@ -40,12 +42,12 @@ public class ScrapingService {
                 box.getBoxNumber());
         if (employee.getLastName().toUpperCase().equals(
                 scrapper.getEmployeeLastName().toUpperCase())) {
-            Set<Cloth> actualClothes = scrapper.getClothes();
+            List<Cloth> actualClothes = scrapper.getClothes();
             clothService.updateClothes(currentClothes, actualClothes, employee);
             return box;
         } else if (employee.getFirstName().toUpperCase().equals(
                 scrapper.getEmployeeFirstName().toUpperCase())) {
-            Set<Cloth> actualClothes = scrapper.getClothes();
+            List<Cloth> actualClothes = scrapper.getClothes();
             clothService.updateClothes(currentClothes, actualClothes, employee);
             return boxService.getBoxById(boxId);
         } else {
@@ -67,7 +69,7 @@ public class ScrapingService {
 
         String firstName = scrapper.getEmployeeFirstName();
         String lastName = scrapper.getEmployeeLastName();
-        Set<Cloth> clothes = scrapper.getClothes();
+        List<Cloth> clothes = scrapper.getClothes();
 
 
         employeeService.createEmployee(

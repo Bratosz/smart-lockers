@@ -12,8 +12,8 @@ public enum ClothActualStatus {
     EXCHANGED("Wymienione", false),
     WITHDRAWN("Wycofane", false);
 
-    private String name;
-    private boolean inRotation;
+    private final String name;
+    private final boolean inRotation;
 
     ClothActualStatus(String name, boolean inRotation) {
         this.name = name;
@@ -25,7 +25,6 @@ public enum ClothActualStatus {
         return name;
     }
 
-    @JsonValue
     public boolean isInRotation() {
         return inRotation;
     }

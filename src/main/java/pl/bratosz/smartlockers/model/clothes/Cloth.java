@@ -50,7 +50,7 @@ public class Cloth {
     protected Date assignment;
 
     @JsonView(Views.Public.class)
-    protected Stack<Date> washingHistory;
+    protected Date lastWashing;
 
     @JsonView(Views.Public.class)
     protected Date releaseDate;
@@ -193,18 +193,12 @@ public class Cloth {
         this.assignment = assignment;
     }
 
-    public Stack<Date> getWashingHistory() {
-        return washingHistory;
-    }
-
-    public Date getLastWashing() {return washingHistory.peek();}
-
-    public void setWashingHistory(Stack<Date> washingHistory) {
-        this.washingHistory = washingHistory;
+    public Date getLastWashing() {
+        return lastWashing;
     }
 
     public void setLastWashing(Date lastWashing) {
-        this.washingHistory.push(lastWashing);
+        this.lastWashing = lastWashing;
     }
 
     public Date getReleaseDate() {

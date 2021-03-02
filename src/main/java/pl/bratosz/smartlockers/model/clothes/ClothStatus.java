@@ -79,4 +79,6 @@ public class ClothStatus {
     public void setStatus(ClothActualStatus status) {
         this.status = status;
     }
+
+
 }

@@ -1,36 +1,25 @@
-$("#button-add-locker").click(function () {
-    let plantId = $("#select-plant").val();
+let clientId = 1;
+
+loadPlants(clientId);
+loadDepartments(clientId);
+loadLocations(clientId);
+
+$("#button-add-lockers").click(function () {
+    const startingLockerNumber = $("#input-starting-locker-number").val();
+    const endingLockerNumber = $("#input-ending-locker-number").val();
+    const capacity = $("#select-capacity").val();
+    const plantId = $("#select-plant").val();
+    const departmentId = $("#select-department").val();
+    const locationId = $("#select-location").val();
+
     $.ajax({
-        url: `http://localhost:8080/lockers/quantity/${plantId}`,
-        method: "get",
-        success: function (lockersQuantity) {
-            const amount = $("#input-lockers-amount").val();
-            for (let i = 0; i < amount; i++) {
-                let capacity = $("#select-locker-capacity").val();
-                let departmentId = $("#select-department").val();
-                let locationId = $("#select-locker-location").val();
-
-                lockersQuantity++;
-
-                const locker = {
-                    lockerNumber: lockersQuantity,
-                    capacity: capacity,
-                };
-
-                $.ajax({
-                    url: `http://localhost:8080/lockers/create/${plantId}/${departmentId}/${locationId}`,
-                    method: "post",
-                    data: JSON.stringify(locker),
-                    contentType: "application/json",
-                    success: function () {
-                        console.log(locker);
-                    }
-                })
-            }
+        url: `http://localhost:8080/lockers/create/${startingLockerNumber}/${endingLockerNumber}/${capacity}/${plantId}/${departmentId}/${locationId}`,
+        method: "post",
+        contentType: "application/json",
+        success: function (lockers) {
+            console.log(lockers);
         }
     })
 });
 
-loadPlants();
-loadDepartments();
-loadLocations();
+

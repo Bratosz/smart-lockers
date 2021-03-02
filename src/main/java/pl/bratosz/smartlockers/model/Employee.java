@@ -15,7 +15,7 @@ public class Employee extends EmployeeGeneral {
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private Set<Cloth> clothes;
+    private List<Cloth> clothes;
 
     @JsonView(Views.InternalForEmployees.class)
     @OneToMany(mappedBy = "rotationTemporaryOwner", cascade = CascadeType.ALL)
@@ -54,12 +54,19 @@ public class Employee extends EmployeeGeneral {
         this.rotationalClothes = rotationalClothes;
     }
 
-    public Set<Cloth> getClothes() {
+    public List<Cloth> getClothes() {
         return clothes;
     }
 
-    public void setClothes(Set<Cloth> clothes) {
+    public void setClothes(List<Cloth> clothes) {
         this.clothes = clothes;
+    }
+
+    public void addClothes(List<Cloth> clothes) {
+        for(Cloth c : clothes) {
+            c.setEmployee(this);
+        }
+        this.setClothes(clothes);
     }
 
     public Department getDepartment() {

@@ -6,6 +6,7 @@ import pl.bratosz.smartlockers.model.clothes.ClothDestination;
 import pl.bratosz.smartlockers.model.users.User;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class EmployeeManager {
@@ -45,7 +46,7 @@ public class EmployeeManager {
     }
 
     private void updateClothesForDismiss() {
-        Set<Cloth> clothes = employee.getClothes();
+        List<Cloth> clothes = employee.getClothes();
         ClothesManager clothesManager = new ClothesManager(user, date);
         clothes = clothesManager.set(ClothDestination.FOR_WITHDRAW_AND_DELETE, clothes);
         employee.setClothes(clothes);

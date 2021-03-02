@@ -5,10 +5,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import pl.bratosz.smartlockers.model.Box;
-import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.Location;
-import pl.bratosz.smartlockers.model.Locker;
+import pl.bratosz.smartlockers.model.*;
 
 import java.util.List;
 
@@ -45,15 +42,15 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
     List<Locker> getLockersFromRange(int plantNumber, int firstLocker, int lastLocker);
 
     @Query("select l from Locker l where " +
-            "(l.plant.id = :plantId or :plantId is null) " +
+            "(l.plant = :plant or :plant is null) " +
             "and " +
-            "(l.department.id = :departmentId or :departmentId is null) " +
+            "(l.department = :department or :department is null) " +
             "and " +
-            "(l.location.id = :locationId or :locationId is null) order by l.lockerNumber ")
-    List<Locker> filterAllByPlantAndDepartmentAndLocation(
-            @Param("plantId") long plantId,
-            @Param("departmentId") long departmentId,
-            @Param("locationId") long locationId);
+            "(l.location = :location or :location is null) order by l.lockerNumber ")
+    List<Locker> getFiltered(
+            @Param("plant") Plant plant,
+            @Param("department") Department department,
+            @Param("location") Location location);
 
 
     @Query("select l from Locker l where " +
