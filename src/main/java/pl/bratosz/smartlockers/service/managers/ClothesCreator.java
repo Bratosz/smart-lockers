@@ -8,7 +8,6 @@ import pl.bratosz.smartlockers.model.users.User;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import static pl.bratosz.smartlockers.model.clothes.ClothActualStatus.*;
 import static pl.bratosz.smartlockers.model.clothes.ClothDestination.*;
@@ -28,7 +27,7 @@ public class ClothesCreator {
     public Cloth createNew(Cloth prototype) {
         this.cloth = prototype;
         ClothDestination destiny = FOR_ASSIGN;
-        setOrdinalNumber();
+        determineOrdinalNumber();
         setClothStatus(destiny);
         return cloth;
     }
@@ -98,7 +97,7 @@ public class ClothesCreator {
         }
     }
 
-    private void setOrdinalNumber() {
+    private void determineOrdinalNumber() {
         int articleNumber = cloth.getArticle().getArticleNumber();
         List<Cloth> clothes = cloth.getEmployee().getClothes();
         int ordinalNumber = resolveOrdinalNumber(clothes, articleNumber);

@@ -1,0 +1,56 @@
+package pl.bratosz.smartlockers.model;
+
+import javax.persistence.*;
+import java.util.Objects;
+
+@Entity
+public class DepartmentAlias {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+    private String alias;
+    @ManyToOne
+    private Department department;
+
+    public DepartmentAlias() {
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (alias == o) return true;
+        if (o == null || alias.getClass() != o.getClass()) return false;
+        String that = (String) o;
+        return Objects.equals(alias, that);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAlias());
+    }
+
+
+}

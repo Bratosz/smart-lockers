@@ -1,11 +1,12 @@
 const url = new URL(window.location.href);
 const boxId = url.searchParams.get("id");
-let lockerNumber;
-let boxNumber;
-let lastName;
-let firstName;
-let employeeId;
-let boxStatus;
+let lockerNumber,
+boxNumber,
+lastName,
+firstName,
+employeeId,
+employee,
+boxStatus;
 const userId = 1;
 
 reloadPage();
@@ -112,7 +113,7 @@ function reloadPage() {
             employeeId = employee.id;
 
             $("#employee").text(lockerNumber + "/" + boxNumber
-                + " " + firstName + " " + lastName);
+                + " " + lastName + " " + firstName);
 
             displayClothes(box.employee.clothes);
             console.log(employee.acceptedClothes);
@@ -123,21 +124,14 @@ function reloadPage() {
 }
 
 function loadEmployee() {
-    let departmentId = $('#select-department').val();
-    if (departmentId == 0) {
-        alert("Nie wybrano oddziału.")
-    } else if (boxStatus == "Zajęta") {
-        alert("Pracownik został już wczytany.")
-    } else {
         $.ajax({
-            url: `http://localhost:8080/scrap/load-employee/${departmentId}/${boxId}`,
+            url: `http://localhost:8080/scrap/load-employee/${boxId}`,
             method: "get",
             success: function (box) {
                 console.log(box);
                 location.reload();
             }
         })
-    }
 };
 
 function displayClothes(clothes) {

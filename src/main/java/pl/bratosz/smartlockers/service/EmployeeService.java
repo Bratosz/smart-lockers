@@ -55,8 +55,12 @@ public class EmployeeService {
         return employeesRepository.getEmployeesByLastName(lastName);
     }
 
-    public Employee createEmployee(long plantId, long departmentId, int lockerNumber,
-                                   int boxNumber, String firstName, String lastName) throws BoxNotAvailableException {
+    public Employee createEmployee(long plantId,
+                                   long departmentId,
+                                   int lockerNumber,
+                                   int boxNumber,
+                                   String firstName,
+                                   String lastName) throws BoxNotAvailableException {
         Department department = departmentService.getById(departmentId);
         Box box = boxService.getBox(plantId, lockerNumber, boxNumber);
         if (box.getBoxStatus().equals(OCCUPY)) {
@@ -68,9 +72,13 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public Employee createEmployee(
-            List<Cloth> clothes, long departmentId, Box box, String firstName, String lastName) {
-        Department department = departmentService.getById(departmentId);
+    public Employee createEmployee(List<Cloth> clothes,
+                                   String departmentName,
+                                   Box box,
+                                   String firstName,
+                                   String lastName) {
+        Client client = box.getLocker().getPlant().getClient();
+        Department department = departmentService.getByNameAndClient(departmentName, client);
         if(box.getBoxStatus().equals(OCCUPY)) {
             throw new BoxNotAvailableException("Box is occupy by"
                     + box.getEmployee().getLastName() + " " + box.getEmployee().getFirstName());
@@ -81,8 +89,12 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public Employee createEmployee(int plantNumber, String departmentName, int lockerNumber,
-                                   int boxNumber, String firstName, String lastName) {
+    public Employee createEmployee(int plantNumber,
+                                   String departmentName,
+                                   int lockerNumber,
+                                   int boxNumber,
+                                   String firstName,
+                                   String lastName) {
         Plant plant = plantService.getByNumber(plantNumber);
         Department department = departmentService.getByNameAndPlantNumber(departmentName, plantNumber);
         Box box = boxService.getBox(plant.getId(), lockerNumber, boxNumber);
@@ -94,8 +106,10 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public Employee createEmployeeAndAssignToBox(
-            int plantNumber, Department department, Location location, Employee employee) {
+    public Employee createEmployeeAndAssignToBox(int plantNumber,
+                                                 Department department,
+                                                 Location location,
+                                                 Employee employee) {
         Box emptyBox;
         //change location if there is no free boxes
         try {
@@ -118,7 +132,8 @@ public class EmployeeService {
         return employeeGeneralRepository.getById(id);
     }
 
-    public List<Employee> getByFirstNameAndLastName(String firstName, String lastName) {
+    public List<Employee> getByFirstNameAndLastName(String firstName,
+                                                    String lastName) {
         List<Employee> filteredEmployees = new LinkedList<>();
         List<Employee> employees = employeesRepository.getByFirstNameAndLastName(firstName, lastName);
         for (Employee e : employees) {
@@ -139,7 +154,8 @@ public class EmployeeService {
 
 
 
-    public Employee dismissById(long employeeId, long userId) {
+    public Employee dismissById(long employeeId,
+                                long userId) {
         user = userService.getUserById(userId);
         Employee employee = getEmployeeById(employeeId);
         Box box = employee.getBox();
@@ -174,7 +190,8 @@ public class EmployeeService {
     }
 
 
-    public Employee changeEmployeeFirstNameAndLastNameById(Employee updatedEmployee, Long id) {
+    public Employee changeEmployeeFirstNameAndLastNameById(Employee updatedEmployee,
+                                                           Long id) {
         Employee employee = getEmployeeById(id);
         employee.setFirstName(updatedEmployee.getFirstName());
         employee.setLastName(updatedEmployee.getLastName());

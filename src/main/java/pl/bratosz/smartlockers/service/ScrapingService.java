@@ -55,12 +55,13 @@ public class ScrapingService {
         }
     }
 
-    public Box loadEmployee(long departmentId, long boxId) {
+    public Box loadEmployee(long boxId) {
         Box box = boxService.getBoxById(boxId);
         int lockerNumber = box.getLocker().getLockerNumber();
         int boxNumber = box.getBoxNumber();
 
         Plant plant = box.getLocker().getPlant();
+        Client client = plant.getClient();
         String login = plant.getLogin();
         String password = plant.getPassword();
 
@@ -69,11 +70,13 @@ public class ScrapingService {
 
         String firstName = scrapper.getEmployeeFirstName();
         String lastName = scrapper.getEmployeeLastName();
+        String departmentName = scrapper.getDepartmentName();
         List<Cloth> clothes = scrapper.getClothes();
 
 
+
         employeeService.createEmployee(
-                clothes, departmentId, box, firstName, lastName);
+                clothes, departmentName, box, firstName, lastName);
         return boxService.getBoxById(boxId);
     }
 

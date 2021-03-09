@@ -5,9 +5,11 @@ import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.repository.DepartmentsRepository;
+import pl.bratosz.smartlockers.service.managers.DepartmentManager;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -54,5 +56,23 @@ public class DepartmentService {
             return null;
         }
         return departmentsRepository.getOne(id);
+    }
+
+    public Department getByNameAndClient(String departmentAlias, Client client) {
+        Set<Department> departments = client.getDepartments();
+        Optional<Department> first = departments.stream().filter(
+                d -> d.getAliases().contains(departmentAlias)).findFirst();
+        if(first.isPresent()){
+            return first.get();
+        } else {
+            Optional<Department> departmentDefault = departments.stream().filter(
+                    d -> d.isDepartmentDefault()).findFirst();
+            if(departmentDefault.isPresent()) {
+                return departmentDefault.get();
+            } else {
+                Department department = DepartmentManager.createDefaultDepartment(client);
+                return departmentsRepository.save(department);
+            }
+        }
     }
 }

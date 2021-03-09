@@ -3,6 +3,7 @@ package pl.bratosz.smartlockers.scraping;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import pl.bratosz.smartlockers.date.FormatDate;
+import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
@@ -27,7 +28,7 @@ public class Scrapper {
     }
 
     public void createConnection(String login, String password) {
-        if(itIsSamePlant(login, password) && oc != null) {
+        if (itIsSamePlant(login, password) && oc != null) {
             try {
                 oc.checkConnection();
             } catch (IOException e) {
@@ -46,13 +47,13 @@ public class Scrapper {
     }
 
     private boolean itIsSamePlant(String login, String password) {
-        if(this.login.equals(login) && this.password.equals(password)) return true;
+        if (this.login.equals(login) && this.password.equals(password)) return true;
         return false;
     }
 
     public void findByLockerAndBox(Integer lockerNo, Integer boxNo) {
-            searchByLockerNoAndBoxNo(lockerNo, boxNo);
-            clickViewButton();
+        searchByLockerNoAndBoxNo(lockerNo, boxNo);
+        clickViewButton();
     }
 
     private void searchByLockerNoAndBoxNo(Integer lockerNo, Integer boxNo) {
@@ -61,25 +62,22 @@ public class Scrapper {
 
     }
 
-    public String getEmployeeDepartment() {
-        MyString employeeDepartment = MyString.create(oc.getActualPage().select(
+    public String getDepartmentName() {
+        return MyString.create(oc.getActualPage().select(
                 "#ctl00_MainContent_GridView102 > tbody > " +
-                        "tr:nth-child(2) > td:nth-child(1)").text());
-        return employeeDepartment.get();
+                        "tr:nth-child(2) > td:nth-child(1)").text()).get();
     }
 
     public String getEmployeeLastName() {
-        MyString lastName = MyString.create(oc.getActualPage().select(
+        return MyString.create(oc.getActualPage().select(
                 "#ctl00_MainContent_GridView102 > tbody > " +
-                        "tr:nth-child(2) > td:nth-child(3)").text());
-        return lastName.get();
+                        "tr:nth-child(2) > td:nth-child(3)").text()).get();
     }
 
-
     public String getEmployeeFirstName() {
-        MyString firstName = MyString.create(oc.getActualPage().select(
-                "#ctl00_MainContent_GridView102 > tbody > tr:nth-child(2) > td:nth-child(2)").text());
-        return firstName.get();
+        return MyString.create(oc.getActualPage().select(
+                "#ctl00_MainContent_GridView102 > tbody > " +
+                        "tr:nth-child(2) > td:nth-child(2)").text()).get();
     }
 
 
@@ -87,7 +85,7 @@ public class Scrapper {
         Elements elements = oc.getActualPage().select(
                 "#ctl00_MainContent_GridView2 > tbody > tr");
         List<Cloth> clothes = new LinkedList<>();
-        for(int i = 1; i < elements.size(); i++) {
+        for (int i = 1; i < elements.size(); i++) {
             Elements td = elements.get(i).select("td");
             Cloth cloth = new Cloth(
                     getBarcode(td),
