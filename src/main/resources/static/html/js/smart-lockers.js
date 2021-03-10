@@ -1,3 +1,5 @@
+let clientId = 1;
+
 function loadPlants(clientId) {
     $.ajax({
         url: `http://localhost:8080/plant/get_all/${clientId}`,

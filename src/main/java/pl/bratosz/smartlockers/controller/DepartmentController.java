@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.service.DepartmentService;
+import pl.bratosz.smartlockers.strings.MyString;
 
 import java.util.List;
 
@@ -29,11 +30,19 @@ public class DepartmentController {
         return departmentService.getByNameAndPlantNumber(departmentName, mainPlantNumber);
     }
 
+    @PostMapping("/add_alias/{departmentId}/{alias}")
+    public Department addAlias(@PathVariable long departmentId,
+                               @PathVariable String alias) {
+        alias = MyString.create(alias).get();
+        return departmentService.addAlias(departmentId, alias);
+
+    }
+
     @PostMapping("/create/{departmentName}/{clientId}/{mainPlantNumber}")
     public Department create(@PathVariable String departmentName,
                              @PathVariable long clientId,
                              @PathVariable int mainPlantNumber) {
-        departmentName = departmentName.trim().toUpperCase();
+        departmentName = MyString.create(departmentName).get();
         return departmentService.create(departmentName, clientId, mainPlantNumber);
     }
 

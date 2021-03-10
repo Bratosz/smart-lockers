@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import pl.bratosz.smartlockers.model.users.UserClient;
 
 import javax.persistence.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Department {
@@ -52,11 +54,28 @@ public class Department {
     public Department() {
     }
 
-    public Department(String name, Client client, Set<Plant> plants, int mainPlantNumber) {
+    public Department(String name,
+                      Client client,
+                      Set<Plant> plants,
+                      int mainPlantNumber,
+                      List<DepartmentAlias> aliases
+    ) {
         this.name = name;
         this.client = client;
         this.plants = plants;
         this.mainPlantNumber = mainPlantNumber;
+        addAliases(aliases);
+    }
+
+    public void addAliases(List<DepartmentAlias> aliases) {
+        if (this.aliases == null) {
+          aliases.stream()
+                  .forEach(alias -> alias.setDepartment(this));
+          setAliases(aliases);
+        } else {
+            aliases.stream()
+                    .forEach(alias -> addAlias(alias));
+        }
     }
 
     public long getId() {
@@ -149,5 +168,10 @@ public class Department {
 
     public void setDepartmentDefault(boolean departmentDefault) {
         this.departmentDefault = departmentDefault;
+    }
+
+    public void addAlias(DepartmentAlias departmentAlias) {
+//        departmentAlias.setDepartment(this);
+        getAliases().add(departmentAlias);
     }
 }

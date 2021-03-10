@@ -15,6 +15,10 @@ public class DepartmentAlias {
     public DepartmentAlias() {
     }
 
+    public DepartmentAlias(String alias) {
+        setAlias(alias);
+    }
+
     public String getAlias() {
         return alias;
     }

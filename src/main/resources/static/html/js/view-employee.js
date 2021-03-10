@@ -9,7 +9,7 @@ employee,
 boxStatus;
 const userId = 1;
 
-reloadPage();
+reloadBox();
 loadDepartments();
 
 $("#button-load-employee").click(function () {
@@ -99,7 +99,7 @@ function updateClothes() {
     })
 }
 
-function reloadPage() {
+function reloadBox() {
     $.ajax({
         url: `http://localhost:8080/boxes/${boxId}`,
         method: "get",
@@ -111,6 +111,8 @@ function reloadPage() {
             lastName = employee.lastName;
             firstName = employee.firstName;
             employeeId = employee.id;
+
+            console.log(employee);
 
             $("#employee").text(lockerNumber + "/" + boxNumber
                 + " " + lastName + " " + firstName);

@@ -3,14 +3,12 @@ package pl.bratosz.smartlockers.service;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Department;
+import pl.bratosz.smartlockers.model.DepartmentAlias;
 import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.repository.DepartmentsRepository;
 import pl.bratosz.smartlockers.service.managers.DepartmentManager;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class DepartmentService {
@@ -19,12 +17,14 @@ public class DepartmentService {
     private ClientService clientService;
     private PlantService plantService;
     private LocationService locationService;
+    private DepartmentAliasService departmentAliasService;
 
-    public DepartmentService(DepartmentsRepository departmentsRepository, ClientService clientService, PlantService plantService, LocationService locationService) {
+    public DepartmentService(DepartmentsRepository departmentsRepository, ClientService clientService, PlantService plantService, LocationService locationService, DepartmentAliasService departmentAliasService) {
         this.departmentsRepository = departmentsRepository;
         this.clientService = clientService;
         this.plantService = plantService;
         this.locationService = locationService;
+        this.departmentAliasService = departmentAliasService;
     }
 
     public Department getByNameAndPlantNumber(String name, int plantNumber) {
@@ -34,9 +34,17 @@ public class DepartmentService {
 
     public Department create(String departmentName, long clientId, int plantNumber) {
         Client client = clientService.getById(clientId);
+
         Set<Plant> plants = new HashSet<>();
-        plants.add(plantService.getByNumber(plantNumber));
-        Department department = new Department(departmentName, client, plants, plantNumber);
+        plants.add(
+                plantService.getByNumber(plantNumber));
+
+        List<DepartmentAlias> aliases = new LinkedList<>();
+        aliases.add(
+                departmentAliasService.create(departmentName));
+
+        Department department = new Department(
+                departmentName, client, plants, plantNumber, aliases);
         return departmentsRepository.save(department);
     }
 
@@ -74,5 +82,13 @@ public class DepartmentService {
                 return departmentsRepository.save(department);
             }
         }
+    }
+
+
+    public Department addAlias(long departmentId, String alias) {
+        Department dep = departmentsRepository.getDepartmetById(departmentId);
+        DepartmentAlias departmentAlias = departmentAliasService.create(alias);
+        dep.addAlias(departmentAlias);
+        return departmentsRepository.save(dep);
     }
 }

@@ -16,4 +16,6 @@ public interface DepartmentsRepository extends JpaRepository<Department, Long> {
     @Query("select d from Department d join d.client c where " +
             "c.id = :clientId order by d.mainPlantNumber")
     List<Department> getAll(long clientId);
+
+    Department getDepartmetById(long departmentId);
 }

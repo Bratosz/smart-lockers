@@ -17,10 +17,11 @@ public class Employee extends EmployeeGeneral {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Cloth> clothes;
 
-    @JsonView(Views.InternalForEmployees.class)
+    @JsonView(Views.Public.class)
     @OneToMany(mappedBy = "rotationTemporaryOwner", cascade = CascadeType.ALL)
     private Set<RotationalCloth> rotationalClothes;
 
+    @JsonView(Views.Public.class)
     @ManyToOne(cascade = CascadeType.ALL)
     private Department department;
 
