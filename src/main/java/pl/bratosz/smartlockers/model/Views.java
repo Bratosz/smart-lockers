@@ -18,7 +18,7 @@ public class Views {
 
     }
 
-    public static class InternalForClothes extends Public{
+    public static class InternalForClothes extends Public {
 
     }
 
@@ -30,6 +30,10 @@ public class Views {
 
 
     public static class DepartmentBasicInfo extends Public {
+    }
+
+    public static class PrivateView {
+
     }
 
     public static class InternalForClothOrders extends Public {}

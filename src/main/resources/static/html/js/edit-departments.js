@@ -13,6 +13,7 @@ function displayDepartment(department) {
 function addAlias(departmentId, alias) {
     $.ajax({
         url: `http://localhost:8080/department/add_alias/${departmentId}/${alias}`,
+        method: "post",
         success: function (department) {
             displayDepartment(department)
         }

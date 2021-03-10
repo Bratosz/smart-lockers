@@ -171,7 +171,7 @@ public class Department {
     }
 
     public void addAlias(DepartmentAlias departmentAlias) {
-//        departmentAlias.setDepartment(this);
+        departmentAlias.setDepartment(this);
         getAliases().add(departmentAlias);
     }
 }

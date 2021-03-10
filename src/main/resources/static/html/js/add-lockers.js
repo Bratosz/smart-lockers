@@ -1,4 +1,4 @@
-let clientId = 1;
+
 
 loadPlants(clientId);
 loadDepartments(clientId);

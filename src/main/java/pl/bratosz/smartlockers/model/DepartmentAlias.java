@@ -1,5 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -10,6 +12,7 @@ public class DepartmentAlias {
     private long id;
     private String alias;
     @ManyToOne
+    @JsonView(Views.PrivateView.class)
     private Department department;
 
     public DepartmentAlias() {

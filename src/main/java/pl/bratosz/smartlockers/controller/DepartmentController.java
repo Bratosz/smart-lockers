@@ -30,6 +30,7 @@ public class DepartmentController {
         return departmentService.getByNameAndPlantNumber(departmentName, mainPlantNumber);
     }
 
+    @JsonView(Views.Public.class)
     @PostMapping("/add_alias/{departmentId}/{alias}")
     public Department addAlias(@PathVariable long departmentId,
                                @PathVariable String alias) {
@@ -38,6 +39,7 @@ public class DepartmentController {
 
     }
 
+    @JsonView(Views.Public.class)
     @PostMapping("/create/{departmentName}/{clientId}/{mainPlantNumber}")
     public Department create(@PathVariable String departmentName,
                              @PathVariable long clientId,
