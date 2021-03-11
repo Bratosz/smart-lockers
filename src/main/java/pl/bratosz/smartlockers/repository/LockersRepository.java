@@ -60,4 +60,6 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
     List<Locker> getLockersByPlantAndNumber(
             @Param("plantId") long plantId,
             @Param("lockerNumber") int lockerNumber);
+
+    Locker getLockerById(long lockerId);
 }

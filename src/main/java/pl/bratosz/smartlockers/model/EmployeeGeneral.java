@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.strings.MyString;
 
 import javax.persistence.*;
 
@@ -40,7 +41,7 @@ public abstract class EmployeeGeneral {
     }
 
     public String getLastName() {
-        return lastName;
+        return MyString.create(lastName).get();
     }
 
     public void setLastName(String lastName) {

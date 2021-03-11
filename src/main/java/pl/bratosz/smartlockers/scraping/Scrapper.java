@@ -3,7 +3,9 @@ package pl.bratosz.smartlockers.scraping;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import pl.bratosz.smartlockers.date.FormatDate;
-import pl.bratosz.smartlockers.model.Department;
+import pl.bratosz.smartlockers.model.Box;
+import pl.bratosz.smartlockers.model.Locker;
+import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
@@ -17,7 +19,7 @@ import java.util.*;
 @Component
 public class Scrapper {
     private ArticleService articleService;
-    private OnlineConnection oc;
+    private OnlineConnection connection;
     private String login;
     private String password;
 
@@ -27,17 +29,19 @@ public class Scrapper {
         password = "";
     }
 
-    public void createConnection(String login, String password) {
-        if (itIsSamePlant(login, password) && oc != null) {
+    public void createConnection(Plant plant) {
+        login = plant.getLogin();
+        password = plant.getPassword();
+        if (itIsSamePlant(login, password) && connection != null) {
             try {
-                oc.checkConnection();
+                connection.checkConnection();
             } catch (IOException e) {
                 updateActualLoginData(login, password);
-                oc = new OnlineConnection(login, password);
+                connection = new OnlineConnection(login, password);
             }
         } else {
             updateActualLoginData(login, password);
-            oc = new OnlineConnection(login, password);
+            connection = new OnlineConnection(login, password);
         }
     }
 
@@ -51,38 +55,42 @@ public class Scrapper {
         return false;
     }
 
-    public void findByLockerAndBox(Integer lockerNo, Integer boxNo) {
+    public void find(Box box) {
+        int lockerNo = box.getLocker().getLockerNumber();
+        int boxNo = box.getBoxNumber();
         searchByLockerNoAndBoxNo(lockerNo, boxNo);
-        clickViewButton();
+    }
+
+    public void find(Locker locker) {
     }
 
     private void searchByLockerNoAndBoxNo(Integer lockerNo, Integer boxNo) {
         putLockerNoAndBoxNoToForm(lockerNo.toString(), boxNo.toString());
-        oc.standardPost();
+        connection.standardPost();
 
     }
 
     public String getDepartmentName() {
-        return MyString.create(oc.getActualPage().select(
+        return MyString.create(connection.getActualPage().select(
                 "#ctl00_MainContent_GridView102 > tbody > " +
                         "tr:nth-child(2) > td:nth-child(1)").text()).get();
     }
 
     public String getEmployeeLastName() {
-        return MyString.create(oc.getActualPage().select(
+        return MyString.create(connection.getActualPage().select(
                 "#ctl00_MainContent_GridView102 > tbody > " +
                         "tr:nth-child(2) > td:nth-child(3)").text()).get();
     }
 
     public String getEmployeeFirstName() {
-        return MyString.create(oc.getActualPage().select(
+        return MyString.create(connection.getActualPage().select(
                 "#ctl00_MainContent_GridView102 > tbody > " +
                         "tr:nth-child(2) > td:nth-child(2)").text()).get();
     }
 
 
     public List<Cloth> getClothes() {
-        Elements elements = oc.getActualPage().select(
+        Elements elements = connection.getActualPage().select(
                 "#ctl00_MainContent_GridView2 > tbody > tr");
         List<Cloth> clothes = new LinkedList<>();
         for (int i = 1; i < elements.size(); i++) {
@@ -100,22 +108,27 @@ public class Scrapper {
         return clothes;
     }
 
-    private void clickViewButton() {
-        updateFormWithClick();
-        oc.standardPost();
+    public void clickViewButton() {
+        int buttonIndex = 0;
+        clickViewButton(buttonIndex);
     }
 
-    private void updateFormWithClick() {
-        oc.formParameters.put("__EVENTTARGET", "ctl00$MainContent$GridView102");
-        oc.formParameters.put("__EVENTARGUMENT", "Select$0");
+    public void clickViewButton(int buttonIndex) {
+        updateFormWithClick(buttonIndex);
+        connection.standardPost();
+    }
+
+    private void updateFormWithClick(int buttonIndex) {
+        connection.formParameters.put("__EVENTTARGET", "ctl00$MainContent$GridView102");
+        connection.formParameters.put("__EVENTARGUMENT", "Select$" + buttonIndex);
     }
 
 
     private void putLockerNoAndBoxNoToForm(String lockerNo, String boxNo) {
-        oc.setFormParameters(new HashMap<String, String>());
-        oc.formParameters.put("ctl00$MainContent$szafa_akt", lockerNo);
-        oc.formParameters.put("ctl00$MainContent$box_akt", boxNo);
-        oc.formParameters.put("__EVENTTARGET", "ctl00$MainContent$box_akt");
+        connection.setFormParameters(new HashMap<String, String>());
+        connection.formParameters.put("ctl00$MainContent$szafa_akt", lockerNo);
+        connection.formParameters.put("ctl00$MainContent$box_akt", boxNo);
+        connection.formParameters.put("__EVENTTARGET", "ctl00$MainContent$box_akt");
     }
 
     private int getOrdinalNo(Elements td) {
@@ -155,4 +168,6 @@ public class Scrapper {
         String date = td.get(7).text();
         return FormatDate.getDate(date);
     }
+
+
 }

@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Box;
+import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.service.ScrapingService;
 
@@ -39,6 +37,12 @@ public class ScrappingController {
     @JsonView(Views.InternalForBoxes.class)
     public Box loadEmployee(@PathVariable long boxId) {
        return scrapingService.loadEmployee(boxId);
+    }
+
+    @PostMapping("/load-locker/{lockerId}")
+    @JsonView(Views.InternalForLockers.class)
+    public Locker loadLocker(@PathVariable long lockerId) {
+        return scrapingService.loadLocker(lockerId);
     }
 
 

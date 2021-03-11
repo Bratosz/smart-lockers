@@ -143,4 +143,8 @@ public class LockerService {
             return lockers.subList(0, 49);
         }
     }
+
+    public Locker getLockerById(long lockerId) {
+        return lockersRepository.getLockerById(lockerId);
+    }
 }

@@ -56,6 +56,8 @@ public class ClientController {
                 "JIT", clientId, 385);
         Department department3 = departmentController.create(
                 "MANTRANS", clientId, 386);
+        Department department4 = departmentController.create(
+                "JIT LOGISTYKA", clientId, 384);
         long id1 = locationController.create(
                 clientId, "Stara szatnia - piwnica").getId();
         long id2 = locationController.create(
