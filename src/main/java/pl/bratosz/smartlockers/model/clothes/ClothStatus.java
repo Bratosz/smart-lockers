@@ -28,10 +28,14 @@ public class ClothStatus {
     public ClothStatus() {
     }
 
-    public ClothStatus(ClothActualStatus status, ClothDestination clothDestination,
-                       User user, Date dateOfUpdate) {
+    public ClothStatus(ClothActualStatus status,
+                       ClothDestination clothDestination,
+                       Cloth cloth,
+                       User user,
+                       Date dateOfUpdate) {
         this.status = status;
         this.clothDestination = clothDestination;
+        this.cloth = cloth;
         this.user = user;
         this.dateOfUpdate = dateOfUpdate;
     }

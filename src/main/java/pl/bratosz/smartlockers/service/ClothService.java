@@ -7,6 +7,7 @@ import pl.bratosz.smartlockers.exception.NoActiveClothOrderException;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
+import pl.bratosz.smartlockers.model.clothes.ClothStatus;
 import pl.bratosz.smartlockers.model.orders.*;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.OrdersRepository;
@@ -38,23 +39,24 @@ public class ClothService {
     public ClothService(ClothesRepository clothesRepository,
                         OrdersRepository ordersRepository,
                         UserService userService,
-                        ClothStatusService clothStatusService) {
+                        ClothStatusService clothStatusService,
+                        ClothesManager clothesManager) {
         this.clothesRepository = clothesRepository;
         this.ordersRepository = ordersRepository;
         this.userService = userService;
         this.clothStatusService = clothStatusService;
+        this.clothesManager = clothesManager;
     }
 
-    public void loadManagerAndUser(long userId) {
+    public void loadUserAndDate(long userId) {
         user = userService.getUserById(userId);
         date = new Date();
-        clothesManager = new ClothesManager(user, date);
+
     }
 
-    public void loadManagerAndUser(User user) {
+    public void loadUserAndDate(User user) {
         this.user = user;
         this.date = new Date();
-        clothesManager = new ClothesManager(this.user, date);
     }
 
     public Cloth createNewInstead(
@@ -64,7 +66,7 @@ public class ClothService {
             Employee employee,
             User user
     ) {
-        loadManagerAndUser(user);
+        loadUserAndDate(user);
         Cloth newCloth = clothesManager.createNewInstead(ordinalNumber, article, size, employee);
         return clothesRepository.save(newCloth);
     }
@@ -96,7 +98,7 @@ public class ClothService {
         if (clothIsNotPresent(clientId, cloth)) {
             return createClothNotFoundResponse(cloth, clothBarCode);
         } else {
-            loadManagerAndUser(userId);
+            loadUserAndDate(userId);
             OrderType actualOrderType = determineOrderType(cloth);
             switch (orderType) {
                 case AUTO_EXCHANGE:
@@ -200,8 +202,8 @@ public class ClothService {
     }
 
     private Cloth acceptForExchange(Cloth cloth) {
-
-        cloth = clothesManager.updateCloth(ACCEPTED_FOR_EXCHANGE, cloth);
+        ClothStatus actualStatus = clothStatusService.create(ACCEPTED_FOR_EXCHANGE, cloth, user);
+        cloth = clothesManager.updateCloth(actualStatus, cloth);
         if(cloth.getClothOrder() != null) cloth = clothesManager.updateOrder(cloth);
         return clothesRepository.save(cloth);
     }
