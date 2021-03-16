@@ -9,6 +9,7 @@ import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForExcha
 import pl.bratosz.smartlockers.model.users.User;
 
 import java.util.Date;
+import java.util.LinkedList;
 
 public class OrderCreator {
     public static NeedOrderStatus builder(User user, Date date) {
@@ -60,9 +61,10 @@ public class OrderCreator {
         @Override
         public ClothOrder build() {
             ClothOrder order = new ClothOrder();
+            order.setOrderStatusHistory(new LinkedList<>());
+            order.setOrderStatus(orderStatus);
             order.setClothToExchange(clothToExchange);
             order.setClothToRelease(clothToRelease);
-            order.setOrderStatus(orderStatus);
             order.setOrderType(orderType);
             order.setNote(note);
             order.setActive(true);

@@ -1,12 +1,15 @@
 package pl.bratosz.smartlockers.service;
 
 import org.springframework.stereotype.Service;
+import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.scraping.Scrapper;
+import pl.bratosz.smartlockers.utils.Utils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ScrapingService {
@@ -14,19 +17,22 @@ public class ScrapingService {
     private BoxService boxService;
     private EmployeeService employeeService;
     private ClothService clothService;
+    private PlantService plantService;
     private Scrapper scrapper;
     private List<Cloth> currentClothes;
+    private LockersLoadReport lockersLoadReport;
 
     public ScrapingService(LockerService lockerService,
                            BoxService boxService,
                            EmployeeService employeeService,
                            ClothService clothService,
-                           Scrapper scrapper
+                           PlantService plantService, Scrapper scrapper
     ) {
         this.lockerService = lockerService;
         this.boxService = boxService;
         this.employeeService = employeeService;
         this.clothService = clothService;
+        this.plantService = plantService;
         this.scrapper = scrapper;
     }
 
@@ -53,21 +59,60 @@ public class ScrapingService {
         }
     }
 
-    public LockerReport loadLocker(long lockerId) {
+    public LockersLoadReport loadLocker(long lockerId) {
         Locker locker = lockerService.getLockerById(lockerId);
         Plant plant = locker.getPlant();
+        lockersLoadReport = new LockersLoadReport(plant.getPlantNumber());
 
         scrapper.createConnection(plant);
         scrapper.find(locker);
+        loadBoxes(locker);
 
-        LockerReport lockerReport = loadBoxes(locker);
-        return lockerReport;
+        return lockersLoadReport;
     }
 
-    private LockerReport loadBoxes(Locker locker) {
-
+    private void loadLocker(Locker locker) {
+        scrapper.find(locker);
+        loadBoxes(locker);
     }
 
+    private void loadBoxes(Locker locker) {
+        List<Integer> boxNumbers = scrapper.getBoxNumbers();
+        List<Integer> duplicates = Utils.getDuplicates(boxNumbers);
+        for(int i = 1; i <= boxNumbers.size(); i++) {
+                int boxNumber = scrapper.getBoxNumberByTableRow(i);
+                if(boxIsDuplicated(boxNumber, duplicates)) {
+                    BoxInfo boxInfo = new BoxInfo(locker.getLockerNumber(), boxNumber);
+                    lockersLoadReport.getDuplicatedBoxes().add(boxInfo);
+                } else {
+                    try {
+                        Box box = lockerService.getBoxByNumber(locker, boxNumber);
+                        loadEmployee(i, box);
+                    } catch (BoxNotAvailableException e) {
+                    }
+                }
+            }
+    }
+
+    private boolean boxIsDuplicated(int boxNumber, List<Integer> duplicates) {
+        if(duplicates.contains(boxNumber)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void loadEmployee(int rowIndex, Box box) {
+        String firstName = scrapper.getEmployeeFirstName(rowIndex);
+        String lastName = scrapper.getEmployeeLastName(rowIndex);
+        String departmentName = scrapper.getDepartmentName(rowIndex);
+
+        scrapper.clickViewButton(rowIndex);
+        List<Cloth> clothes = scrapper.getClothes();
+
+        employeeService.createEmployee(
+                clothes, departmentName, box, firstName, lastName);
+    }
 
     public Box loadEmployee(long boxId) {
         Box box = boxService.getBoxById(boxId);
@@ -84,7 +129,19 @@ public class ScrapingService {
 
         employeeService.createEmployee(
                 clothes, departmentName, box, firstName, lastName);
-        return boxService.getBoxById(boxId);
+        return boxService.getBoxById(box.getId());
     }
 
+    public LockersLoadReport loadPlantBoxByBox(long id) {
+        Plant plant = plantService.getById(id);
+        lockersLoadReport = new LockersLoadReport(plant.getPlantNumber());
+
+        scrapper.createConnection(plant);
+
+        Set<Locker> lockers = plant.getLockers();
+        lockers.stream().forEach(l -> {
+            loadLocker(l);
+        });
+        return lockersLoadReport;
+    }
 }

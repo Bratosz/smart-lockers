@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface ClothesRepository extends JpaRepository<Cloth, Long> {
     Cloth getClothById(long id);
+
+    Cloth getClothByBarCode(long barCode);
 }

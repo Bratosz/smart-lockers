@@ -107,10 +107,6 @@ public class Locker {
         this.capacity = capacity;
     }
 
-    public Optional<Box> getBoxByNumber(Integer boxNumber) {
-        return boxes.stream().filter(b -> b.getBoxNumber() == boxNumber).findFirst();
-    }
-
     public Plant getPlant() {
         return plant;
     }

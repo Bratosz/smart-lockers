@@ -9,6 +9,7 @@ public class DepartmentManager {
         Department d = new Department();
         d.setClient(client);
         d.setName("Główny");
+        d.setDepartmentDefault(true);
         return d;
     }
 }

@@ -30,15 +30,19 @@ public class ClothService {
     @Autowired
     private OrderService orderService;
     private UserService userService;
+    private ClothStatusService clothStatusService;
     private User user;
     private Date date;
     private ClothesManager clothesManager;
 
     public ClothService(ClothesRepository clothesRepository,
-                        OrdersRepository ordersRepository, UserService userService) {
+                        OrdersRepository ordersRepository,
+                        UserService userService,
+                        ClothStatusService clothStatusService) {
         this.clothesRepository = clothesRepository;
         this.ordersRepository = ordersRepository;
         this.userService = userService;
+        this.clothStatusService = clothStatusService;
     }
 
     public void loadManagerAndUser(long userId) {
@@ -61,7 +65,8 @@ public class ClothService {
             User user
     ) {
         loadManagerAndUser(user);
-        return clothesManager.createNewInstead(ordinalNumber, article, size, employee);
+        Cloth newCloth = clothesManager.createNewInstead(ordinalNumber, article, size, employee);
+        return clothesRepository.save(newCloth);
     }
 
     public List<Cloth> getClothesByIds(long[] clothsIds) {
@@ -86,10 +91,10 @@ public class ClothService {
         }
     }
 
-    public ResponseClothAcceptance accept(long clientId, long userId, long clothId, OrderType orderType) {
-        Cloth cloth = clothesRepository.getClothById(clothId);
+    public ResponseClothAcceptance accept(long clientId, long userId, long clothBarCode, OrderType orderType) {
+        Cloth cloth = clothesRepository.getClothByBarCode(clothBarCode);
         if (clothIsNotPresent(clientId, cloth)) {
-            return createClothNotFoundResponse(cloth, clothId);
+            return createClothNotFoundResponse(cloth, clothBarCode);
         } else {
             loadManagerAndUser(userId);
             OrderType actualOrderType = determineOrderType(cloth);
@@ -144,7 +149,8 @@ public class ClothService {
                     clothForExchange,
                     orderType,
                     clothForExchange.getArticle(),
-                    clothForExchange.getSize());
+                    clothForExchange.getSize(),
+                    user);
             return ResponseClothAcceptance.createNewOrderAddedAndClothAcceptedResponse(clothOrder);
         } else if (orderType.equals(EXCHANGE_FOR_A_NEW_ONE)) {
             ClothOrder order = acceptClothAndUpdateOrder(cloth);
@@ -194,8 +200,9 @@ public class ClothService {
     }
 
     private Cloth acceptForExchange(Cloth cloth) {
+
         cloth = clothesManager.updateCloth(ACCEPTED_FOR_EXCHANGE, cloth);
-        cloth = clothesManager.updateOrder(cloth);
+        if(cloth.getClothOrder() != null) cloth = clothesManager.updateOrder(cloth);
         return clothesRepository.save(cloth);
     }
 
@@ -215,7 +222,7 @@ public class ClothService {
     }
 
     private ClothOrder getOrderFromCloth(Cloth cloth) throws ClothOrderException {
-        if (cloth.getClothOrder().equals(null)) {
+        if (cloth.getClothOrder() == null) {
             throw new NoActiveClothOrderException("");
         } else {
             ClothOrder clothOrder = cloth.getClothOrder();

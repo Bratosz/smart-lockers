@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.orders.OrderType;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
+import pl.bratosz.smartlockers.response.ResponseClothAcceptance;
 import pl.bratosz.smartlockers.service.ClothService;
 
 import static pl.bratosz.smartlockers.model.Views.*;
@@ -27,11 +28,12 @@ public class ClothController {
     }
 
     @JsonView(InternalForClothes.class)
-    @PostMapping("/acceptance/{clientId}/{userId}/{clothId}/{orderType}")
-    public int accept(
-            @PathVariable long userId, @PathVariable long clientId,
-            @PathVariable long clothId, @PathVariable OrderType orderType) {
-        clothesService.accept(clientId, userId, clothId, orderType);
-        return 1;
+    @PostMapping("/acceptance/{clientId}/{userId}/{clothBarCode}/{orderType}")
+    public ResponseClothAcceptance accept(
+            @PathVariable long userId,
+            @PathVariable long clientId,
+            @PathVariable long clothBarCode,
+            @PathVariable OrderType orderType) {
+        return clothesService.accept(clientId, userId, clothBarCode, orderType);
     }
 }

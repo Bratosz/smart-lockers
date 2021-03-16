@@ -38,7 +38,7 @@ public class Plant {
     private Client client;
 
     @JsonView(Views.PlantExtendedInfo.class)
-    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "plant", cascade = CascadeType.ALL)
     private Set<Locker> lockers;
 
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)

@@ -1,8 +1,7 @@
 package pl.bratosz.smartlockers.model.users;
 
 import pl.bratosz.smartlockers.model.clothes.ClothStatus;
-import pl.bratosz.smartlockers.model.users.roles.PlainUserRole;
-import pl.bratosz.smartlockers.model.users.roles.UserRole;
+import pl.bratosz.smartlockers.model.orders.OrderStatus;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -10,13 +9,11 @@ import java.util.Set;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected long id;
 
-    @Embedded
-    protected PlainUserRole userRole;
+    protected OrderStatus.OrderStage initialStageForOrders;
 
     protected String firstName;
 
@@ -33,14 +30,22 @@ public abstract class User {
 
     public User() {}
 
-    public User(PlainUserRole role, String firstName, String lastName, String login, String password,
+    public User(OrderStatus.OrderStage initialStageForOrders, String firstName, String lastName, String login, String password,
                 String email) {
-        this.userRole = role;
+        this.initialStageForOrders = initialStageForOrders;
         this.firstName = firstName;
         this.lastName = lastName;
         this.login = login;
         this.password = password;
         this.email = email;
+    }
+
+    public OrderStatus.OrderStage getInitialStageForOrders() {
+        return initialStageForOrders;
+    }
+
+    public void setInitialStageForOrders(OrderStatus.OrderStage initialStageForOrders) {
+        this.initialStageForOrders = initialStageForOrders;
     }
 
     public long getId() {
@@ -49,14 +54,6 @@ public abstract class User {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public UserRole getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(PlainUserRole userRole) {
-        this.userRole = userRole;
     }
 
     public String getFirstName() {

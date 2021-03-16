@@ -21,15 +21,12 @@ public class ClothesManager {
         this.date = date;
     }
 
-    public Cloth createNewInstead(int ordinalNumber, Article article, ClothSize size, Employee employee) {
-        Cloth prototype = new Cloth(
-                ordinalNumber,
-                article,
-                size,
-                employee,
-                date);
+    public Cloth createNewInstead(int ordinalNumber,
+                                  Article article,
+                                  ClothSize size,
+                                  Employee employee) {
         ClothesCreator creator = new ClothesCreator(user, date);
-        return creator.createNewInstead(prototype);
+        return creator.createNewInstead(ordinalNumber, article, size, employee);
     }
 
     public Cloth createNew(Article article, ClothSize size, Employee employee) {
@@ -75,8 +72,6 @@ public class ClothesManager {
                 destination = FOR_ASSIGN;
                 break;
             case ASSIGNED:
-                destination = FOR_RELEASE;
-                break;
             case IN_PREPARATION:
                 destination = FOR_RELEASE;
                 break;

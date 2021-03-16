@@ -88,5 +88,27 @@ public class ResponseClothAcceptance {
         isAccepted = true;
     }
 
+    public boolean isFound() {
+        return isFound;
+    }
 
+    public void setFound(boolean found) {
+        isFound = found;
+    }
+
+    public boolean isAccepted() {
+        return isAccepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        isAccepted = accepted;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

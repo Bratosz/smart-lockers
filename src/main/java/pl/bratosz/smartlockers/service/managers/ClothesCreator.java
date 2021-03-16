@@ -1,8 +1,7 @@
 package pl.bratosz.smartlockers.service.managers;
 
-import pl.bratosz.smartlockers.model.clothes.Cloth;
-import pl.bratosz.smartlockers.model.clothes.ClothDestination;
-import pl.bratosz.smartlockers.model.clothes.ClothStatus;
+import pl.bratosz.smartlockers.model.Employee;
+import pl.bratosz.smartlockers.model.clothes.*;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.users.User;
 
@@ -32,10 +31,19 @@ public class ClothesCreator {
         return cloth;
     }
 
-    public Cloth createNewInstead(Cloth prototype) {
-        this.cloth = prototype;
+    public Cloth createNewInstead(int ordinalNumber,
+                                  Article article,
+                                  ClothSize size,
+                                  Employee employee) {
+        this.cloth = new Cloth();
         ClothDestination destiny = FOR_ASSIGN;
         setClothStatus(destiny);
+        cloth.setActive(false);
+        cloth.setCreated(date);
+        cloth.setOrdinalNumber(ordinalNumber);
+        cloth.setArticle(article);
+        cloth.setSize(size);
+        cloth.setEmployee(employee);
         return cloth;
     }
 

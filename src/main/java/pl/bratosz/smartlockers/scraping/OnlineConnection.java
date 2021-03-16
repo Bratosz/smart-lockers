@@ -90,7 +90,6 @@ public class OnlineConnection {
                     .followRedirects(true)
                     .execute();
             return actualResponse.parse();
-
     }
 
     public Document checkConnection() throws IOException {

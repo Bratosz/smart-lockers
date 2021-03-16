@@ -2,8 +2,7 @@ package pl.bratosz.smartlockers.model.users;
 
 import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Employee;
-import pl.bratosz.smartlockers.model.users.roles.PlainUserRole;
-import pl.bratosz.smartlockers.model.users.roles.UserRole;
+import pl.bratosz.smartlockers.model.orders.OrderStatus;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -17,9 +16,15 @@ public class UserEmployee extends UserClient {
 
     public UserEmployee(){}
 
-    public UserEmployee(PlainUserRole role, String firstName, String lastName, String login,
-                        String password, String email, Client client, Employee employee) {
-        super(role, firstName, lastName, login, password, email, client);
+    public UserEmployee(OrderStatus.OrderStage initialStageForOrders,
+                        String firstName,
+                        String lastName,
+                        String login,
+                        String password,
+                        String email,
+                        Client client,
+                        Employee employee) {
+        super(initialStageForOrders, firstName, lastName, login, password, email, client);
         this.employee = employee;
     }
 

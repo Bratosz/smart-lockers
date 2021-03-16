@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.scraping;
 
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import pl.bratosz.smartlockers.date.FormatDate;
@@ -62,13 +63,21 @@ public class Scrapper {
     }
 
     public void find(Locker locker) {
+        int lockerNumber = locker.getLockerNumber();
+        searchByLockerNumber(lockerNumber);
     }
 
     private void searchByLockerNoAndBoxNo(Integer lockerNo, Integer boxNo) {
         putLockerNoAndBoxNoToForm(lockerNo.toString(), boxNo.toString());
         connection.standardPost();
-
     }
+
+    private void searchByLockerNumber(Integer lockerNumber) {
+        putLockerNumberToForm(lockerNumber.toString());
+        connection.standardPost();
+    }
+
+
 
     public String getDepartmentName() {
         return MyString.create(connection.getActualPage().select(
@@ -80,6 +89,28 @@ public class Scrapper {
         return MyString.create(connection.getActualPage().select(
                 "#ctl00_MainContent_GridView102 > tbody > " +
                         "tr:nth-child(2) > td:nth-child(3)").text()).get();
+    }
+
+    public String getEmployeeFirstName(int rowIndex) {
+        Element boxRow = getBoxRow(rowIndex);
+        return MyString.create(boxRow.select("td").get(1).text()).get();
+    }
+
+    public String getEmployeeLastName(int rowIndex) {
+        Element boxRow = getBoxRow(rowIndex);
+        return MyString.create(boxRow.select("td").get(2).text()).get();
+    }
+
+    public String getDepartmentName(int rowIndex) {
+        Element boxRow = getBoxRow(rowIndex);
+        return MyString.create(boxRow.select("td").get(0).text()).get();
+    }
+
+
+    private Element getBoxRow(int rowIndex) {
+        Elements boxesRows = getBoxesRows();
+        return boxesRows.get(rowIndex);
+
     }
 
     public String getEmployeeFirstName() {
@@ -108,6 +139,26 @@ public class Scrapper {
         return clothes;
     }
 
+    public int getBoxNumberByTableRow(int rowIndex) {
+        Elements boxesRows = getBoxesRows();
+        return getBoxNumber(rowIndex, boxesRows);
+    }
+
+    private Elements getBoxesRows() {
+        return connection.getActualPage().select(
+                "#ctl00_MainContent_GridView102 > tbody > tr");
+    }
+
+    public List<Integer> getBoxNumbers() {
+        Elements boxesRows = getBoxesRows();
+        List<Integer> boxNumbers = new LinkedList<>();
+        for(int i = 1; i < boxesRows.size(); i++) {
+            boxNumbers.add(
+                    getBoxNumber(i, boxesRows));
+        }
+        return boxNumbers;
+    }
+
     public void clickViewButton() {
         int buttonIndex = 0;
         clickViewButton(buttonIndex);
@@ -128,6 +179,12 @@ public class Scrapper {
         connection.setFormParameters(new HashMap<String, String>());
         connection.formParameters.put("ctl00$MainContent$szafa_akt", lockerNo);
         connection.formParameters.put("ctl00$MainContent$box_akt", boxNo);
+        connection.formParameters.put("__EVENTTARGET", "ctl00$MainContent$box_akt");
+    }
+
+    private void putLockerNumberToForm(String lockerNumber) {
+        connection.setFormParameters(new HashMap<String, String>());
+        connection.formParameters.put("ctl00$MainContent$szafa_akt", lockerNumber);
         connection.formParameters.put("__EVENTTARGET", "ctl00$MainContent$box_akt");
     }
 
@@ -169,5 +226,9 @@ public class Scrapper {
         return FormatDate.getDate(date);
     }
 
-
+    private Integer getBoxNumber(int rowIndex, Elements boxesRows) {
+        String boxNumber = boxesRows.get(rowIndex)
+                .select("td").get(5).text();
+        return Integer.valueOf(boxNumber);
+    }
 }

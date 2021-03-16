@@ -10,8 +10,10 @@ public class DepartmentAlias {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @JsonView(Views.Public.class)
     private String alias;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonView(Views.PrivateView.class)
     private Department department;
 

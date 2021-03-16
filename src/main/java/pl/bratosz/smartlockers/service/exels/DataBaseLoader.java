@@ -79,7 +79,9 @@ public class DataBaseLoader {
         Locker locker = lockers.stream().filter(l -> l.getLockerNumber() == lockerNumber)
                 .filter(l -> l.getPlant().getPlantNumber() == plantNumber)
                 .findFirst().orElseThrow(NoSuchElementException::new);
-        return locker.getBoxByNumber(boxNumber).orElseThrow(NoSuchElementException::new);
+        return locker.getBoxes()
+        .stream()
+        .filter(box -> box.getBoxNumber() == boxNumber).findFirst().orElseThrow(NoSuchElementException::new);
     }
 
     private void createLockersAndBoxes() {

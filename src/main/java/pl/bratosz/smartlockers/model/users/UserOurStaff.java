@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.model.users;
 
-import pl.bratosz.smartlockers.model.users.roles.PlainUserRole;
+import pl.bratosz.smartlockers.model.orders.OrderStatus;
+
 
 
 import javax.persistence.Entity;
@@ -13,9 +14,14 @@ public class UserOurStaff extends User {
     public UserOurStaff() {
     }
 
-    public UserOurStaff(PlainUserRole role, String firstName, String lastName, String login,
-                        String password, String email, Position position) {
-        super(role, firstName, lastName, login, password, email);
+    public UserOurStaff(OrderStatus.OrderStage initialStageForOrders,
+                        String firstName,
+                        String lastName,
+                        String login,
+                        String password,
+                        String email,
+                        Position position) {
+        super(initialStageForOrders, firstName, lastName, login, password, email);
         this.position = position;
     }
 

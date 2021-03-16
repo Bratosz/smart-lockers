@@ -3,9 +3,11 @@ package pl.bratosz.smartlockers.service;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Department;
+import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.repository.PlantsRepository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -65,6 +67,6 @@ public class PlantService {
         if(id == 0) {
             return null;
         }
-        return plantsRepository.getOne(id);
+        return plantsRepository.getById(id);
     }
 }

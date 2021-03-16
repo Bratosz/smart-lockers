@@ -5,10 +5,7 @@ import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -40,6 +37,7 @@ public class Cloth {
     @ManyToOne(cascade = CascadeType.ALL)
     protected Employee employee;
 
+    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "cloth")
     protected List<ClothStatus> statusHistory;
 
@@ -55,6 +53,7 @@ public class Cloth {
     @JsonView(Views.Public.class)
     protected Date releaseDate;
 
+    @JsonView(Views.Public.class)
     protected boolean active;
 
     public Cloth(){}
@@ -103,6 +102,7 @@ public class Cloth {
         this.ordinalNumber = ordinalNumber;
         this.article = article;
         this.size = size;
+        active = true;
     }
 
     public long getId() {
@@ -174,7 +174,9 @@ public class Cloth {
     }
 
     public void setStatus(ClothStatus status) {
-        this.statusHistory.add(status);
+        status.setCloth(this);
+        if(statusHistory == null) statusHistory = new LinkedList<>();
+        statusHistory.add(status);
     }
 
     public long getBarCode() {

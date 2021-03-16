@@ -27,15 +27,13 @@ public class OrderController {
                                   @PathVariable ClothSize size,
                                   @PathVariable OrderType orderType,
                                   @RequestBody long[] clothIds,
-                                  @PathVariable long userId
-    ) {
+                                  @PathVariable long userId) {
         return orderService.placeMany(
                 orderType,
                 articleNumber,
                 size,
                 clothIds,
-                userId
-        );
+                userId);
     }
 
     @JsonView(Views.InternalForClothOrders.class)
@@ -49,12 +47,10 @@ public class OrderController {
     public List<ClothOrder> performActionOnOrders(
             @PathVariable ActionType actionType,
             @RequestBody long[] clothOrderIds,
-            @PathVariable long userId
-    ) {
+            @PathVariable long userId) {
         return orderService.performActionOnOrders(
                 actionType,
                 clothOrderIds,
-                userId
-        );
+                userId);
     }
 }

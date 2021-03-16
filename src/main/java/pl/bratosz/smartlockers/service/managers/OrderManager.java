@@ -38,9 +38,6 @@ public class OrderManager  {
         return OrderCreator.createWithExchange(parameters, user, date);
     }
 
-
-
-
     public ClothOrder createForExistingCloth(
             OrderType orderType,
             Cloth cloth
@@ -107,6 +104,9 @@ public class OrderManager  {
 
 
     public ClothOrder update(ClothOrder order, ClothActualStatus clothStatus) {
+        if(order == null) {
+
+        }
         OrderStatus orderStatus = null;
         switch (clothStatus) {
             case ORDERED:

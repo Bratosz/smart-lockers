@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.service;
 
 import org.springframework.stereotype.Service;
+import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.LockersRepository;
 import pl.bratosz.smartlockers.service.managers.creators.LockerCreator;
@@ -78,10 +79,10 @@ public class LockerService {
         Department department = departmentService.getById(departmentId);
         Location location = locationService.getById(locationId);
         List<Locker> lockers = new LinkedList<>();
-        for(int i = startingLockerNumber; i <= endingLockerNumber; i++) {
+        for (int i = startingLockerNumber; i <= endingLockerNumber; i++) {
             lockers.add(
                     LockerCreator.create(
-                    i, capacity, plant, department, location));
+                            i, capacity, plant, department, location));
         }
         return lockersRepository.saveAll(lockers);
     }
@@ -131,13 +132,13 @@ public class LockerService {
             List<Box> boxes = locker.getBoxes();
             List<Box> filteredBoxes = new LinkedList<>();
             for (Box b : boxes) {
-                if(boxStatus.equals(ALL) || b.getBoxStatus().equals(boxStatus)) {
+                if (boxStatus.equals(ALL) || b.getBoxStatus().equals(boxStatus)) {
                     filteredBoxes.add(b);
                 }
             }
             locker.setBoxes(filteredBoxes);
         }
-        if(lockers.size() <= 50) {
+        if (lockers.size() <= 50) {
             return lockers;
         } else {
             return lockers.subList(0, 49);
@@ -146,5 +147,17 @@ public class LockerService {
 
     public Locker getLockerById(long lockerId) {
         return lockersRepository.getLockerById(lockerId);
+    }
+
+    public Box getBoxByNumber(Locker locker, int boxNumber) {
+        if (boxNumber <= locker.getCapacity()) {
+            return locker.getBoxes()
+                    .stream()
+                    .filter(b -> b.getBoxNumber() == boxNumber)
+                    .findFirst().get();
+        } else {
+            throw new BoxNotAvailableException(
+                    "Locker number is grater than locker capacity");
+        }
     }
 }

@@ -1,5 +1,7 @@
 package pl.bratosz.smartlockers.model.clothes;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothActualStatus;
 import pl.bratosz.smartlockers.model.clothes.ClothDestination;
@@ -13,7 +15,9 @@ public class ClothStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     private ClothActualStatus status;
+    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     private ClothDestination clothDestination;
     @ManyToOne
     private User user;

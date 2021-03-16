@@ -60,7 +60,7 @@ public class DepartmentService {
     }
 
     public Department getById(long id) {
-        if(id == 0) {
+        if (id == 0) {
             return null;
         }
         return departmentsRepository.getOne(id);
@@ -68,22 +68,21 @@ public class DepartmentService {
 
     public Department getByNameAndClient(String departmentAlias, Client client) {
         Set<Department> departments = client.getDepartments();
-        Optional<Department> first = departments.stream().filter(
-                d -> d.getAliases().contains(departmentAlias)).findFirst();
-        if(first.isPresent()){
-            return first.get();
-        } else {
-            Optional<Department> departmentDefault = departments.stream().filter(
-                    d -> d.isDepartmentDefault()).findFirst();
-            if(departmentDefault.isPresent()) {
-                return departmentDefault.get();
-            } else {
-                Department department = DepartmentManager.createDefaultDepartment(client);
-                return departmentsRepository.save(department);
+        for (Department d : departments) {
+            if (d.getAliases().stream().anyMatch(
+                    alias -> alias.equals(departmentAlias))) {
+                return d;
             }
         }
+        Optional<Department> departmentDefault = departments.stream().filter(
+                d -> d.isDepartmentDefault()).findFirst();
+        if (departmentDefault.isPresent()) {
+            return departmentDefault.get();
+        } else {
+            Department department = DepartmentManager.createDefaultDepartment(client);
+            return departmentsRepository.save(department);
+        }
     }
-
 
     public Department addAlias(long departmentId, String alias) {
         Department dep = departmentsRepository.getDepartmetById(departmentId);

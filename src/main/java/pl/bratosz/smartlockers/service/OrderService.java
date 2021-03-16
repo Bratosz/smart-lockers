@@ -11,9 +11,12 @@ import pl.bratosz.smartlockers.model.orders.parameters.basic.BasicOrderParameter
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.orders.OrderType;
 import pl.bratosz.smartlockers.model.orders.parameters.basic.ParametersForExchangeAndRelease;
+import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForExchangeAndRelease;
+import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteOrderParameters;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.OrdersRepository;
 import pl.bratosz.smartlockers.service.managers.OrderManager;
+
 
 import java.util.*;
 
@@ -37,6 +40,11 @@ public class OrderService {
 
     public void loadUserAndManager(long userId) {
         user = userService.getUserById(userId);
+        loadUserAndManager(user);
+    }
+
+    public void loadUserAndManager(User user) {
+        this.user = user;
         date = new Date();
         orderManager = new OrderManager(user, date);
     }
@@ -47,6 +55,7 @@ public class OrderService {
             ClothSize size,
             long[] clothIds,
             long userId) {
+        loadUserAndManager(userId);
         List<Cloth> clothesForExchange = clothesService.getClothesByIds(clothIds);
         Article article = articleService.get(articleNumber);
         List<ClothOrder> clothOrders = new LinkedList<>();
@@ -55,7 +64,8 @@ public class OrderService {
                     clothToExchange,
                     orderType,
                     article,
-                    size);
+                    size,
+                    user);
             ((LinkedList<ClothOrder>) clothOrders).push(order);
         });
         return clothOrders;
@@ -64,7 +74,9 @@ public class OrderService {
     public ClothOrder placeOne(Cloth clothForExchange,
                                OrderType orderType,
                                Article article,
-                               ClothSize size) {
+                               ClothSize size,
+                               User user) {
+        loadUserAndManager(user);
         Employee employee = clothForExchange.getEmployee();
         Cloth clothForRelease = clothesService.createNewInstead(
                 clothForExchange.getOrdinalNumber(),
@@ -72,12 +84,13 @@ public class OrderService {
                 size,
                 employee,
                 user);
-        ParametersForExchangeAndRelease basicParameters = BasicOrderParameters.createForClothExchange(
+        CompleteForExchangeAndRelease completeParameters =
+                CompleteOrderParameters.createForClothExchangeAndRelease(
                 clothForExchange,
                 clothForRelease,
                 orderType,
                 user);
-        ClothOrder order = user.getUserRole().createOrder(basicParameters);
+        ClothOrder order = orderManager.createOne(completeParameters);
         return ordersRepository.save(order);
     }
 

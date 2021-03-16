@@ -16,4 +16,6 @@ public interface PlantsRepository extends JpaRepository <Plant, Long> {
     @Query("select p from Plant p join p.client c where " +
             "c.id = :clientId order by p.plantNumber ")
     List<Plant> getAll(@Param("clientId") long clientId);
+
+    Plant getById(long id);
 }

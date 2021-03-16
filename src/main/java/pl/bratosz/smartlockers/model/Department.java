@@ -21,13 +21,13 @@ public class Department {
     private String name;
 
     @JsonView(Views.Public.class)
-    @OneToMany(mappedBy = "department")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "department")
     private List<DepartmentAlias> aliases;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Client client;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "plants",
             joinColumns = @JoinColumn(name = "department_id"),
@@ -35,13 +35,13 @@ public class Department {
     )
     private Set<Plant> plants;
 
-    @ManyToMany(mappedBy = "departments")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "departments")
     private Set<Location> locations;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "department", cascade = CascadeType.ALL)
     private Set<Employee> employees;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "department", cascade = CascadeType.ALL)
     private Set<Locker> lockers;
 
     private int mainPlantNumber;

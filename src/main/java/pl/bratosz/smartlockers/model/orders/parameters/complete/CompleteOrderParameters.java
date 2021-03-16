@@ -17,31 +17,18 @@ public class CompleteOrderParameters extends BasicOrderParameters
     private boolean orderActive;
 
 
-    public static CompleteForExchangeAndRelease createForClothExchange(
+    public static CompleteForExchangeAndRelease createForClothExchangeAndRelease(
             Cloth clothForExchange,
             Cloth clothForRelease,
             OrderType orderType,
-            OrderStage orderStage,
             User user
     ) {
         return new CompleteOrderParameters(
                 clothForExchange,
                 clothForRelease,
                 orderType,
-                orderStage,
+                user.getInitialStageForOrders(),
                 user
-        );
-    }
-
-
-    public static CompleteForExchangeAndRelease createForClothExchange(
-            ParametersForExchangeAndRelease basicParameters, OrderStage orderStage) {
-        return createForClothExchange(
-                basicParameters.getClothToExchange(),
-                basicParameters.getClothToRelease(),
-                basicParameters.getOrderType(),
-                orderStage,
-                basicParameters.getUser()
         );
     }
 
