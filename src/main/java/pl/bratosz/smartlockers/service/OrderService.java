@@ -26,11 +26,14 @@ public class OrderService {
     private ClothService clothesService;
     private OrderManager orderManager;
 
-    public OrderService(OrdersRepository ordersRepository, UserService userService,
-                        ArticleService articleService) {
+    public OrderService(OrdersRepository ordersRepository,
+                        UserService userService,
+                        ArticleService articleService,
+                        OrderManager orderManager) {
         this.ordersRepository = ordersRepository;
         this.userService = userService;
         this.articleService = articleService;
+        this.orderManager = orderManager;
     }
 
     public List<ClothOrder> placeMany(

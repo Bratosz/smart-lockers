@@ -28,9 +28,8 @@ public class ClothesCreator {
     public Cloth createNew(Cloth prototype, User user) {
         this.user = user;
         this.cloth = prototype;
-        ClothDestination destiny = FOR_ASSIGN;
-        determineOrdinalNumber();
-        setClothStatus(destiny);
+        setOrdinalNumber();
+        setClothStatus(FOR_ASSIGN);
         return cloth;
     }
 
@@ -39,8 +38,7 @@ public class ClothesCreator {
                                   ClothSize size,
                                   Employee employee) {
         this.cloth = new Cloth();
-        ClothDestination destiny = FOR_ASSIGN;
-        setClothStatus(destiny);
+        setClothStatus(FOR_ASSIGN);
         cloth.setActive(false);
         cloth.setCreated(new Date());
         cloth.setOrdinalNumber(ordinalNumber);
@@ -48,6 +46,12 @@ public class ClothesCreator {
         cloth.setSize(size);
         cloth.setEmployee(employee);
         return cloth;
+    }
+
+    private void setClothStatus(ClothDestination destiny) {
+        ClothStatus clothStatus =
+                clothStatusService.create(destiny, user);
+        cloth.setStatus(clothStatus);
     }
 
     public Cloth createExisting(Cloth existing, User user) {
@@ -81,15 +85,7 @@ public class ClothesCreator {
         }
     }
 
-    private void setClothStatus(ClothDestination destiny) {
-        ClothStatus status = clothStatusService.create(
-                destiny,
-                cloth,
-                user);
-        cloth.setStatus(status);
-    }
-
-    private void determineOrdinalNumber() {
+    private void setOrdinalNumber() {
         int articleNumber = cloth.getArticle().getArticleNumber();
         List<Cloth> clothes = cloth.getEmployee().getClothes();
         int ordinalNumber = resolveOrdinalNumber(clothes, articleNumber);

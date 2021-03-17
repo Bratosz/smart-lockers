@@ -6,8 +6,8 @@ public enum ClothDestination {
     FOR_ASSIGN("Do przypisania"),
     FOR_RELEASE("Do wydania"),
     FOR_WASH("Do prania"),
-    FOR_WITHDRAW_AND_DELETE("Do wycofania"),
-    FOR_WITHDRAW_AND_EXCHANGE("Do wycofania na wymianę"),
+    FOR_WITHDRAW_AND_DELETE("Do wycofania i usunięcia"),
+    FOR_WITHDRAW_AND_EXCHANGE("Do wycofania i wymiany"),
     FOR_DISPOSAL("Do utylizacji");
 
     private final String name;

@@ -22,6 +22,15 @@ public class ClothStatusService {
         this.clothesStatusRepository = clothesStatusRepository;
     }
 
+    public ClothStatus create(ClothDestination destination,
+                              User user) {
+        ClothActualStatus actualStatus =
+                resolveStatus(destination);
+        ClothStatus clothStatus =
+                new ClothStatus(actualStatus, destination, user, new Date());
+        return clothesStatusRepository.save(clothStatus);
+    }
+
     public ClothStatus create(ClothActualStatus actualStatus,
                               Cloth cloth,
                               User user) {

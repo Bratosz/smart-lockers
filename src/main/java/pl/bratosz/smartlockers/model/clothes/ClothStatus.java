@@ -40,6 +40,17 @@ public class ClothStatus {
         this.dateOfUpdate = dateOfUpdate;
     }
 
+    public ClothStatus(ClothActualStatus status,
+                       ClothDestination clothDestination,
+                       User user,
+                       Date dateOfUpdate) {
+        this.status = status;
+        this.clothDestination = clothDestination;
+        this.user = user;
+        this.dateOfUpdate = dateOfUpdate;
+    }
+
+
     public long getId() {
         return id;
     }
