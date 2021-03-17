@@ -30,8 +30,8 @@ public class ClothController {
     @JsonView(InternalForClothes.class)
     @PostMapping("/acceptance/{clientId}/{userId}/{clothBarCode}/{orderType}")
     public ResponseClothAcceptance accept(
-            @PathVariable long userId,
             @PathVariable long clientId,
+            @PathVariable long userId,
             @PathVariable long clothBarCode,
             @PathVariable OrderType orderType) {
         return clothesService.accept(clientId, userId, clothBarCode, orderType);

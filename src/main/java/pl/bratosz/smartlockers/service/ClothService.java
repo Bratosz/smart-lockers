@@ -150,17 +150,17 @@ public class ClothService {
         return cloth.equals(null) || isClothBelongsToOtherClient(cloth, clientId);
     }
 
-    private ResponseClothAcceptance acceptForExchangeForNewOne(Cloth cloth, OrderType orderType) {
-        if (orderType.equals(EMPTY)) {
+    private ResponseClothAcceptance acceptForExchangeForNewOne(Cloth cloth, OrderType actualOrderType) {
+        if (actualOrderType.equals(EMPTY)) {
             Cloth clothForExchange = acceptForExchange(cloth);
             ClothOrder clothOrder = orderService.placeOne(
                     clothForExchange,
-                    orderType,
+                    actualOrderType,
                     clothForExchange.getArticle(),
                     clothForExchange.getSize(),
                     user);
             return ResponseClothAcceptance.createNewOrderAddedAndClothAcceptedResponse(clothOrder);
-        } else if (orderType.equals(EXCHANGE_FOR_A_NEW_ONE)) {
+        } else if (actualOrderType.equals(EXCHANGE_FOR_A_NEW_ONE)) {
             ClothOrder order = acceptClothAndUpdateOrder(cloth);
             return ResponseClothAcceptance.createClothAcceptedResponse(order);
         } else {
