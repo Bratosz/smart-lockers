@@ -37,14 +37,13 @@ public class EmployeeService {
         this.userService = userService;
     }
 
-    public void loadManagerAndUser(long userId) {
-        user = userService.getUserById(userId);
-        employeeManager = new EmployeeManager(user);
+    private void loadUser(User user) {
+        this.user = user;
     }
 
-    public void loadManagerAndUser(User user) {
+    private void loadUser(long userId) {
+        User user = userService.getUserById(userId);
         this.user = user;
-        employeeManager = new EmployeeManager(user);
     }
 
     public List<Employee> getAllEmployees() {
@@ -161,7 +160,7 @@ public class EmployeeService {
         Box box = employee.getBox();
 
         if(box.getBoxStatus().equals(OCCUPY)) {
-            employee = employeeManager.dismiss(employee);
+            employee = employeeManager.dismiss(employee, user);
             return employeesRepository.save(employee);
         } else {
             return employee;

@@ -21,11 +21,12 @@ public class ScrappingController {
         this.scrapingService = scrapingService;
     }
 
-    @GetMapping("/update-clothes/{boxId}")
+    @GetMapping("/update-clothes/{boxId}/{userId}")
     @JsonView(Views.InternalForBoxes.class)
-    public Box updateEmployeeClothes(@PathVariable long boxId) throws IOException {
+    public Box updateEmployeeClothes(@PathVariable long boxId,
+                                     @PathVariable long userId) throws IOException {
         try {
-            return scrapingService.updateEmployeeClothes(boxId);
+            return scrapingService.updateEmployeeClothes(boxId, userId);
         } catch (IOException e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());

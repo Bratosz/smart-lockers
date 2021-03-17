@@ -31,6 +31,7 @@ public class ClothService {
     @Autowired
     private OrderService orderService;
     private UserService userService;
+    private OrderManager orderManager;
     private ClothStatusService clothStatusService;
     private User user;
     private Date date;
@@ -39,11 +40,12 @@ public class ClothService {
     public ClothService(ClothesRepository clothesRepository,
                         OrdersRepository ordersRepository,
                         UserService userService,
-                        ClothStatusService clothStatusService,
+                        OrderManager orderManager, ClothStatusService clothStatusService,
                         ClothesManager clothesManager) {
         this.clothesRepository = clothesRepository;
         this.ordersRepository = ordersRepository;
         this.userService = userService;
+        this.orderManager = orderManager;
         this.clothStatusService = clothStatusService;
         this.clothesManager = clothesManager;
     }
@@ -113,7 +115,11 @@ public class ClothService {
 
 
     public void updateClothes(
-            List<Cloth> currentClothes, List<Cloth> actualClothes, Employee employee) {
+            List<Cloth> currentClothes,
+            List<Cloth> actualClothes,
+            Employee employee,
+            User user) {
+        loadUserAndDate(user);
         List<Cloth> newClothes = new LinkedList<>();
         if (currentClothes.isEmpty()) {
             for (Cloth cloth : actualClothes) {
@@ -204,17 +210,17 @@ public class ClothService {
     private Cloth acceptForExchange(Cloth cloth) {
         ClothStatus actualStatus = clothStatusService.create(ACCEPTED_FOR_EXCHANGE, cloth, user);
         cloth = clothesManager.updateCloth(actualStatus, cloth);
-        if(cloth.getClothOrder() != null) cloth = clothesManager.updateOrder(cloth);
+        if(cloth.getClothOrder() != null) cloth =
+                clothesManager.updateOrder(cloth, user);
         return clothesRepository.save(cloth);
     }
 
     private ClothOrder setOrderReadyForRealization(Cloth cloth, User user) {
         ClothOrder order = null;
-        OrderManager orderManager = new OrderManager(user);
         try {
             order = getOrderFromCloth(cloth);
             order = orderManager.update(
-                    OrderStatus.OrderStage.READY_FOR_REALIZATION, order);
+                    OrderStatus.OrderStage.READY_FOR_REALIZATION, order, user);
             ordersRepository.save(order);
         } catch (ClothOrderException e) {
             e.printStackTrace();

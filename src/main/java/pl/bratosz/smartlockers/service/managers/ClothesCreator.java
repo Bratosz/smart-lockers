@@ -10,21 +10,23 @@ import pl.bratosz.smartlockers.service.ClothStatusService;
 import java.util.Date;
 import java.util.List;
 
-import static pl.bratosz.smartlockers.model.clothes.ClothActualStatus.*;
 import static pl.bratosz.smartlockers.model.clothes.ClothDestination.*;
 import static pl.bratosz.smartlockers.model.orders.OrderType.*;
 
 @Service
 public class ClothesCreator {
     private ClothStatusService clothStatusService;
+    private OrderManager orderManager;
     private Cloth cloth;
     private User user;
 
-    public ClothesCreator(ClothStatusService clothStatusService) {
+    public ClothesCreator(ClothStatusService clothStatusService, OrderManager orderManager) {
         this.clothStatusService = clothStatusService;
+        this.orderManager = orderManager;
     }
 
-    public Cloth createNew(Cloth prototype) {
+    public Cloth createNew(Cloth prototype, User user) {
+        this.user = user;
         this.cloth = prototype;
         ClothDestination destiny = FOR_ASSIGN;
         determineOrdinalNumber();
@@ -49,9 +51,10 @@ public class ClothesCreator {
     }
 
     public Cloth createExisting(Cloth existing, User user) {
+        this.user = user;
         this.cloth = existing;
         ClothDestination destiny = determineClothDestination();
-        setClothStatus(destiny, user);
+        setClothStatus(destiny);
         setClothOrder(destiny);
         return cloth;
     }
@@ -65,21 +68,20 @@ public class ClothesCreator {
     }
 
     private void setClothOrder(ClothDestination destiny) {
-        OrderManager orderManager = new OrderManager(user, date);
         ClothOrder clothOrder;
         switch (destiny) {
             case FOR_RELEASE:
-                clothOrder = orderManager.createForExistingCloth(RELEASE, cloth);
+                clothOrder = orderManager.createForExistingCloth(RELEASE, cloth, user);
                 cloth.setClothOrder(clothOrder);
                 break;
             case FOR_WASH:
-                clothOrder = orderManager.createForExistingCloth(EMPTY, cloth);
+                clothOrder = orderManager.createForExistingCloth(EMPTY, cloth, user);
                 cloth.setClothOrder(clothOrder);
                 break;
         }
     }
 
-    private void setClothStatus(ClothDestination destiny, User user) {
+    private void setClothStatus(ClothDestination destiny) {
         ClothStatus status = clothStatusService.create(
                 destiny,
                 cloth,

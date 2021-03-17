@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
+import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.scraping.Scrapper;
 import pl.bratosz.smartlockers.utils.Utils;
 
@@ -18,25 +19,37 @@ public class ScrapingService {
     private EmployeeService employeeService;
     private ClothService clothService;
     private PlantService plantService;
+    private UserService userService;
     private Scrapper scrapper;
     private List<Cloth> currentClothes;
     private LockersLoadReport lockersLoadReport;
+    private User user;
 
     public ScrapingService(LockerService lockerService,
                            BoxService boxService,
                            EmployeeService employeeService,
                            ClothService clothService,
-                           PlantService plantService, Scrapper scrapper
+                           PlantService plantService, UserService userService, Scrapper scrapper
     ) {
         this.lockerService = lockerService;
         this.boxService = boxService;
         this.employeeService = employeeService;
         this.clothService = clothService;
         this.plantService = plantService;
+        this.userService = userService;
         this.scrapper = scrapper;
     }
 
-    public Box updateEmployeeClothes(long boxId) throws IOException {
+    private void loadUser(long userId) {
+        User user = userService.getUserById(userId);
+        this.user = user;
+
+    }
+
+    public Box updateEmployeeClothes(
+            long boxId,
+            long userId) throws IOException {
+        loadUser(userId);
         Box box = boxService.getBoxById(boxId);
         Plant plant = box.getLocker().getPlant();
         Employee employee = (Employee) box.getEmployee();
@@ -47,12 +60,12 @@ public class ScrapingService {
         if (employee.getLastName().equals(
                 scrapper.getEmployeeLastName())) {
             List<Cloth> actualClothes = scrapper.getClothes();
-            clothService.updateClothes(currentClothes, actualClothes, employee);
+            clothService.updateClothes(currentClothes, actualClothes, employee, user);
             return box;
         } else if (employee.getFirstName().toUpperCase().equals(
                 scrapper.getEmployeeFirstName().toUpperCase())) {
             List<Cloth> actualClothes = scrapper.getClothes();
-            clothService.updateClothes(currentClothes, actualClothes, employee);
+            clothService.updateClothes(currentClothes, actualClothes, employee, user);
             return boxService.getBoxById(boxId);
         } else {
             throw new IOException("Last names are different!");

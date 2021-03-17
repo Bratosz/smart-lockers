@@ -12,21 +12,17 @@ import java.util.*;
 @Service
 public class ClothesManager {
     private ClothStatusService clothStatusService;
+    private OrderManager orderManager;
     private ClothesCreator creator;
-    private User user;
-    private Date date;
     private Set<Cloth> clothes;
     private Cloth cloth;
 
     public ClothesManager(ClothStatusService clothStatusService,
-                          ClothesCreator creator) {
+                          ClothesCreator creator,
+                          OrderManager orderManager) {
         this.clothStatusService = clothStatusService;
         this.creator = creator;
-    }
-
-    public void loadUserAndDate(User user, Date date) {
-        this.user = user;
-        this.date = date;
+        this.orderManager = orderManager;
     }
 
     public Cloth createNewInstead(int ordinalNumber,
@@ -36,7 +32,7 @@ public class ClothesManager {
         return creator.createNewInstead(ordinalNumber, article, size, employee);
     }
 
-    public Cloth createNew(Article article, ClothSize size, Employee employee) {
+    public Cloth createNew(Article article, ClothSize size, Employee employee, User user) {
         Cloth prototype = new Cloth(
                 article,
                 size,
@@ -45,9 +41,14 @@ public class ClothesManager {
         return creator.createNew(prototype, user);
     }
 
-    public Cloth createExisting(long barCode, Date assignment, Date lastWashing,
-                                Date release, int ordinalNo, Article article,
-                                ClothSize size) {
+    public Cloth createExisting(long barCode,
+                                Date assignment,
+                                Date lastWashing,
+                                Date release,
+                                int ordinalNo,
+                                Article article,
+                                ClothSize size,
+                                User user) {
         cloth = new Cloth();
         cloth.setBarCode(barCode);
         cloth.setAssignment(assignment);
@@ -60,7 +61,9 @@ public class ClothesManager {
 
     }
 
-    public List<Cloth> set(ClothDestination destiny, List<Cloth> clothes) {
+    public List<Cloth> set(ClothDestination destiny,
+                           List<Cloth> clothes,
+                           User user) {
         List<Cloth> updatedClothes = new LinkedList<>();
         for(Cloth cloth : clothes) {
             ClothStatus clothStatus = clothStatusService.create(destiny, cloth, user);
@@ -75,13 +78,12 @@ public class ClothesManager {
         return clothToUpdate;
     }
 
-    private void updateClothOrdersForWithdraw() {
-        OrderManager orderManager = new OrderManager(user);
+    private void updateClothOrdersForWithdraw(User user) {
         ClothOrder order;
         for(Cloth c : clothes) {
             if(c.getClothOrder().isActive()) {
                 order = c.getClothOrder();
-                order = orderManager.cancel(order);
+                order = orderManager.cancel(order, user);
                 //c.getClothOrder - czy zwraca zmienione zamówienie czy potrzebne jest ponowne przypisanie
                 //zamówienia do ubrania?
                 System.out.println("something");
@@ -90,11 +92,10 @@ public class ClothesManager {
         }
     }
 
-    public Cloth updateOrder(Cloth cloth) {
+    public Cloth updateOrder(Cloth cloth, User user) {
         ClothOrder order = cloth.getClothOrder();
         ClothActualStatus actualStatus = cloth.getClothStatus().getStatus();
-        OrderManager orderManager = new OrderManager(user);
-        order = orderManager.update(order, actualStatus);
+        order = orderManager.update(order, actualStatus, user);
         cloth.setClothOrder(order);
         return cloth;
     }

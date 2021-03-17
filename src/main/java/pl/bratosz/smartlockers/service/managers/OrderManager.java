@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.service.managers;
 
+import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothActualStatus;
 import pl.bratosz.smartlockers.model.orders.*;
@@ -8,6 +9,7 @@ import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteOrderPar
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForExchangeAndRelease;
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForRelease;
 import pl.bratosz.smartlockers.model.users.User;
+import pl.bratosz.smartlockers.service.OrderStatusService;
 import pl.bratosz.smartlockers.service.managers.creators.OrderCreator;
 
 import java.util.Date;
@@ -16,55 +18,48 @@ import java.util.function.Consumer;
 
 import static pl.bratosz.smartlockers.model.orders.OrderStatus.OrderStage.*;
 
+@Service
 public class OrderManager  {
-    private User user;
-    private Date date;
+    private OrderStatusService orderStatusService;
 
-    public OrderManager(User user) {
-        this.user = user;
-        this.date = new Date();
+    public OrderManager(OrderStatusService orderStatusService) {
+        this.orderStatusService = orderStatusService;
     }
 
-    public OrderManager(User user, Date date) {
-        this.user = user;
-        this.date = date;
+    public ClothOrder createOne(CompleteForRelease parameters, User user) {
+        return OrderCreator.create(parameters, user);
     }
 
-    public ClothOrder createOne(CompleteForRelease parameters) {
-        return OrderCreator.create(parameters, user, date);
-    }
-
-    public ClothOrder createOne(CompleteForExchangeAndRelease parameters) {
-        return OrderCreator.createWithExchange(parameters, user, date);
+    public ClothOrder createOne(CompleteForExchangeAndRelease parameters, User user) {
+        return OrderCreator.createWithExchange(parameters, user);
     }
 
     public ClothOrder createForExistingCloth(
             OrderType orderType,
-            Cloth cloth
-            ) {
+            Cloth cloth,
+            User user) {
         CompleteForRelease parameters = CompleteOrderParameters.createForExistingCloth(
                 cloth,
                 orderType,
                 user);
-        return create(parameters);
+        return create(parameters, user);
     }
 
     private ClothOrder create(
-            CompleteForRelease parameters
+            CompleteForRelease parameters,
+            User user
     ) {
         ClothOrder order = new ClothOrder();
         order.setOrderType(parameters.getOrderType());
         order.setClothToRelease(parameters.getClothToRelease());
-
-        OrderStatus status = new OrderStatus(parameters.getOrderStage(), user, date);
+        OrderStatus status = orderStatusService.create(parameters.getOrderStage(), order, user);
         order.setOrderStatus(status);
-
         return order;
     }
 
 
-    public ClothOrder update(OrderStage orderStage, ClothOrder order) {
-        OrderStatus status = new OrderStatus(orderStage, user, date);
+    public ClothOrder update(OrderStage orderStage, ClothOrder order, User user) {
+        OrderStatus status = orderStatusService.create(orderStage, order, user);
         switch (orderStage) {
             case CANCELLED:
             case DECLINED_BY_CLIENT:
@@ -79,59 +74,47 @@ public class OrderManager  {
         return order;
     }
 
-    public List<ClothOrder> update(OrderStage orderStage, List<ClothOrder> clothOrders) {
-        Consumer<ClothOrder> changeStatus = order -> update(orderStage, order);
+    public List<ClothOrder> update(OrderStage orderStage, List<ClothOrder> clothOrders, User user) {
+        Consumer<ClothOrder> changeStatus = order -> update(orderStage, order, user);
         clothOrders.stream().forEach(changeStatus);
         return clothOrders;
     }
 
-    public List<ClothOrder> perform(ActionType actionType, List<ClothOrder> clothOrders) {
+    public List<ClothOrder> perform(ActionType actionType, List<ClothOrder> clothOrders, User user) {
         switch (actionType) {
             case ACCEPT:
                 OrderStage accepted = PENDING_FOR_ASSIGNMENT;
-                return update(accepted, clothOrders);
+                return update(accepted, clothOrders, user);
             case CANCEL:
                 OrderStage cancelled = CANCELLED;
-                return update(cancelled, clothOrders);
+                return update(cancelled, clothOrders, user);
             default:
                 return clothOrders;
         }
     }
 
-    public ClothOrder cancel(ClothOrder order) {
-        return update(CANCELLED, order);
+    public ClothOrder cancel(ClothOrder order, User user) {
+        return update(CANCELLED, order, user);
     }
 
 
-    public ClothOrder update(ClothOrder order, ClothActualStatus clothStatus) {
+    public ClothOrder update(ClothOrder order, ClothActualStatus clothStatus, User user) {
         if(order == null) {
 
         }
         OrderStatus orderStatus = null;
         switch (clothStatus) {
             case ORDERED:
-                break;
             case ASSIGNED:
-                break;
             case IN_PREPARATION:
-                break;
             case RELEASED:
-                break;
-            case ACCEPTED_FOR_EXCHANGE:
-                orderStatus = createActualStatus(READY_FOR_REALIZATION);
-                break;
             case EXCHANGED:
-                break;
             case WITHDRAWN:
                 break;
+            case ACCEPTED_FOR_EXCHANGE:
+                order = update(READY_FOR_REALIZATION, order, user);
+                break;
         }
-        order.setOrderStatus(orderStatus);
         return order;
     }
-
-    private OrderStatus createActualStatus(OrderStage stage) {
-        return new OrderStatus(stage, user, date);
-    }
-
-
 }

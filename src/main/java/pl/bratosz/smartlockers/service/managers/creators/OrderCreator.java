@@ -17,8 +17,8 @@ public class OrderCreator {
     }
 
     public static ClothOrder create(
-            CompleteForRelease params, User user, Date date) {
-        return builder(user, date)
+            CompleteForRelease params, User user) {
+        return builder(user, new Date())
                 .orderStatus(params.getOrderStage())
                 .orderType(params.getOrderType())
                 .aNewCloth(params.getClothToRelease())
@@ -26,8 +26,8 @@ public class OrderCreator {
     }
 
     public static ClothOrder createWithExchange(
-            CompleteForExchangeAndRelease params, User user, Date date) {
-        return builder(user, date)
+            CompleteForExchangeAndRelease params, User user) {
+        return builder(user, new Date())
                 .orderStatus(params.getOrderStage())
                 .orderType(params.getOrderType())
                 .replacingCloth(params.getClothToRelease())
