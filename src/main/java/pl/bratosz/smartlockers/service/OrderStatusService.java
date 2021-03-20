@@ -16,10 +16,9 @@ public class OrderStatusService {
         this.ordersStatusRepository = ordersStatusRepository;
     }
 
-    public OrderStatus create(OrderStatus.OrderStage orderStage, ClothOrder order, User user) {
+    public OrderStatus create(OrderStatus.OrderStage orderStage, User user) {
         OrderStatus status = new OrderStatus();
         status.setActualStage(orderStage);
-        status.setClothOrder(order);
         status.setUser(user);
         status.setDateOfUpdate(new Date());
         return ordersStatusRepository.save(status);

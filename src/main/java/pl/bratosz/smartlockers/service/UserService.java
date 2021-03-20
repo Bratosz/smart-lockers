@@ -33,4 +33,12 @@ public class UserService {
         return usersOurStaffRepository.getById(id);
     }
 
+    public User getDefaultUser() {
+        User defaultUser = usersRepository.getUserByFirstName("default");
+        if (defaultUser == null) {
+            return create("default", "user");
+        } else {
+            return defaultUser;
+        }
+    }
 }

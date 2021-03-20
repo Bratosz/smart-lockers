@@ -9,10 +9,10 @@ import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteOrderPar
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForExchangeAndRelease;
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForRelease;
 import pl.bratosz.smartlockers.model.users.User;
+import pl.bratosz.smartlockers.repository.OrdersRepository;
 import pl.bratosz.smartlockers.service.OrderStatusService;
 import pl.bratosz.smartlockers.service.managers.creators.OrderCreator;
 
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -21,9 +21,11 @@ import static pl.bratosz.smartlockers.model.orders.OrderStatus.OrderStage.*;
 @Service
 public class OrderManager  {
     private OrderStatusService orderStatusService;
+    private OrdersRepository ordersRepository;
 
-    public OrderManager(OrderStatusService orderStatusService) {
+    public OrderManager(OrderStatusService orderStatusService, OrdersRepository ordersRepository) {
         this.orderStatusService = orderStatusService;
+        this.ordersRepository = ordersRepository;
     }
 
     public ClothOrder createOne(CompleteForRelease parameters, User user) {
@@ -52,14 +54,14 @@ public class OrderManager  {
         ClothOrder order = new ClothOrder();
         order.setOrderType(parameters.getOrderType());
         order.setClothToRelease(parameters.getClothToRelease());
-        OrderStatus status = orderStatusService.create(parameters.getOrderStage(), order, user);
+        OrderStatus status = orderStatusService.create(parameters.getOrderStage(), user);
         order.setOrderStatus(status);
-        return order;
+        return ordersRepository.save(order);
     }
 
 
     public ClothOrder update(OrderStage orderStage, ClothOrder order, User user) {
-        OrderStatus status = orderStatusService.create(orderStage, order, user);
+        OrderStatus status = orderStatusService.create(orderStage, user);
         switch (orderStage) {
             case CANCELLED:
             case DECLINED_BY_CLIENT:

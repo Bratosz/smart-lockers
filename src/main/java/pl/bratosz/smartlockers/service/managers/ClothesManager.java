@@ -41,6 +41,10 @@ public class ClothesManager {
         return creator.createNew(prototype, user);
     }
 
+    public Cloth createExisting(Cloth cloth, User user) {
+        return creator.createExisting(cloth, user);
+    }
+
     public Cloth createExisting(long barCode,
                                 Date assignment,
                                 Date lastWashing,
@@ -57,8 +61,7 @@ public class ClothesManager {
         cloth.setOrdinalNumber(ordinalNo);
         cloth.setArticle(article);
         cloth.setSize(size);
-        return creator.createExisting(cloth, user);
-
+        return createExisting(cloth, user);
     }
 
     public List<Cloth> set(ClothDestination destiny,
@@ -81,22 +84,22 @@ public class ClothesManager {
     private void updateClothOrdersForWithdraw(User user) {
         ClothOrder order;
         for(Cloth c : clothes) {
-            if(c.getClothOrder().isActive()) {
-                order = c.getClothOrder();
+            if(c.getExchangeOrder().isActive()) {
+                order = c.getExchangeOrder();
                 order = orderManager.cancel(order, user);
-                //c.getClothOrder - czy zwraca zmienione zamówienie czy potrzebne jest ponowne przypisanie
+                //c.getExchangeOrder - czy zwraca zmienione zamówienie czy potrzebne jest ponowne przypisanie
                 //zamówienia do ubrania?
                 System.out.println("something");
-                c.setClothOrder(order);
+                c.setExchangeOrder(order);
             }
         }
     }
 
     public Cloth updateOrder(Cloth cloth, User user) {
-        ClothOrder order = cloth.getClothOrder();
-        ClothActualStatus actualStatus = cloth.getClothStatus().getStatus();
+        ClothOrder order = cloth.getExchangeOrder();
+        ClothActualStatus actualStatus = cloth.getClothStatus().getActualStatus();
         order = orderManager.update(order, actualStatus, user);
-        cloth.setClothOrder(order);
+        cloth.setExchangeOrder(order);
         return cloth;
     }
 }

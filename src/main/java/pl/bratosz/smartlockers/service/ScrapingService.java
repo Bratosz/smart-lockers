@@ -43,7 +43,6 @@ public class ScrapingService {
     private void loadUser(long userId) {
         User user = userService.getUserById(userId);
         this.user = user;
-
     }
 
     public Box updateEmployeeClothes(
@@ -122,7 +121,8 @@ public class ScrapingService {
 
         scrapper.clickViewButton(rowIndex);
         List<Cloth> clothes = scrapper.getClothes();
-
+        User user = userService.getDefaultUser();
+        clothes = clothService.createExisting(clothes, user);
         employeeService.createEmployee(
                 clothes, departmentName, box, firstName, lastName);
     }
@@ -135,26 +135,27 @@ public class ScrapingService {
         scrapper.find(box);
         scrapper.clickViewButton();
 
+        List<Cloth> clothes = scrapper.getClothes();
+        User user = userService.getDefaultUser();
+        clothes = clothService.createExisting(clothes, user);
+
         String firstName = scrapper.getEmployeeFirstName();
         String lastName = scrapper.getEmployeeLastName();
         String departmentName = scrapper.getDepartmentName();
-        List<Cloth> clothes = scrapper.getClothes();
-
         employeeService.createEmployee(
                 clothes, departmentName, box, firstName, lastName);
         return boxService.getBoxById(box.getId());
     }
 
-    public LockersLoadReport loadPlantBoxByBox(long id) {
-        Plant plant = plantService.getById(id);
+    public LockersLoadReport loadPlantBoxByBox(long plantId) {
+        Plant plant = plantService.getById(plantId);
         lockersLoadReport = new LockersLoadReport(plant.getPlantNumber());
 
         scrapper.createConnection(plant);
 
         Set<Locker> lockers = plant.getLockers();
-        lockers.stream().forEach(l -> {
-            loadLocker(l);
-        });
+        lockers.stream().forEach(
+                l -> loadLocker(l));
         return lockersLoadReport;
     }
 }

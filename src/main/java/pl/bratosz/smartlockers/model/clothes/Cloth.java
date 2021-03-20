@@ -31,7 +31,11 @@ public class Cloth {
 
     @JsonView(Views.InternalForClothes.class)
     @OneToOne(mappedBy = "clothToExchange", cascade = CascadeType.ALL)
-    private ClothOrder clothOrder;
+    private ClothOrder exchangeOrder;
+
+    @JsonView(Views.InternalForClothes.class)
+    @OneToOne(mappedBy = "clothToRelease", cascade = CascadeType.ALL)
+    private ClothOrder releaseOrder;
 
     @JsonView(Views.InternalForClothes.class)
     @ManyToOne(cascade = CascadeType.ALL)
@@ -145,12 +149,13 @@ public class Cloth {
         this.article = article;
     }
 
-    public ClothOrder getClothOrder() {
-        return clothOrder;
+    public ClothOrder getExchangeOrder() {
+        return exchangeOrder;
     }
 
-    public void setClothOrder(ClothOrder clothOrder) {
-        this.clothOrder = clothOrder;
+    public void setExchangeOrder(ClothOrder exchangeOrder) {
+        exchangeOrder.setClothToRelease(this);
+        this.exchangeOrder = exchangeOrder;
     }
 
     public Employee getEmployee() {

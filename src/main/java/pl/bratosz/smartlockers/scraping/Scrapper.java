@@ -3,6 +3,7 @@ package pl.bratosz.smartlockers.scraping;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.date.FormatDate;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Locker;
@@ -17,7 +18,7 @@ import pl.bratosz.smartlockers.strings.MyString;
 import java.io.IOException;
 import java.util.*;
 
-@Component
+@Service
 public class Scrapper {
     private ArticleService articleService;
     private OnlineConnection connection;

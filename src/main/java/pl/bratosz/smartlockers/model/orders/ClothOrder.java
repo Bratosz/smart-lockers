@@ -7,6 +7,7 @@ import pl.bratosz.smartlockers.model.clothes.ClothSize;
 import pl.bratosz.smartlockers.model.Views;
 
 import javax.persistence.*;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -101,6 +102,8 @@ public class ClothOrder implements OrderForRelease, OrderForExchangeAndRelease {
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
+        orderStatus.setClothOrder(this);
+        if(orderStatusHistory == null) orderStatusHistory = new LinkedList<>();
         orderStatusHistory.add(orderStatus);
     }
 

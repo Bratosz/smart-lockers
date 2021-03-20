@@ -3,7 +3,6 @@ package pl.bratosz.smartlockers.service.managers;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.*;
-import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.service.ClothStatusService;
 
@@ -28,17 +27,19 @@ public class ClothesCreator {
     public Cloth createNew(Cloth prototype, User user) {
         this.user = user;
         this.cloth = prototype;
-        setOrdinalNumber();
         setClothStatus(FOR_ASSIGN);
+        setOrdinalNumber();
         return cloth;
+
     }
 
     public Cloth createNewInstead(int ordinalNumber,
                                   Article article,
                                   ClothSize size,
                                   Employee employee) {
+        ClothStatus clothStatus = clothStatusService.create(FOR_ASSIGN, user);
         this.cloth = new Cloth();
-        setClothStatus(FOR_ASSIGN);
+        cloth.setStatus(clothStatus);
         cloth.setActive(false);
         cloth.setCreated(new Date());
         cloth.setOrdinalNumber(ordinalNumber);
@@ -48,9 +49,8 @@ public class ClothesCreator {
         return cloth;
     }
 
-    private void setClothStatus(ClothDestination destiny) {
-        ClothStatus clothStatus =
-                clothStatusService.create(destiny, user);
+    private void setClothStatus (ClothDestination destiny) {
+        ClothStatus clothStatus = clothStatusService.create(destiny, user);
         cloth.setStatus(clothStatus);
     }
 
@@ -72,15 +72,12 @@ public class ClothesCreator {
     }
 
     private void setClothOrder(ClothDestination destiny) {
-        ClothOrder clothOrder;
         switch (destiny) {
             case FOR_RELEASE:
-                clothOrder = orderManager.createForExistingCloth(RELEASE, cloth, user);
-                cloth.setClothOrder(clothOrder);
+                orderManager.createForExistingCloth(RELEASE, cloth, user);
                 break;
             case FOR_WASH:
-                clothOrder = orderManager.createForExistingCloth(EMPTY, cloth, user);
-                cloth.setClothOrder(clothOrder);
+                orderManager.createForExistingCloth(EMPTY, cloth, user);
                 break;
         }
     }

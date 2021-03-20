@@ -24,17 +24,19 @@ public class EmployeeService {
     private PlantService plantService;
     private DepartmentService departmentService;
     private UserService userService;
+    private ClothService clothService;
     private User user;
     private EmployeeManager employeeManager;
 
     public EmployeeService(EmployeesRepository employeesRepository, EmployeeGeneralRepository employeeGeneralRepository, BoxService boxesService,
-                           PlantService plantService, DepartmentService departmentService, UserService userService) {
+                           PlantService plantService, DepartmentService departmentService, UserService userService, ClothService clothService) {
         this.employeesRepository = employeesRepository;
         this.employeeGeneralRepository = employeeGeneralRepository;
         this.boxService = boxesService;
         this.plantService = plantService;
         this.departmentService = departmentService;
         this.userService = userService;
+        this.clothService = clothService;
     }
 
     private void loadUser(User user) {

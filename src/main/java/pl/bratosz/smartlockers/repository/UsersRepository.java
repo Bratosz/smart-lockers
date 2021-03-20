@@ -7,4 +7,6 @@ import pl.bratosz.smartlockers.model.users.User;
 @Repository
 public interface UsersRepository extends JpaRepository <User, Long> {
     User getById(long id);
+
+    User getUserByFirstName(String firstName);
 }

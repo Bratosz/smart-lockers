@@ -1,13 +1,18 @@
 package pl.bratosz.smartlockers.response;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothAcceptanceType;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.orders.OrderType;
 
 public class ResponseClothAcceptance {
+    @JsonView(Views.Public.class)
     private boolean isFound;
+    @JsonView(Views.Public.class)
     private boolean isAccepted;
+    @JsonView(Views.Public.class)
     private String message;
 
     private ResponseClothAcceptance(String message){
@@ -65,6 +70,13 @@ public class ResponseClothAcceptance {
     public static ResponseClothAcceptance wrongOrderTypeResponse(OrderType orderType) {
         ResponseClothAcceptance response = new ResponseClothAcceptance("Niewłaściwy typ zamówienia \n"
         + orderType.getName());
+        return response;
+    }
+
+    public static ResponseClothAcceptance createClothAlreadyReturned(Cloth cloth) {
+        ResponseClothAcceptance response = new ResponseClothAcceptance("Ubranie zostało już przyjęte do wymiany: " +
+                "Rodzaj zamówienia: " + cloth.getExchangeOrder().getOrderType().getName() +
+                "Status: " + cloth.getClothStatus().getActualStatus().getName() + " " + cloth.getClothStatus().getDateOfUpdate());
         return response;
     }
 

@@ -91,7 +91,7 @@ public class ClothStatus {
         this.cloth = cloth;
     }
 
-    public ClothActualStatus getStatus() {
+    public ClothActualStatus getActualStatus() {
         return status;
     }
 
