@@ -1,12 +1,14 @@
 const url = new URL(window.location.href);
 const boxId = url.searchParams.get("id");
 let lockerNumber,
-boxNumber,
-lastName,
-firstName,
-employeeId,
-employee,
-boxStatus;
+    boxNumber,
+    lastName,
+    firstName,
+    employeeId,
+    employee,
+    clothes,
+    clothOrders,
+    boxStatus;
 const userId = 1;
 
 reloadBox();
@@ -100,6 +102,12 @@ function updateClothes() {
 }
 
 function reloadBox() {
+    function extractActiveClothes(clothes) {
+        for(let cloth of clothes) {
+            cloth.
+        }
+    }
+
     $.ajax({
         url: `http://localhost:8080/boxes/${boxId}`,
         method: "get",
@@ -108,6 +116,8 @@ function reloadBox() {
             boxNumber = box.boxNumber;
             boxStatus = box.boxStatus;
             employee = box.employee;
+            clothes = employee.clothes;
+            clothOrders = employee.clothOrders;
             lastName = employee.lastName;
             firstName = employee.firstName;
             employeeId = employee.id;
@@ -116,24 +126,27 @@ function reloadBox() {
 
             $("#employee").text(lockerNumber + "/" + boxNumber
                 + " " + lastName + " " + firstName);
+            let activeClothes, acceptedClothes;
 
-            displayClothes(box.employee.clothes);
-            console.log(employee.acceptedClothes);
-            displayAcceptedClothes(employee.acceptedClothes);
-            displayOrders(employee.clothOrders);
+            extractActiveClothes(clothes);
+            extractAcceptedClothes(clothes);
+
+            displayClothes(activeClothes);
+            displayAcceptedClothes(acceptedClothes);
+            displayOrders(clothOrders);
         }
     })
 }
 
 function loadEmployee() {
-        $.ajax({
-            url: `http://localhost:8080/scrap/load-employee/${boxId}`,
-            method: "get",
-            success: function (box) {
-                console.log(box);
-                location.reload();
-            }
-        })
+    $.ajax({
+        url: `http://localhost:8080/scrap/load-employee/${boxId}`,
+        method: "get",
+        success: function (box) {
+            console.log(box);
+            location.reload();
+        }
+    })
 };
 
 function displayClothes(clothes) {
@@ -165,9 +178,11 @@ function displayClothes(clothes) {
     }
 }
 
-function displayAcceptedClothes(acceptedClothes) {
+function displayAcceptedClothes(clothes) {
     $("#table-of-accepted-clothes-body > tr:not(#row-template-accepted-clothes)").remove();
     let $rowTemplate = $("#row-template-accepted-clothes");
+    let acceptedClothes;
+    extractAcceptedClothes(clothes);
     if (acceptedClothes !== undefined) {
         acceptedClothes.sort(function (a, b) {
             return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
@@ -185,6 +200,12 @@ function displayAcceptedClothes(acceptedClothes) {
             $row.find(".cell-id-bar-code").text(cloth.id);
             $row.find(".cell-accepted-for-exchange-date").text(acceptedDate);
             $("#table-of-accepted-clothes-body").append($row);
+        }
+    }
+
+    function extractAcceptedClothes(clothes) {
+        for (let i = 0; i < clothes.size(); i++) {
+
         }
     }
 }

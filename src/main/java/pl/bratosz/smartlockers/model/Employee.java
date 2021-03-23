@@ -2,8 +2,10 @@ package pl.bratosz.smartlockers.model;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.RotationalCloth;
+import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.users.UserEmployee;
 
 import javax.persistence.*;
@@ -16,6 +18,11 @@ public class Employee extends EmployeeGeneral {
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Cloth> clothes;
+
+    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private List<ClothOrder> clothOrders;
+
 
     @JsonView(Views.Public.class)
     @OneToMany(mappedBy = "rotationTemporaryOwner", cascade = CascadeType.ALL)
@@ -124,5 +131,13 @@ public class Employee extends EmployeeGeneral {
     public String toString() {
         return box.getLocker().getLockerNumber() + "/" + box.getBoxNumber() + " " +
                 lastName + " " + firstName;
+    }
+
+    public List<ClothOrder> getClothOrders() {
+        return clothOrders;
+    }
+
+    public void setClothOrders(List<ClothOrder> clothOrders) {
+        this.clothOrders = clothOrders;
     }
 }
