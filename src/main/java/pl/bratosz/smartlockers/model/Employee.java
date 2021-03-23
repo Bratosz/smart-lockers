@@ -2,7 +2,6 @@ package pl.bratosz.smartlockers.model;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
-import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.RotationalCloth;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
@@ -22,7 +21,6 @@ public class Employee extends EmployeeGeneral {
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<ClothOrder> clothOrders;
-
 
     @JsonView(Views.Public.class)
     @OneToMany(mappedBy = "rotationTemporaryOwner", cascade = CascadeType.ALL)

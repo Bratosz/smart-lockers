@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.model.orders;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
@@ -25,6 +26,10 @@ public class ClothOrder implements OrderForRelease, OrderForExchangeAndRelease {
     @JsonView(Views.Public.class)
     @OneToOne
     private Cloth clothToRelease;
+
+    @JsonView(Views.InternalForClothOrders.class)
+    @ManyToOne
+    private Employee employee;
 
     @JsonView(Views.Public.class)
     @OneToMany(mappedBy = "clothOrder")
@@ -117,5 +122,13 @@ public class ClothOrder implements OrderForRelease, OrderForExchangeAndRelease {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 }

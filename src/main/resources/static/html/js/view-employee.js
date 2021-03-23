@@ -12,7 +12,6 @@ let lockerNumber,
 const userId = 1;
 
 reloadBox();
-loadDepartments();
 
 $("#button-load-employee").click(function () {
     loadEmployee();
@@ -102,12 +101,6 @@ function updateClothes() {
 }
 
 function reloadBox() {
-    function extractActiveClothes(clothes) {
-        for(let cloth of clothes) {
-            cloth.
-        }
-    }
-
     $.ajax({
         url: `http://localhost:8080/boxes/${boxId}`,
         method: "get",
@@ -128,11 +121,11 @@ function reloadBox() {
                 + " " + lastName + " " + firstName);
             let activeClothes, acceptedClothes;
 
-            extractActiveClothes(clothes);
-            extractAcceptedClothes(clothes);
+            let inRotation = extractClothes("IN_ROTATION", clothes);
+            let accepted = extractClothes("ACCEPTED", clothes);
 
-            displayClothes(activeClothes);
-            displayAcceptedClothes(acceptedClothes);
+            displayClothes(inRotation);
+            displayAcceptedClothes(accepted);
             displayOrders(clothOrders);
         }
     })

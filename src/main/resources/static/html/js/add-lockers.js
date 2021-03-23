@@ -1,5 +1,3 @@
-
-
 loadPlants(clientId);
 loadDepartments(clientId);
 loadLocations(clientId);

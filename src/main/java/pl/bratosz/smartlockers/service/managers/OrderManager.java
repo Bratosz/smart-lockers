@@ -111,7 +111,7 @@ public class OrderManager  {
             case IN_PREPARATION:
             case RELEASED:
             case EXCHANGED:
-            case WITHDRAWN:
+            case ACCEPTED_AND_WITHDRAWN:
                 break;
             case ACCEPTED_FOR_EXCHANGE:
                 order = update(READY_FOR_REALIZATION, order, user);

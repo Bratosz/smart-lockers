@@ -68,7 +68,7 @@ public class ClothStatusService {
                 destination = FOR_WITHDRAW_AND_EXCHANGE;
                 break;
             case EXCHANGED:
-            case WITHDRAWN:
+            case ACCEPTED_AND_WITHDRAWN:
                 destination = FOR_DISPOSAL;
                 break;
         }
@@ -94,7 +94,7 @@ public class ClothStatusService {
                 status = RELEASED;
                 break;
             case FOR_DISPOSAL:
-                status = WITHDRAWN;
+                status = ACCEPTED_AND_WITHDRAWN;
                 break;
         }
         return status;

@@ -1,31 +1,34 @@
 package pl.bratosz.smartlockers.model.clothes;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import pl.bratosz.smartlockers.serializers.ClothActualStatusSerializer;
 
+import static pl.bratosz.smartlockers.model.clothes.LifeCycleStatus.*;
+
+@JsonSerialize(using = ClothActualStatusSerializer.class)
 public enum ClothActualStatus {
-    ORDERED("Zamówione", false),
-    ASSIGNED("Przypisane", false),
-    PENDING_FOR_SUPPLY("Oczekuje na dostawę", false),
-    IN_PREPARATION("W przygotowaniu", false),
-    RELEASED("Wydane", true),
-    ACCEPTED_FOR_EXCHANGE("Przyjęte do wymiany", true),
-    EXCHANGED("Wymienione", false),
-    WITHDRAWN("Wycofane", false);
+    ORDERED("Zamówione", BEFORE_RELEASE),
+    ASSIGNED("Przypisane", BEFORE_RELEASE),
+    PENDING_FOR_SUPPLY("Oczekuje na dostawę",BEFORE_RELEASE),
+    IN_PREPARATION("W przygotowaniu", BEFORE_RELEASE),
+    RELEASED("Wydane", IN_ROTATION),
+    ACCEPTED_FOR_EXCHANGE("Przyjęte do wymiany", ACCEPTED),
+    EXCHANGED("Wymienione", WITHDRAWN),
+    ACCEPTED_AND_WITHDRAWN("Wycofane", WITHDRAWN);
 
     private final String name;
-    private final boolean inRotation;
+    private final LifeCycleStatus lifeCycleStatus;
 
-    ClothActualStatus(String name, boolean inRotation) {
+    ClothActualStatus(String name, LifeCycleStatus lifeCycleStatus) {
         this.name = name;
-        this.inRotation = inRotation;
+        this.lifeCycleStatus = lifeCycleStatus;
     }
 
-    @JsonValue
     public String getName() {
         return name;
     }
 
-    public boolean isInRotation() {
-        return inRotation;
+    public LifeCycleStatus getLifeCycleStatus() {
+        return lifeCycleStatus;
     }
 }
