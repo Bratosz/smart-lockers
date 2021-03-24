@@ -119,10 +119,11 @@ function reloadBox() {
 
             $("#employee").text(lockerNumber + "/" + boxNumber
                 + " " + lastName + " " + firstName);
-            let activeClothes, acceptedClothes;
 
+            let beforeRelease = extractClothes("BEFORE_RELEASE", clothes);
             let inRotation = extractClothes("IN_ROTATION", clothes);
             let accepted = extractClothes("ACCEPTED", clothes);
+            let withdrawn = extractClothes("WITHDRAWN", clothes);
 
             displayClothes(inRotation);
             displayAcceptedClothes(accepted);
@@ -143,78 +144,21 @@ function loadEmployee() {
 };
 
 function displayClothes(clothes) {
-    $("#table-of-clothes-body > tr:not(#row-template)").remove();
-    const $rowTemplate = $("#row-template");
-    console.log("table of clothes");
-    console.log($rowTemplate);
-    console.log(clothes);
-    clothes.sort(function (a, b) {
-        return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
-    });
-    for (let i = 0; i < clothes.length; i++) {
-        let cloth = clothes[i];
-        let assignmentDate = formatDate(cloth.assignment);
-        let releaseDate = formatDate(cloth.releaseDate);
-        let lastWashingDate = formatDate(cloth.lastWashing);
-        const $row = $rowTemplate.clone();
-        $row.removeAttr("id");
-        $row.css("display", "table-row");
-        $row.find(".cell-ordinal-number").text(cloth.ordinalNumber);
-        $row.find(".cell-article-number").text(cloth.article.articleNumber);
-        $row.find(".cell-article-name").text(cloth.article.name);
-        $row.find(".cell-size").text(cloth.size);
-        $row.find(".cell-assignment-date").text(assignmentDate);
-        $row.find(".cell-id-bar-code").text(cloth.barCode);
-        $row.find(".cell-release-date").text(releaseDate);
-        $row.find(".cell-washing-date").text(lastWashingDate);
-        $("#table-of-clothes-body").append($row);
-    }
+    writeClothesToTable($("#table-of-clothes-body"), clothes);
+}
+
+function displayRotationalClothes(clothes) {
+    writeClothesToTable($("#table-of-rotational-clothes-body"), clothes);
 }
 
 function displayAcceptedClothes(clothes) {
-    $("#table-of-accepted-clothes-body > tr:not(#row-template-accepted-clothes)").remove();
-    let $rowTemplate = $("#row-template-accepted-clothes");
-    let acceptedClothes;
-    extractAcceptedClothes(clothes);
-    if (acceptedClothes !== undefined) {
-        acceptedClothes.sort(function (a, b) {
-            return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
-        });
-        for (let i = 0; i < acceptedClothes.length; i++) {
-            let cloth = acceptedClothes[i];
-            console.log(cloth);
-            let $row = $rowTemplate.clone();
-            let acceptedDate = formatDate(cloth.acceptedForExchangeDate);
-            $row.css("display", "table-row");
-            $row.find(".cell-ordinal-number").text(cloth.ordinalNumber);
-            $row.find(".cell-article-number").text(cloth.article.articleNumber);
-            $row.find(".cell-article-name").text(cloth.article.name);
-            $row.find(".cell-size").text(cloth.size);
-            $row.find(".cell-id-bar-code").text(cloth.id);
-            $row.find(".cell-accepted-for-exchange-date").text(acceptedDate);
-            $("#table-of-accepted-clothes-body").append($row);
-        }
-    }
-
-    function extractAcceptedClothes(clothes) {
-        for (let i = 0; i < clothes.size(); i++) {
-
-        }
-    }
-}
-
-function formatDate(date) {
-    date = date.substring(0, 10);
-    if (date == "1970-01-01") {
-        return "";
-    } else {
-        return date;
-    }
+    writeClothesToTable($("#table-of-accepted-clothes-body"), clothes);
 }
 
 function displayOrders(clothOrders) {
-    $("#table-of-orders-body > tr:not(#row-order-template)").remove();
-    const $rowTemplate = $("#row-order-template");
+    writeOrdersToTable($("#table-of-cloth-orders-body"), clothOrders);
+    $("#table-of-orders-body > tr:not(#row-template-cloth-order)").remove();
+    const $rowTemplate = $("#row-template-cloth-order");
     clothOrders.sort(function (a, b) {
         return a.cloth.article.articleNumber - b.cloth.article.articleNumber
             || a.orderStatus - b.orderStatus

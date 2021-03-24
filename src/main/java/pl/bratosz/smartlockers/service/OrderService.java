@@ -74,6 +74,7 @@ public class OrderService {
                 CompleteOrderParameters.createForClothExchangeAndRelease(
                 clothForExchange,
                 clothForRelease,
+                employee,
                 orderType,
                 user);
         ClothOrder order = orderManager.createOne(completeParameters, user);

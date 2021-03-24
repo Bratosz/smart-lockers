@@ -40,8 +40,9 @@ public class OrderManager  {
             OrderType orderType,
             Cloth cloth,
             User user) {
-        CompleteForRelease parameters = CompleteOrderParameters.createForExistingCloth(
+        CompleteForRelease parameters = CompleteOrderParameters.createOrderForExistingCloth(
                 cloth,
+                cloth.getEmployee(),
                 orderType,
                 user);
         return create(parameters, user);

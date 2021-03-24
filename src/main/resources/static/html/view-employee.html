@@ -84,7 +84,7 @@
             <th>\\</th>
             </thead>
             <tbody id="table-of-clothes-body">
-            <tr id="row-template" style="display: none">
+            <tr style="display: none">
                 <td class="cell-ordinal-number"></td>
                 <td class="cell-article-number"></td>
                 <td class="cell-article-name"></td>
@@ -101,11 +101,42 @@
 
     <div class="gap-vertical-20"></div>
     <div class="gap-vertical-20"></div>
+
+    <!--ACCEPTED CLOTHES-->
+
+    <div class="container-table">
+        <table id="table-of-accepted-clothes">
+            <thead>
+            <th>Lp</th>
+            <th>Artykuł</th>
+            <th>Nazwa artykułu</th>
+            <th>Rozmiar</th>
+            <th>Data przypisania</th>
+            <th>Kod kreskowy</th>
+            <th>Data wydania</th>
+            <th>W praniu</th>
+            <th>\\</th>
+            </thead>
+            <tbody id="table-of-accepted-clothes-body">
+            <tr id="row-template-accepted-clothes" style="display: none">
+                <td class="cell-ordinal-number"></td>
+                <td class="cell-article-number"></td>
+                <td class="cell-article-name"></td>
+                <td class="cell-size"></td>
+                <td class="cell-assignment-date"></td>
+                <td class="cell-id-bar-code"></td>
+                <td class="cell-release-date"></td>
+                <td class="cell-washing-date"></td>
+                <td><input type="checkbox" class="clothToRelease-check-box"/></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <!--ROTATIONAL CLOTHES-->
 
     <div class="container-table">
-        <table id="table-of-rotational-clothing">
+        <table id="table-of-rotational-clothes">
             <thead>
             <th>Lp</th>
             <th>Artykuł</th>
@@ -117,8 +148,8 @@
             <th>W praniu</th>
             <th>\\</th>
             </thead>
-            <tbody id="table-of-rotational-clothing-body">
-            <tr id="row-template-rotational-clothing" style="display: none">
+            <tbody id="table-of-rotational-clothes-body">
+            <tr id="row-template-rotational-clothes" style="display: none">
                 <td class="cell-ordinal-number"></td>
                 <td class="cell-article-number"></td>
                 <td class="cell-article-name"></td>
@@ -136,10 +167,10 @@
     <div class="gap-vertical-20"></div>
     <div class="gap-vertical-20"></div>
 
-    <!--WITHDRAWN CLOTHING-->
+    <!--WITHDRAWN CLOTHES-->
 
     <div class="container-table">
-        <table id="table-of-withdrawn-clothing">
+        <table id="table-of-withdrawn-clothes">
             <thead>
             <th>Lp</th>
             <th>Artykuł</th>
@@ -151,8 +182,8 @@
             <th>W praniu</th>
             <th>\\</th>
             </thead>
-            <tbody id="table-of-withdrawn-clothing-body">
-            <tr id="row-template-withdrawn-clothing" style="display: none">
+            <tbody id="table-of-withdrawn-clothes-body">
+            <tr id="row-template-withdrawn-clothes" style="display: none">
                 <td class="cell-ordinal-number"></td>
                 <td class="cell-article-number"></td>
                 <td class="cell-article-name"></td>
@@ -167,11 +198,7 @@
         </table>
     </div>
 
-
     <div class="gap-vertical-20"></div>
-
-
-        <!--CLOTH ORDERS-->
 
     <div>
         <div>
@@ -420,7 +447,7 @@
 
 
     <div class="container-table">
-        <table id="table-of-orders">
+        <table id="table-of-cloth-orders">
             <thead>
             <th>Rodzaj zamówienia</th>
             <th>Status zamówienia</th>
@@ -430,8 +457,8 @@
             <th>Rozmiar</th>
             <th>Data akceptacji</th>
             </thead>
-            <tbody id="table-of-orders-body">
-            <tr id="row-order-template" style="display: none">
+            <tbody id="table-of-cloth-orders-body">
+            <tr id="row-template-cloth-orders" style="display: none">
                 <td class="cell-order-type"></td>
                 <td class="cell-order-status"></td>
                 <td class="cell-id-clothToRelease-order"></td>
@@ -461,33 +488,7 @@
     <div class="gap-vertical-20"></div>
     <div class="gap-vertical-20"></div>
 
-    <!--ACCEPTED CLOTHES-->
 
-    <div class="container-table">
-        <table id="table-of-accepted-clothes">
-            <thead>
-            <th>Lp</th>
-            <th>Artykuł</th>
-            <th>Nazwa artykułu</th>
-            <th>Rozmiar</th>
-            <th>Kod kreskowy</th>
-            <th>Data przyjęcia na wymianę</th>
-            <th>\\</th>
-            </thead>
-            <tbody id="table-of-accepted-clothes-body">
-            <tr id="row-template-accepted-clothes" style="display: none">
-                <td class="cell-ordinal-number"></td>
-                <td class="cell-article-number"></td>
-                <td class="cell-article-name"></td>
-                <td class="cell-size"></td>
-                <td class="cell-id-bar-code"></td>
-                <td class="cell-accepted-for-exchange-date"></td>
-
-                <td><input type="checkbox" class="accepted-clothToRelease-check-box"/></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
 
     <!--Clothing acceptance-->
 
