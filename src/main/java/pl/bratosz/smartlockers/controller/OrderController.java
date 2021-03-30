@@ -7,6 +7,7 @@ import pl.bratosz.smartlockers.model.clothes.ClothSize;
 import pl.bratosz.smartlockers.model.orders.ActionType;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.orders.OrderType;
+import pl.bratosz.smartlockers.response.ResponseOrdersCreated;
 import pl.bratosz.smartlockers.service.OrderService;
 
 import java.util.List;
@@ -23,16 +24,16 @@ public class OrderController {
 
     @JsonView(Views.InternalForClothOrders.class)
     @PostMapping("/place/{articleNumber}/{size}/{orderType}/{userId}")
-    public List<ClothOrder> place(@PathVariable int articleNumber,
-                                  @PathVariable ClothSize size,
-                                  @PathVariable OrderType orderType,
-                                  @RequestBody long[] clothIds,
-                                  @PathVariable long userId) {
+    public ResponseOrdersCreated place(@PathVariable OrderType orderType,
+                                       @PathVariable int articleNumber,
+                                       @PathVariable ClothSize size,
+                                       @RequestBody long[] barCodes,
+                                       @PathVariable long userId) {
         return orderService.placeMany(
                 orderType,
                 articleNumber,
                 size,
-                clothIds,
+                barCodes,
                 userId);
     }
 

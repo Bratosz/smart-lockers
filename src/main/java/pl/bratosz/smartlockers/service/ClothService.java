@@ -22,6 +22,7 @@ import java.util.*;
 
 import static pl.bratosz.smartlockers.model.clothes.ClothActualStatus.ACCEPTED_FOR_EXCHANGE;
 import static pl.bratosz.smartlockers.model.clothes.ClothSize.*;
+import static pl.bratosz.smartlockers.model.orders.OrderStatus.OrderStage.READY_FOR_REALIZATION;
 import static pl.bratosz.smartlockers.model.orders.OrderType.*;
 
 @Service
@@ -30,6 +31,7 @@ public class ClothService {
     private OrdersRepository ordersRepository;
     @Autowired
     private OrderService orderService;
+    private OrderStatusService orderStatusService;
     private UserService userService;
     private OrderManager orderManager;
     private ClothStatusService clothStatusService;
@@ -38,11 +40,12 @@ public class ClothService {
 
     public ClothService(ClothesRepository clothesRepository,
                         OrdersRepository ordersRepository,
-                        UserService userService,
+                        OrderStatusService orderStatusService, UserService userService,
                         OrderManager orderManager, ClothStatusService clothStatusService,
                         ClothesManager clothesManager) {
         this.clothesRepository = clothesRepository;
         this.ordersRepository = ordersRepository;
+        this.orderStatusService = orderStatusService;
         this.userService = userService;
         this.orderManager = orderManager;
         this.clothStatusService = clothStatusService;
@@ -69,11 +72,20 @@ public class ClothService {
         return clothesRepository.save(newCloth);
     }
 
-    public List<Cloth> getClothesByIds(long[] clothsIds) {
+    public List<Cloth> getByIds(long[] clothsIds) {
         List<Cloth> clothes = new LinkedList<>();
         for (int i = 0; i < clothsIds.length; i++) {
             long clothId = clothsIds[i];
             Cloth cloth = clothesRepository.getClothById(clothId);
+            clothes.add(cloth);
+        }
+        return clothes;
+    }
+
+    public List<Cloth> getByBarCodes(long[] barCodes) {
+        List<Cloth> clothes = new LinkedList<>();
+        for(long barCode : barCodes) {
+            Cloth cloth = clothesRepository.getClothByBarCode(barCode);
             clothes.add(cloth);
         }
         return clothes;
@@ -159,9 +171,13 @@ public class ClothService {
     private ResponseClothAcceptance acceptForExchangeForNewOne(OrderType orderType, Cloth cloth, OrderType actualOrderType) {
         if (actualOrderType.equals(EMPTY)) {
             Cloth clothForExchange = acceptForExchange(cloth);
+            OrderStatus orderStatus = orderStatusService.create(
+                    READY_FOR_REALIZATION,
+                    user);
             ClothOrder clothOrder = orderService.placeOne(
                     clothForExchange,
                     orderType,
+                    orderStatus,
                     clothForExchange.getArticle(),
                     clothForExchange.getSize(),
                     user);
@@ -226,7 +242,7 @@ public class ClothService {
         try {
             order = getOrderFromCloth(cloth);
             order = orderManager.update(
-                    OrderStatus.OrderStage.READY_FOR_REALIZATION, order, user);
+                    READY_FOR_REALIZATION, order, user);
             ordersRepository.save(order);
         } catch (ClothOrderException e) {
             e.printStackTrace();

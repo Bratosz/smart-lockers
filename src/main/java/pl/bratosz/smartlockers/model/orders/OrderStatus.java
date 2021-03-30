@@ -20,7 +20,7 @@ public class OrderStatus {
     private User user;
 
     @JsonView(Views.Public.class)
-    private OrderStage actualStage;
+    private OrderStage orderStage;
 
     @JsonView(Views.Public.class)
     private Date dateOfUpdate;
@@ -34,7 +34,7 @@ public class OrderStatus {
     public OrderStatus(OrderStage initialStage,
                        User user,
                        Date date) {
-        this.actualStage = initialStage;
+        this.orderStage = initialStage;
         this.dateOfUpdate = date;
         this.user = user;
     }
@@ -55,12 +55,12 @@ public class OrderStatus {
         this.user = user;
     }
 
-    public OrderStage getActualStage() {
-        return actualStage;
+    public OrderStage getOrderStage() {
+        return orderStage;
     }
 
-    public void setActualStage(OrderStage actualStage) {
-        this.actualStage = actualStage;
+    public void setOrderStage(OrderStage orderStage) {
+        this.orderStage = orderStage;
     }
 
     public Date getDateOfUpdate() {

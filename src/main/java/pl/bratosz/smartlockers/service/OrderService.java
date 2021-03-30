@@ -8,14 +8,17 @@ import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
 import pl.bratosz.smartlockers.model.orders.ActionType;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
+import pl.bratosz.smartlockers.model.orders.OrderStatus;
 import pl.bratosz.smartlockers.model.orders.OrderType;
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForExchangeAndRelease;
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteOrderParameters;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.OrdersRepository;
+import pl.bratosz.smartlockers.response.ResponseOrdersCreated;
 import pl.bratosz.smartlockers.service.managers.OrderManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -24,42 +27,108 @@ public class OrderService {
     private ArticleService articleService;
     @Autowired
     private ClothService clothesService;
+    private OrderStatusService orderStatusService;
     private OrderManager orderManager;
 
     public OrderService(OrdersRepository ordersRepository,
                         UserService userService,
                         ArticleService articleService,
-                        OrderManager orderManager) {
+                        OrderStatusService orderStatusService, OrderManager orderManager) {
         this.ordersRepository = ordersRepository;
         this.userService = userService;
         this.articleService = articleService;
+        this.orderStatusService = orderStatusService;
         this.orderManager = orderManager;
     }
 
-    public List<ClothOrder> placeMany(
+    //DEPENDS ON ORDERTYPE DIFERENT BEHAVIOURS, CHECKING SIZE AND ARTICLE NUMBER
+    public ResponseOrdersCreated placeMany(
             OrderType orderType,
             int articleNumber,
             ClothSize size,
-            long[] clothIds,
+            long[] barCodes,
             long userId) {
         User user = userService.getUserById(userId);
-        List<Cloth> clothesForExchange = clothesService.getClothesByIds(clothIds);
+        List<Cloth> clothes = clothesService.getByBarCodes(barCodes);
+        List<Cloth> clothesWithActiveOrders = getClothesWithActiveOrders(clothes);
+        if(clothesWithActiveOrders.isEmpty()) {
+            switch (orderType) {
+                case EXCHANGE_FOR_A_NEW_ONE:
+                    return exchangeForNewOnes(clothes, user, orderType);
+                case CHANGE_SIZE:
+                    return exchangeForAnotherSize(size, clothes, user, orderType);
+                case CHANGE_ARTICLE:
+                    return exchangeForAnotherArticle(articleNumber, size, clothes, user, orderType);
+                default:
+                    throw new IllegalStateException("Unexpected value: " + orderType);
+            }
+        } else {
+            return ResponseOrdersCreated.createForOrdersNotCreatedBecauseActiveOrdersPresent(
+                    orderType, clothesWithActiveOrders);
+        }
+    }
+
+    private List<Cloth> getClothesWithActiveOrders(List<Cloth> clothes) {
+        List<Cloth> clothesWithActiveOrders = new LinkedList<>();
+        for(Cloth cloth : clothes) {
+            if(containsActiveOrder(cloth)){
+                clothesWithActiveOrders.add(cloth);
+            }
+        }
+        return clothesWithActiveOrders;
+    }
+
+    private boolean containsActiveOrder(Cloth cloth) {
+        if(cloth.getExchangeOrder() != null) {
+            if(cloth.getExchangeOrder().isActive()) {
+                return true;
+            }
+        } else if(cloth.getReleaseOrder() != null) {
+            if(cloth.getReleaseOrder().isActive()) {
+                return true;
+            }
+        } return false;
+    }
+
+    private ResponseOrdersCreated exchangeForAnotherArticle(int articleNumber,
+                                                            ClothSize size,
+                                                            List<Cloth> clothesForExchange,
+                                                            User user,
+                                                            OrderType orderType) {
         Article article = articleService.get(articleNumber);
-        List<ClothOrder> clothOrders = new LinkedList<>();
-        clothesForExchange.stream().forEach(clothToExchange -> {
-            ClothOrder order = placeOne(
-                    clothToExchange,
-                    orderType,
-                    article,
-                    size,
-                    user);
-            ((LinkedList<ClothOrder>) clothOrders).push(order);
-        });
-        return clothOrders;
+        for(Cloth cloth : clothesForExchange) {
+            OrderStatus orderStatus = orderStatusService.create(orderType, user);
+            placeOne(cloth, orderType, orderStatus, article, size, user);
+        }
+        return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
+    }
+
+    private ResponseOrdersCreated exchangeForAnotherSize(
+            ClothSize size,
+            List<Cloth> clothesForExchange,
+            User user,
+            OrderType orderType) {
+        for(Cloth cloth : clothesForExchange) {
+            OrderStatus orderStatus = orderStatusService.create(orderType, user);
+            placeOne(cloth, orderType, orderStatus, cloth.getArticle(), size, user);
+        }
+        return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
+
+    }
+
+    private ResponseOrdersCreated exchangeForNewOnes(List<Cloth> clothesForExchange,
+                                                     User user,
+                                                     OrderType orderType) {
+        for (Cloth cloth : clothesForExchange) {
+            OrderStatus orderStatus = orderStatusService.create(orderType, user);
+            placeOne(cloth, orderType, orderStatus, cloth.getArticle(), cloth.getSize(), user);
+        }
+        return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
     }
 
     public ClothOrder placeOne(Cloth clothForExchange,
                                OrderType orderType,
+                               OrderStatus orderStatus,
                                Article article,
                                ClothSize size,
                                User user) {
@@ -72,11 +141,12 @@ public class OrderService {
                 user);
         CompleteForExchangeAndRelease completeParameters =
                 CompleteOrderParameters.createForClothExchangeAndRelease(
-                clothForExchange,
-                clothForRelease,
-                employee,
-                orderType,
-                user);
+                        clothForExchange,
+                        clothForRelease,
+                        employee,
+                        orderType,
+                        orderStatus,
+                        user);
         ClothOrder order = orderManager.createOne(completeParameters, user);
         return ordersRepository.save(order);
     }
@@ -104,5 +174,4 @@ public class OrderService {
         }
         return clothOrders;
     }
-
 }

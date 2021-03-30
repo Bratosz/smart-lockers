@@ -2,6 +2,7 @@ package pl.bratosz.smartlockers.model.orders.parameters.complete;
 
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
+import pl.bratosz.smartlockers.model.orders.OrderStatus;
 import pl.bratosz.smartlockers.model.orders.OrderType;
 import pl.bratosz.smartlockers.model.orders.parameters.basic.BasicOrderParameters;
 import pl.bratosz.smartlockers.model.orders.parameters.basic.ParametersForExchangeAndRelease;
@@ -14,7 +15,7 @@ public class CompleteOrderParameters extends BasicOrderParameters
         implements
         CompleteForExchangeAndRelease, CompleteForRelease {
 
-    private OrderStage orderStage;
+    private OrderStatus orderStatus;
     private boolean orderActive;
 
 
@@ -23,6 +24,7 @@ public class CompleteOrderParameters extends BasicOrderParameters
             Cloth clothForRelease,
             Employee employee,
             OrderType orderType,
+            OrderStatus orderStatus,
             User user
     ) {
         return new CompleteOrderParameters(
@@ -30,7 +32,7 @@ public class CompleteOrderParameters extends BasicOrderParameters
                 clothForRelease,
                 employee,
                 orderType,
-                user.getInitialStageForOrders(),
+                orderStatus,
                 user
         );
     }
@@ -39,7 +41,7 @@ public class CompleteOrderParameters extends BasicOrderParameters
     public static CompleteForRelease createForNewArticle(
             Cloth clothForRelease,
             Employee employee,
-            OrderStage orderStage,
+            OrderStatus orderStatus,
             User user
     ) {
         OrderType orderType = OrderType.NEW_ARTICLE;
@@ -47,7 +49,7 @@ public class CompleteOrderParameters extends BasicOrderParameters
                 clothForRelease,
                 employee,
                 orderType,
-                orderStage,
+                orderStatus,
                 user
         );
     }
@@ -55,12 +57,12 @@ public class CompleteOrderParameters extends BasicOrderParameters
 
     public static CompleteForRelease createForNewArticle(
             ParametersForRelease parameters,
-            OrderStage orderStage
+            OrderStatus orderStatus
     ) {
         return createForNewArticle(
                 parameters.getClothToRelease(),
                 parameters.getEmployee(),
-                orderStage,
+                orderStatus,
                 parameters.getUser()
         );
     }
@@ -70,14 +72,14 @@ public class CompleteOrderParameters extends BasicOrderParameters
             Cloth cloth,
             Employee employee,
             OrderType orderType,
+            OrderStatus orderStatus,
             User user
     ) {
-        OrderStage stage = resolveOrderStage(orderType);
         return new CompleteOrderParameters(
                 cloth,
                 employee,
                 orderType,
-                stage,
+                orderStatus,
                 user
         );
     }
@@ -86,11 +88,11 @@ public class CompleteOrderParameters extends BasicOrderParameters
     private CompleteOrderParameters(Cloth clothForRelease,
                                     Employee employee,
                                     OrderType orderType,
-                                    OrderStage orderStage,
+                                    OrderStatus orderStatus,
                                     User user
     ) {
         super(clothForRelease, employee, orderType, user);
-        this.orderStage = orderStage;
+        this.orderStatus = orderStatus;
     }
 
 
@@ -98,29 +100,21 @@ public class CompleteOrderParameters extends BasicOrderParameters
                                     Cloth clothForRelease,
                                     Employee employee,
                                     OrderType orderType,
-                                    OrderStage orderStage,
+                                    OrderStatus orderStatus,
                                     User user
     ) {
         super(clothForExchange, clothForRelease, employee, orderType, user);
-        this.orderStage = orderStage;
+        this.orderStatus = orderStatus;
+
     }
 
 
-    private static OrderStage resolveOrderStage(OrderType orderType) {
-        if (orderType.equals(OrderType.EMPTY)) {
-            return OrderStage.EMPTY;
-        } else {
-            return OrderStage.READY_FOR_REALIZATION;
-        }
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
     }
-
-
-    public OrderStage getOrderStage() {
-        return orderStage;
-    }
-
 
     public boolean isOrderActive() {
         return orderActive;
     }
+
 }

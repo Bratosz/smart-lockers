@@ -5,5 +5,5 @@ import pl.bratosz.smartlockers.model.orders.parameters.basic.ParametersForExchan
 
 public interface CompleteForExchangeAndRelease extends ParametersForExchangeAndRelease {
     boolean isOrderActive();
-    OrderStatus.OrderStage getOrderStage();
+    OrderStatus getOrderStatus();
 }

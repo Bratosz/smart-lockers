@@ -224,6 +224,14 @@ public class Cloth {
         this.active = active;
     }
 
+    public ClothOrder getReleaseOrder() {
+        return releaseOrder;
+    }
+
+    public void setReleaseOrder(ClothOrder releaseOrder) {
+        this.releaseOrder = releaseOrder;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

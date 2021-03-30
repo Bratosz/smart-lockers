@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.service.managers.creators;
 
+import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
@@ -19,30 +20,37 @@ public class OrderCreator {
     public static ClothOrder create(
             CompleteForRelease params, User user) {
         return builder(user, new Date())
-                .orderStatus(params.getOrderStage())
+                .orderStatus(params.getOrderStatus())
                 .orderType(params.getOrderType())
                 .aNewCloth(params.getClothToRelease())
+                .employee(params.getEmployee())
                 .build();
     }
 
     public static ClothOrder createWithExchange(
             CompleteForExchangeAndRelease params, User user) {
         return builder(user, new Date())
-                .orderStatus(params.getOrderStage())
+                .orderStatus(params.getOrderStatus())
                 .orderType(params.getOrderType())
                 .replacingCloth(params.getClothToRelease())
                 .clothToReplace(params.getClothToExchange())
-                .note("")
+                .employee(params.getEmployee())
                 .build();
 
     }
 
     private static class Builder
-            implements NeedOrderStatus, NeedOrderType, NeedClothToExchange, NeedClothToRelease, CanBeBuild {
+            implements NeedOrderStatus,
+            NeedOrderType,
+            NeedClothToExchange,
+            NeedClothToRelease,
+            NeedEmployee,
+            CanBeBuild {
         private User user;
         private Date date;
         private Cloth clothToExchange;
         private Cloth clothToRelease;
+        private Employee employee;
         private OrderStatus orderStatus;
         private OrderType orderType;
         private String note;
@@ -65,6 +73,7 @@ public class OrderCreator {
             order.setOrderStatus(orderStatus);
             order.setClothToExchange(clothToExchange);
             order.setClothToRelease(clothToRelease);
+            order.setEmployee(clothToRelease.getEmployee());
             order.setOrderType(orderType);
             order.setNote(note);
             order.setActive(true);
@@ -73,8 +82,8 @@ public class OrderCreator {
 
 
         @Override
-        public Builder orderStatus(OrderStatus.OrderStage orderStage) {
-            this.orderStatus = new OrderStatus(orderStage, user, date);
+        public Builder orderStatus(OrderStatus orderStatus) {
+            this.orderStatus = orderStatus;
             return this;
         }
 
@@ -102,10 +111,16 @@ public class OrderCreator {
             this.clothToExchange = clothToExchange;
             return this;
         }
+
+        @Override
+        public Builder employee(Employee employee) {
+            this.employee = employee;
+            return this;
+        }
     }
 
     public interface NeedOrderStatus {
-        NeedOrderType orderStatus(OrderStatus.OrderStage orderStage);
+        NeedOrderType orderStatus(OrderStatus orderStatus);
     }
 
     public interface NeedOrderType {
@@ -114,13 +129,17 @@ public class OrderCreator {
 
 
     public interface NeedClothToRelease {
-        CanBeBuild aNewCloth(Cloth clothToRelease);
+        NeedEmployee aNewCloth(Cloth clothToRelease);
 
         NeedClothToExchange replacingCloth(Cloth clothToRelease);
     }
 
     public interface NeedClothToExchange {
-        CanBeBuild clothToReplace(Cloth clothToExchange);
+        NeedEmployee clothToReplace(Cloth clothToExchange);
+    }
+
+    public interface NeedEmployee {
+        CanBeBuild employee(Employee employee);
     }
 
     public interface CanBeBuild {

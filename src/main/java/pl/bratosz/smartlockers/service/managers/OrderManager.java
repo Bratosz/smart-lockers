@@ -40,23 +40,23 @@ public class OrderManager  {
             OrderType orderType,
             Cloth cloth,
             User user) {
+        OrderStatus orderStatus = orderStatusService.create(orderType, user);
         CompleteForRelease parameters = CompleteOrderParameters.createOrderForExistingCloth(
                 cloth,
                 cloth.getEmployee(),
                 orderType,
+                orderStatus,
                 user);
-        return create(parameters, user);
+        return create(parameters);
     }
 
     private ClothOrder create(
-            CompleteForRelease parameters,
-            User user
+            CompleteForRelease parameters
     ) {
         ClothOrder order = new ClothOrder();
         order.setOrderType(parameters.getOrderType());
         order.setClothToRelease(parameters.getClothToRelease());
-        OrderStatus status = orderStatusService.create(parameters.getOrderStage(), user);
-        order.setOrderStatus(status);
+        order.setOrderStatus(parameters.getOrderStatus());
         return ordersRepository.save(order);
     }
 

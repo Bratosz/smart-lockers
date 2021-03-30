@@ -9,7 +9,7 @@ let lockerNumber,
     clothes,
     clothOrders,
     boxStatus;
-const userId = 1;
+const userId = 15;
 
 reloadBox();
 
@@ -46,25 +46,27 @@ function refreshOrders() {
 }
 
 function addOrder() {
-    let clothIds = new Array;
+    let barCodes = new Array;
+    let articleNumber;
+    let size;
     let orderType = $("#select-order-type").val();
     $('#table-of-clothes-body').find('input[type="checkbox"]:checked').each(function () {
         let clothId = parseInt($(this).closest('tr').find('.cell-id-bar-code').text());
-        clothIds.push(clothId);
+        barCodes.push(clothId);
     });
-    let articleNumber = $('input[name="cloth"]:checked').val();
+    articleNumber = $('input[name="cloth"]:checked').val();
     if (typeof articleNumber === "undefined") {
         articleNumber = 0;
     }
-    let size = $('input[name="size"]:checked').val();
+    size = $('input[name="size"]:checked').val();
     if (typeof size === "undefined") {
-        size = "SIZE_DEFAULT";
+        size = "SIZE_SAME";
     }
     $.ajax({
         url: `http://localhost:8080/orders/place/${articleNumber}/${size}/${orderType}/${userId}`,
         method: "post",
         contentType: "application/json",
-        data: JSON.stringify(clothIds),
+        data: JSON.stringify(barCodes),
         success: function () {
             refreshOrders();
         }
@@ -75,7 +77,7 @@ function performActionOnOrders() {
     let actionType = $('#select-action-on-orders').val();
     let orderIds = new Array;
     $('#table-of-orders-body').find('input[type="checkbox"]:checked').each(function () {
-        let orderId = parseInt($(this).closest('tr').find('.cell-id-cloth-order').text());
+        let orderId = parseInt($(this).closest('tr').find('.cell-order-id').text());
         orderIds.push(orderId);
     });
     $.ajax({
@@ -124,10 +126,11 @@ function reloadBox() {
             let inRotation = extractClothes("IN_ROTATION", clothes);
             let accepted = extractClothes("ACCEPTED", clothes);
             let withdrawn = extractClothes("WITHDRAWN", clothes);
+            let activeOrders = extractActiveOrders(clothOrders);
 
             displayClothes(inRotation);
             displayAcceptedClothes(accepted);
-            displayOrders(clothOrders);
+            displayOrders(activeOrders);
         }
     })
 }
@@ -157,29 +160,5 @@ function displayAcceptedClothes(clothes) {
 
 function displayOrders(clothOrders) {
     writeOrdersToTable($("#table-of-cloth-orders-body"), clothOrders);
-    $("#table-of-orders-body > tr:not(#row-template-cloth-order)").remove();
-    const $rowTemplate = $("#row-template-cloth-order");
-    clothOrders.sort(function (a, b) {
-        return a.cloth.article.articleNumber - b.cloth.article.articleNumber
-            || a.orderStatus - b.orderStatus
-            || a.cloth.ordinalNumber - b.cloth.ordinalNumber;
-    });
-    for (let i = 0; i < clothOrders.length; i++) {
-        if (clothOrders[i].isCancelled == true) {
-            continue;
-        }
-        const $row = $rowTemplate.clone();
-        let order = clothOrders[i];
-        $row.css("display", "table-row");
-        $row.attr("id", "id-row-order-" + i);
-        $row.find(".cell-order-type").text(order.orderType);
-        $row.find(".cell-order-status").text(order.orderStatus);
-        $row.find(".cell-id-cloth-order").text(order.id);
-        $row.find(".cell-cloth-to-exchange").text(order.cloth.article.name + " lp. " + order.cloth.ordinalNumber);
-        $row.find(".cell-ordered-cloth").text(order.article.name);
-        $row.find(".cell-ordered-cloth-size").text(order.size);
-        $row.find(".cell-accept-date").text(order.acceptDate);
-        $("#table-of-orders-body").append($row);
-    }
 }
 

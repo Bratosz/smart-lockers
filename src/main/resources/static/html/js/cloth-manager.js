@@ -34,37 +34,22 @@ function writeClothToRow(cloth, $row) {
     $row.find(".cell-article-number").text(cloth.article.articleNumber);
     $row.find(".cell-article-name").text(cloth.article.name);
     $row.find(".cell-size").text(cloth.size);
-    $row.find(".cell-assignment-date").text(formatDate(cloth.assignment));
+    $row.find(".cell-assignment-date").text(formatDateDMY(cloth.assignment));
     $row.find(".cell-id-bar-code").text(cloth.barCode);
-    $row.find(".cell-release-date").text(formatDate(cloth.releaseDate));
-    $row.find(".cell-washing-date").text(formatDate(cloth.lastWashing));
+    $row.find(".cell-release-date").text(formatDateDMY(cloth.releaseDate));
+    $row.find(".cell-washing-date").text(formatDateDMY(cloth.lastWashing));
     return $row;
-}
-
-function formatDate(date) {
-    date = date.substring(0, 10);
-    if (date == "1970-01-01") {
-        return "";
-    } else {
-        return date;
-    }
 }
 
 function sortClothesByArticleNumberAndOrdinalNumber(clothes) {
     clothes.sort(function(a,b) {
-        return a.article.articleNumber - b.article.articleNumber || a.ordinalNumber - b.ordinalNumber;
+        return a.article.articleNumber - b.article.articleNumber
+            || a.ordinalNumber - b.ordinalNumber;
     });
     return clothes;
 }
 
-function getRowTemplate($table) {
-    return $table.find("tr:nth-child(1)");
-}
 
-function removeTableRows($table) {
-    $table.find("tr:not(tr:nth-child(1))").remove();
-    return $table;
-}
 
 function iterateClothesAndWriteInTable(clothes, $table) {
     const $rowTemplate =  getRowTemplate($table);
@@ -81,3 +66,13 @@ function writeClothesToTable($table, clothes) {
     clothes = sortClothesByArticleNumberAndOrdinalNumber(clothes);
     return iterateClothesAndWriteInTable(clothes, $table);
 }
+
+function toStringCloth(cloth) {
+    return cloth.article.clothType + " " +
+        cloth.article.articleNumber + " " +
+        "lp. " + cloth.ordinalNumber + " " +
+        "rozm.: " + cloth.size;
+
+}
+
+

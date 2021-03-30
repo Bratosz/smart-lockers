@@ -81,6 +81,4 @@ public class BasicOrderParameters implements ParametersForExchangeAndRelease {
     public Employee getEmployee() {
         return employee;
     }
-
-
 }
