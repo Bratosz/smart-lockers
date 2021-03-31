@@ -40,7 +40,6 @@ public class OrderService {
         this.orderManager = orderManager;
     }
 
-    //DEPENDS ON ORDERTYPE DIFERENT BEHAVIOURS, CHECKING SIZE AND ARTICLE NUMBER
     public ResponseOrdersCreated placeMany(
             OrderType orderType,
             int articleNumber,
@@ -125,6 +124,8 @@ public class OrderService {
         return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
     }
 
+
+    //clear cloth and hard delete previous cloth order
     public ClothOrder placeOne(Cloth clothForExchange,
                                OrderType orderType,
                                OrderStatus orderStatus,
@@ -155,7 +156,7 @@ public class OrderService {
             long[] clothOrdersIds,
             long userId) {
         User user = userService.getUserById(userId);
-        List<ClothOrder> clothOrders = getClothOrdersById(clothOrdersIds);
+        List<ClothOrder> clothOrders = getClothOrdersByIds(clothOrdersIds);
         clothOrders = orderManager.perform(actionType, clothOrders, user);
         return ordersRepository.saveAll(clothOrders);
     }
@@ -164,7 +165,7 @@ public class OrderService {
         return ordersRepository.getByEmployeeId(employeeId);
     }
 
-    private List<ClothOrder> getClothOrdersById(long[] clothOrdersIds) {
+    private List<ClothOrder> getClothOrdersByIds(long[] clothOrdersIds) {
         List<ClothOrder> clothOrders = new LinkedList<>();
         for (int i = 0; i < clothOrdersIds.length; i++) {
             long id = clothOrdersIds[i];

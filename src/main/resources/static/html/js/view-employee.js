@@ -159,6 +159,6 @@ function displayAcceptedClothes(clothes) {
 }
 
 function displayOrders(clothOrders) {
-    writeOrdersToTable($("#table-of-cloth-orders-body"), clothOrders);
+    writeOrdersToTable($("#table-of-orders-body"), clothOrders);
 }
 
