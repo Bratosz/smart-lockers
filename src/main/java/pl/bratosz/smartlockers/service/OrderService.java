@@ -18,7 +18,6 @@ import pl.bratosz.smartlockers.response.ResponseOrdersCreated;
 import pl.bratosz.smartlockers.service.managers.OrderManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -156,7 +155,7 @@ public class OrderService {
             long[] clothOrdersIds,
             long userId) {
         User user = userService.getUserById(userId);
-        List<ClothOrder> clothOrders = getClothOrders(clothOrdersIds);
+        List<ClothOrder> clothOrders = getClothOrdersById(clothOrdersIds);
         clothOrders = orderManager.perform(actionType, clothOrders, user);
         return ordersRepository.saveAll(clothOrders);
     }
@@ -165,7 +164,7 @@ public class OrderService {
         return ordersRepository.getByEmployeeId(employeeId);
     }
 
-    private List<ClothOrder> getClothOrders(long[] clothOrdersIds) {
+    private List<ClothOrder> getClothOrdersById(long[] clothOrdersIds) {
         List<ClothOrder> clothOrders = new LinkedList<>();
         for (int i = 0; i < clothOrdersIds.length; i++) {
             long id = clothOrdersIds[i];

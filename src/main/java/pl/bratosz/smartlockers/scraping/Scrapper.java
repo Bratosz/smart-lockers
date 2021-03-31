@@ -165,6 +165,11 @@ public class Scrapper {
         clickViewButton(buttonIndex);
     }
 
+    public void clickViewButtonByRowIndex(int rowIndex) {
+        int buttonIndex = rowIndex - 1;
+        clickViewButton(buttonIndex);
+    }
+
     public void clickViewButton(int buttonIndex) {
         updateFormWithClick(buttonIndex);
         connection.standardPost();

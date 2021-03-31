@@ -78,8 +78,8 @@ public class OrderManager  {
     }
 
     public List<ClothOrder> update(OrderStage orderStage, List<ClothOrder> clothOrders, User user) {
-        Consumer<ClothOrder> changeStatus = order -> update(orderStage, order, user);
-        clothOrders.stream().forEach(changeStatus);
+        Consumer<ClothOrder> updateStatus = order -> update(orderStage, order, user);
+        clothOrders.stream().forEach(updateStatus);
         return clothOrders;
     }
 
@@ -89,8 +89,7 @@ public class OrderManager  {
                 OrderStage accepted = PENDING_FOR_ASSIGNMENT;
                 return update(accepted, clothOrders, user);
             case CANCEL:
-                OrderStage cancelled = CANCELLED;
-                return update(cancelled, clothOrders, user);
+                return update(CANCELLED, clothOrders, user);
             default:
                 return clothOrders;
         }

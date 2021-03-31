@@ -119,7 +119,7 @@ public class ScrapingService {
         String lastName = scrapper.getEmployeeLastName(rowIndex);
         String departmentName = scrapper.getDepartmentName(rowIndex);
 
-        scrapper.clickViewButton(rowIndex);
+        scrapper.clickViewButtonByRowIndex(rowIndex);
         List<Cloth> clothes = scrapper.getClothes();
         User user = userService.getDefaultUser();
         clothes = clothService.createExisting(clothes, user);
