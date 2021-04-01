@@ -7,6 +7,7 @@ import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.OrdersStatusRepository;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class OrderStatusService {
@@ -38,4 +39,9 @@ public class OrderStatusService {
     }
 
 
+    public void delete(List<OrderStatus> orderStatusHistory) {
+        for (OrderStatus status : orderStatusHistory) {
+            ordersStatusRepository.deleteById(status.getId());
+        }
+    }
 }

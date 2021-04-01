@@ -125,13 +125,14 @@ public class OrderService {
     }
 
 
-    //clear cloth and hard delete previous cloth order
+    //clear cloth and hard hardDelete previous cloth order
     public ClothOrder placeOne(Cloth clothForExchange,
                                OrderType orderType,
                                OrderStatus orderStatus,
                                Article article,
                                ClothSize size,
                                User user) {
+        deleteInactiveOrder(clothForExchange);
         Employee employee = clothForExchange.getEmployee();
         Cloth clothForRelease = clothesService.createNewInstead(
                 clothForExchange.getOrdinalNumber(),
@@ -149,6 +150,22 @@ public class OrderService {
                         user);
         ClothOrder order = orderManager.createOne(completeParameters, user);
         return ordersRepository.save(order);
+    }
+
+    private void deleteInactiveOrder(Cloth clothForExchange) {
+        if(clothForExchange.getExchangeOrder() != null) {
+            ClothOrder exchangeOrder = clothForExchange.getExchangeOrder();
+            hardDeleteExchangeOrder(exchangeOrder);
+        }
+        if(clothForExchange.getReleaseOrder() != null) {
+            ClothOrder releaseOrder = clothForExchange.getReleaseOrder();
+        }
+    }
+
+    public void hardDeleteExchangeOrder(ClothOrder exchangeOrder) {
+        Cloth clothToRelease = exchangeOrder.getClothToRelease();
+        clothesService.hardDelete(clothToRelease.getId());
+        ordersRepository.deleteById(exchangeOrder.getId());
     }
 
     public List<ClothOrder> performActionOnOrders(
@@ -173,5 +190,9 @@ public class OrderService {
             clothOrders.add(clothOrder);
         }
         return clothOrders;
+    }
+
+    public void hardDelete(long orderId) {
+        ordersRepository.deleteById(orderId);
     }
 }

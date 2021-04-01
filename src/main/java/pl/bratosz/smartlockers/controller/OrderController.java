@@ -22,6 +22,12 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @PostMapping("/delete/{orderId}")
+    public int delete(@PathVariable long orderId) {
+        orderService.hardDelete(orderId);
+        return 1;
+    }
+
     @JsonView(Views.InternalForClothOrders.class)
     @PostMapping("/place/{articleNumber}/{size}/{orderType}/{userId}")
     public ResponseOrdersCreated place(@PathVariable OrderType orderType,

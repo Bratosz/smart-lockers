@@ -26,7 +26,7 @@ public class Cloth {
     protected int ordinalNumber;
 
     @JsonView({Views.InternalForBoxes.class, Views.InternalForClothOrders.class})
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     protected Article article;
 
     @JsonView(Views.InternalForClothes.class)
@@ -38,7 +38,7 @@ public class Cloth {
     private ClothOrder releaseOrder;
 
     @JsonView(Views.InternalForClothes.class)
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     protected Employee employee;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})

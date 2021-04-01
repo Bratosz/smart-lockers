@@ -24,7 +24,7 @@ public class ClothOrder implements OrderForRelease, OrderForExchangeAndRelease {
     private Cloth clothToExchange;
 
     @JsonView(Views.Public.class)
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Cloth clothToRelease;
 
     @JsonView(Views.InternalForClothOrders.class)
@@ -32,7 +32,7 @@ public class ClothOrder implements OrderForRelease, OrderForExchangeAndRelease {
     private Employee employee;
 
     @JsonView(Views.Public.class)
-    @OneToMany(mappedBy = "clothOrder")
+    @OneToMany(mappedBy = "clothOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStatus> orderStatusHistory;
 
     @JsonView(Views.Public.class)
