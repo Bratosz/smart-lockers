@@ -2,6 +2,7 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
@@ -155,10 +156,7 @@ public class OrderService {
     private void deleteInactiveOrder(Cloth clothForExchange) {
         if(clothForExchange.getExchangeOrder() != null) {
             ClothOrder exchangeOrder = clothForExchange.getExchangeOrder();
-            hardDeleteExchangeOrder(exchangeOrder);
-        }
-        if(clothForExchange.getReleaseOrder() != null) {
-            ClothOrder releaseOrder = clothForExchange.getReleaseOrder();
+            hardDelete(exchangeOrder);
         }
     }
 
@@ -192,7 +190,21 @@ public class OrderService {
         return clothOrders;
     }
 
-    public void hardDelete(long orderId) {
+
+    public void hardDelete(ClothOrder order) {
+        hardDeleteClothToRelease(order);
+        hardDeleteOrderStatuses(order);
+        long orderId = order.getId();
         ordersRepository.deleteById(orderId);
+    }
+
+    private void hardDeleteClothToRelease(ClothOrder order) {
+        Cloth cloth = order.getClothToRelease();
+        clothesService.hardDelete(cloth);
+    }
+
+    private void hardDeleteOrderStatuses(ClothOrder order) {
+        List<OrderStatus> orderStatusHistory = order.getOrderStatusHistory();
+        orderStatusService.delete(orderStatusHistory);
     }
 }

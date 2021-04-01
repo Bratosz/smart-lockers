@@ -291,7 +291,7 @@ public class ClothService {
         return existingClothes;
     }
 
-    public void hardDelete(long id) {
-        clothesRepository.deleteById(id);
+    public void hardDelete(Cloth cloth) {
+        clothesRepository.deleteById(cloth.getId());
     }
 }

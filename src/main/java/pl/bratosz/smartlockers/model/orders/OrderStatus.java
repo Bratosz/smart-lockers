@@ -25,7 +25,7 @@ public class OrderStatus {
     @JsonView(Views.Public.class)
     private Date dateOfUpdate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     private ClothOrder clothOrder;
 
     public OrderStatus(){
