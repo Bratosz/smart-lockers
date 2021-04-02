@@ -9,7 +9,7 @@ let lockerNumber,
     clothes,
     clothOrders,
     boxStatus;
-const userId = 15;
+
 
 reloadBox();
 

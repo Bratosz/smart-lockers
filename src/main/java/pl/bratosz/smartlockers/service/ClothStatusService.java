@@ -9,6 +9,7 @@ import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.ClothesStatusRepository;
 
 import java.util.Date;
+import java.util.List;
 
 import static pl.bratosz.smartlockers.model.clothes.ClothActualStatus.*;
 import static pl.bratosz.smartlockers.model.clothes.ClothDestination.*;
@@ -98,5 +99,11 @@ public class ClothStatusService {
                 break;
         }
         return status;
+    }
+
+    public void hardDelete(List<ClothStatus> statusHistory) {
+        for(ClothStatus status : statusHistory) {
+            clothesStatusRepository.deleteById(status.getId());
+        }
     }
 }

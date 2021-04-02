@@ -2,7 +2,7 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import pl.bratosz.smartlockers.exception.ClothOrderException;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
@@ -19,6 +19,8 @@ import pl.bratosz.smartlockers.response.ResponseOrdersCreated;
 import pl.bratosz.smartlockers.service.managers.OrderManager;
 
 import java.util.*;
+
+import static pl.bratosz.smartlockers.model.orders.OrderStatus.OrderStage.READY_FOR_REALIZATION;
 
 @Service
 public class OrderService {
@@ -50,7 +52,7 @@ public class OrderService {
         User user = userService.getUserById(userId);
         List<Cloth> clothes = clothesService.getByBarCodes(barCodes);
         List<Cloth> clothesWithActiveOrders = getClothesWithActiveOrders(clothes);
-        if(clothesWithActiveOrders.isEmpty()) {
+        if (clothesWithActiveOrders.isEmpty()) {
             switch (orderType) {
                 case EXCHANGE_FOR_A_NEW_ONE:
                     return exchangeForNewOnes(clothes, user, orderType);
@@ -67,10 +69,17 @@ public class OrderService {
         }
     }
 
+    public ClothOrder setOrderReadyForRealization(ClothOrder order, User user) {
+        order = orderManager.update(
+                READY_FOR_REALIZATION, order, user);
+        ordersRepository.save(order);
+        return order;
+    }
+
     private List<Cloth> getClothesWithActiveOrders(List<Cloth> clothes) {
         List<Cloth> clothesWithActiveOrders = new LinkedList<>();
-        for(Cloth cloth : clothes) {
-            if(containsActiveOrder(cloth)){
+        for (Cloth cloth : clothes) {
+            if (containsActiveOrder(cloth)) {
                 clothesWithActiveOrders.add(cloth);
             }
         }
@@ -78,15 +87,16 @@ public class OrderService {
     }
 
     private boolean containsActiveOrder(Cloth cloth) {
-        if(cloth.getExchangeOrder() != null) {
-            if(cloth.getExchangeOrder().isActive()) {
+        if (cloth.getExchangeOrder() != null) {
+            if (cloth.getExchangeOrder().isActive()) {
                 return true;
             }
-        } else if(cloth.getReleaseOrder() != null) {
-            if(cloth.getReleaseOrder().isActive()) {
+        } else if (cloth.getReleaseOrder() != null) {
+            if (cloth.getReleaseOrder().isActive()) {
                 return true;
             }
-        } return false;
+        }
+        return false;
     }
 
     private ResponseOrdersCreated exchangeForAnotherArticle(int articleNumber,
@@ -95,7 +105,7 @@ public class OrderService {
                                                             User user,
                                                             OrderType orderType) {
         Article article = articleService.get(articleNumber);
-        for(Cloth cloth : clothesForExchange) {
+        for (Cloth cloth : clothesForExchange) {
             OrderStatus orderStatus = orderStatusService.create(orderType, user);
             placeOne(cloth, orderType, orderStatus, article, size, user);
         }
@@ -107,7 +117,7 @@ public class OrderService {
             List<Cloth> clothesForExchange,
             User user,
             OrderType orderType) {
-        for(Cloth cloth : clothesForExchange) {
+        for (Cloth cloth : clothesForExchange) {
             OrderStatus orderStatus = orderStatusService.create(orderType, user);
             placeOne(cloth, orderType, orderStatus, cloth.getArticle(), size, user);
         }
@@ -154,16 +164,21 @@ public class OrderService {
     }
 
     private void deleteInactiveOrder(Cloth clothForExchange) {
-        if(clothForExchange.getExchangeOrder() != null) {
+        if (clothForExchange.getExchangeOrder() != null) {
             ClothOrder exchangeOrder = clothForExchange.getExchangeOrder();
             hardDelete(exchangeOrder);
         }
     }
 
-    public void hardDeleteExchangeOrder(ClothOrder exchangeOrder) {
-        Cloth clothToRelease = exchangeOrder.getClothToRelease();
-        clothesService.hardDelete(clothToRelease.getId());
-        ordersRepository.deleteById(exchangeOrder.getId());
+    public void hardDelete(long orderId) {
+        ClothOrder order = ordersRepository.getById(orderId);
+        hardDelete(order);
+    }
+
+    public void hardDelete(ClothOrder order) {
+        hardDeleteOrderStatuses(order);
+        ordersRepository.deleteById(order.getId());
+        hardDeleteClothToRelease(order);
     }
 
     public List<ClothOrder> performActionOnOrders(
@@ -190,14 +205,6 @@ public class OrderService {
         return clothOrders;
     }
 
-
-    public void hardDelete(ClothOrder order) {
-        hardDeleteClothToRelease(order);
-        hardDeleteOrderStatuses(order);
-        long orderId = order.getId();
-        ordersRepository.deleteById(orderId);
-    }
-
     private void hardDeleteClothToRelease(ClothOrder order) {
         Cloth cloth = order.getClothToRelease();
         clothesService.hardDelete(cloth);
@@ -205,6 +212,10 @@ public class OrderService {
 
     private void hardDeleteOrderStatuses(ClothOrder order) {
         List<OrderStatus> orderStatusHistory = order.getOrderStatusHistory();
-        orderStatusService.delete(orderStatusHistory);
+        orderStatusService.hardDelete(orderStatusHistory);
+    }
+
+    public ClothOrder getEmpty() {
+        return new ClothOrder();
     }
 }

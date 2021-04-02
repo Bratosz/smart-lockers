@@ -15,6 +15,7 @@ import pl.bratosz.smartlockers.response.ResponseClothAcceptance;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.ClothesRepository;
 
+import pl.bratosz.smartlockers.response.ResponseClothAssignment;
 import pl.bratosz.smartlockers.service.managers.OrderManager;
 import pl.bratosz.smartlockers.service.managers.ClothesManager;
 
@@ -34,6 +35,7 @@ public class ClothService {
     private OrderStatusService orderStatusService;
     private UserService userService;
     private OrderManager orderManager;
+    private EmployeeService employeeService;
     private ClothStatusService clothStatusService;
     private User user;
     private ClothesManager clothesManager;
@@ -41,13 +43,14 @@ public class ClothService {
     public ClothService(ClothesRepository clothesRepository,
                         OrdersRepository ordersRepository,
                         OrderStatusService orderStatusService, UserService userService,
-                        OrderManager orderManager, ClothStatusService clothStatusService,
+                        OrderManager orderManager, EmployeeService employeeService, ClothStatusService clothStatusService,
                         ClothesManager clothesManager) {
         this.clothesRepository = clothesRepository;
         this.ordersRepository = ordersRepository;
         this.orderStatusService = orderStatusService;
         this.userService = userService;
         this.orderManager = orderManager;
+        this.employeeService = employeeService;
         this.clothStatusService = clothStatusService;
         this.clothesManager = clothesManager;
     }
@@ -85,7 +88,7 @@ public class ClothService {
     public List<Cloth> getByBarCodes(long[] barCodes) {
         List<Cloth> clothes = new LinkedList<>();
         for(long barCode : barCodes) {
-            Cloth cloth = clothesRepository.getClothByBarCode(barCode);
+            Cloth cloth = clothesRepository.getByBarCode(barCode);
             clothes.add(cloth);
         }
         return clothes;
@@ -103,10 +106,35 @@ public class ClothService {
         }
     }
 
-    public ResponseClothAcceptance accept(long clientId, long userId, long clothBarCode, OrderType orderType) {
+    public ResponseClothAssignment assign(long clientId,
+                                          long userId,
+                                          long employeeId,
+                                          long clothBarCode,
+                                          AssignmentType assignmentType,
+                                          Cloth cloth) {
         loadUser(userId);
-        Cloth cloth = clothesRepository.getClothByBarCode(clothBarCode);
-        if (clothIsNotPresent(clientId, cloth)) {
+        Employee employee = employeeService.getById(employeeId);
+        Cloth byBarCode = clothesRepository.getByBarCode(clothBarCode);
+        boolean clothIsPresent = clothIsPresent(clientId, cloth);
+        switch (assignmentType) {
+            case ROTATION_RELEASE:
+                if(clothIsPresent) {
+                    return releaseAsRotational(cloth, employee);
+                } else {
+                    return
+                }
+        }
+
+
+    }
+
+    public ResponseClothAcceptance accept(long clientId,
+                                          long userId,
+                                          long clothBarCode,
+                                          OrderType orderType) {
+        loadUser(userId);
+        Cloth cloth = clothesRepository.getByBarCode(clothBarCode);
+        if (clothIsAbsent(clientId, cloth)) {
             return createClothNotFoundResponse(cloth, clothBarCode);
         } else if(clothIsReturned(cloth)) {
             return ResponseClothAcceptance.createClothAlreadyReturned(cloth);
@@ -122,6 +150,12 @@ public class ClothService {
             }
         }
     }
+
+    private boolean clothIsPresent(long clientId, Cloth cloth) {
+        return !clothIsAbsent(clientId, cloth);
+    }
+
+
 
     private boolean clothIsReturned(Cloth cloth) {
         if(cloth.getClothStatus().getActualStatus().equals(ACCEPTED_FOR_EXCHANGE)) {
@@ -164,11 +198,13 @@ public class ClothService {
         clothesRepository.saveAll(newClothes);
     }
 
-    private boolean clothIsNotPresent(long clientId, Cloth cloth) {
+    private boolean clothIsAbsent(long clientId, Cloth cloth) {
         return cloth == null || isClothBelongsToOtherClient(cloth, clientId);
     }
 
-    private ResponseClothAcceptance acceptForExchangeForNewOne(OrderType orderType, Cloth cloth, OrderType actualOrderType) {
+    private ResponseClothAcceptance acceptForExchangeForNewOne(OrderType orderType,
+                                                               Cloth cloth,
+                                                               OrderType actualOrderType) {
         if (actualOrderType.equals(EMPTY)) {
             Cloth clothForExchange = acceptForExchange(cloth);
             OrderStatus orderStatus = orderStatusService.create(
@@ -190,8 +226,8 @@ public class ClothService {
         }
     }
 
-    private ResponseClothAcceptance acceptForAutoExchange(Cloth cloth, OrderType activeOrderType) {
-        if (activeOrderType.equals(EMPTY)) {
+    private ResponseClothAcceptance acceptForAutoExchange(Cloth cloth, OrderType actualOrderType) {
+        if (actualOrderType.equals(EMPTY)) {
             return ResponseClothAcceptance.createNoActiveOrderPresentResponse(cloth);
         } else {
             ClothOrder order = acceptClothAndUpdateOrder(cloth);
@@ -201,7 +237,7 @@ public class ClothService {
 
     private ResponseClothAcceptance getResponseForAnotherActiveOrder(Cloth cloth, long barCode) {
         try {
-            ClothOrder activeOrder = getOrderFromCloth(cloth);
+            ClothOrder activeOrder = getOrder(cloth);
             return ResponseClothAcceptance.createAnotherOrderIsActiveResponse(activeOrder);
         } catch (ClothOrderException e) {
             e.printStackTrace();
@@ -213,7 +249,7 @@ public class ClothService {
     private OrderType getActualOrderType(Cloth cloth) {
         ClothOrder actualOrder = null;
         try {
-            actualOrder = getOrderFromCloth(cloth);
+            actualOrder = getOrder(cloth);
         } catch (NoActiveClothOrderException e) {
             return EMPTY;
         } catch (ClothOrderException e) {
@@ -225,33 +261,22 @@ public class ClothService {
 
     private ClothOrder acceptClothAndUpdateOrder(Cloth cloth) {
         Cloth acceptedCloth = acceptForExchange(cloth);
-        ClothOrder clothOrder = setOrderReadyForRealization(acceptedCloth, user);
-        return clothOrder;
+        try {
+            return orderService.setOrderReadyForRealization(
+                    getOrder(acceptedCloth), user);
+        } catch (ClothOrderException e) {
+            e.printStackTrace();
+            return orderService.getEmpty();
+        }
     }
 
     private Cloth acceptForExchange(Cloth cloth) {
         ClothStatus actualStatus = clothStatusService.create(ACCEPTED_FOR_EXCHANGE, cloth, user);
         cloth = clothesManager.updateCloth(actualStatus, cloth);
-        if(cloth.getExchangeOrder() != null) cloth =
-                clothesManager.updateOrder(cloth, user);
         return clothesRepository.save(cloth);
     }
 
-    private ClothOrder setOrderReadyForRealization(Cloth cloth, User user) {
-        ClothOrder order = null;
-        try {
-            order = getOrderFromCloth(cloth);
-            order = orderManager.update(
-                    READY_FOR_REALIZATION, order, user);
-            ordersRepository.save(order);
-        } catch (ClothOrderException e) {
-            e.printStackTrace();
-            e.getMessage();
-        }
-        return order;
-    }
-
-    private ClothOrder getOrderFromCloth(Cloth cloth) throws ClothOrderException {
+    private ClothOrder getOrder(Cloth cloth) throws ClothOrderException {
         if (cloth.getExchangeOrder() == null) {
             throw new NoActiveClothOrderException("");
         } else {
@@ -292,6 +317,10 @@ public class ClothService {
     }
 
     public void hardDelete(Cloth cloth) {
+        List<ClothStatus> statusHistory = cloth.getStatusHistory();
+        clothStatusService.hardDelete(statusHistory);
         clothesRepository.deleteById(cloth.getId());
+
     }
+
 }

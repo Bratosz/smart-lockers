@@ -39,7 +39,7 @@ public class OrderStatusService {
     }
 
 
-    public void delete(List<OrderStatus> orderStatusHistory) {
+    public void hardDelete(List<OrderStatus> orderStatusHistory) {
         for (OrderStatus status : orderStatusHistory) {
             ordersStatusRepository.deleteById(status.getId());
         }

@@ -30,11 +30,11 @@ public class Cloth {
     protected Article article;
 
     @JsonView(Views.InternalForClothes.class)
-    @OneToOne(mappedBy = "clothToExchange", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "clothToExchange", cascade = CascadeType.PERSIST)
     private ClothOrder exchangeOrder;
 
     @JsonView(Views.InternalForClothes.class)
-    @OneToOne(mappedBy = "clothToRelease", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "clothToRelease", cascade = CascadeType.PERSIST)
     private ClothOrder releaseOrder;
 
     @JsonView(Views.InternalForClothes.class)

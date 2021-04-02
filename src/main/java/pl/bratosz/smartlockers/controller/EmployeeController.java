@@ -8,7 +8,6 @@ import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.service.EmployeeService;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/employees")
@@ -30,7 +29,7 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public Employee getEmployeeById(@PathVariable Long id) throws RuntimeException {
         if (id < 0) throw new WrongIdException("Passed id is: " + id + ". It should be higher or equal to 0");
-        return employeeService.getEmployeeById(id);
+        return employeeService.getById(id);
     }
 
     @JsonView(Views.InternalForEmployees.class)

@@ -189,7 +189,7 @@ public class FileController {
             long id = (long) sheet.getRow(i).getCell(0).getNumericCellValue();
 
             //Adding employee to raport list of deleted employees
-            Employee employee = employeeService.getEmployeeById(id);
+            Employee employee = employeeService.getById(id);
             long boxId = employee.getBox().getId();
                 releasedBoxes.add(boxesService.releaseBoxAndDismissEmployee(boxId, userId));
 

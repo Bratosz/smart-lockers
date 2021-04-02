@@ -3,9 +3,11 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import pl.bratosz.smartlockers.model.AssignmentType;
 import pl.bratosz.smartlockers.model.orders.OrderType;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.response.ResponseClothAcceptance;
+import pl.bratosz.smartlockers.response.ResponseClothAssignment;
 import pl.bratosz.smartlockers.service.ClothService;
 
 import static pl.bratosz.smartlockers.model.Views.*;
@@ -35,5 +37,15 @@ public class ClothController {
             @PathVariable long clothBarCode,
             @PathVariable OrderType orderType) {
         return clothesService.accept(clientId, userId, clothBarCode, orderType);
+    }
+
+    @PostMapping("/assign/{clientId}/{userId}/{clothBarCode}/{assignmentType}")
+    public ResponseClothAssignment assign(
+            @PathVariable long clientId,
+            @PathVariable long userId,
+            @PathVariable long clothBarCode,
+            @PathVariable AssignmentType assignmentType,
+            @RequestBody Cloth cloth) {
+        return clothesService.assign(clientId, userId, clothBarCode, assignmentType, cloth);
     }
 }

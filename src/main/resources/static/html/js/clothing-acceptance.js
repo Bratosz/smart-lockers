@@ -1,36 +1,56 @@
-let isSended = true;
-
 $(document).ready(function () {
     $('#input-bar-code').keypress(function (event) {
-        let input = $('#input-bar-code');
-        let initialInputValue = input.val();
-        if(isSended && (initialInputValue.length > 0)){
-            isSended = false;
-            input.val("");
-        } else if (isSended && initialInputValue.length == 0) {
-            isSended = false;
-        }
         let keyPressed = event.which;
-        if (isEnterKeyPressed(keyPressed)) {
-            let clothBarCode = input.val();
-            console.log(clothBarCode);
-            console.log(userId);
-            let exchangeType = $('input[name="exchange"]:checked').val();
-            $.ajax({
-                url: `http://localhost:8080/clothes/acceptance/${clientId}/${userId}/${clothBarCode}/${exchangeType}`,
-                method: "post",
-                success: function (response) {
-                    console.log(response)
-                }
-            })
-            isSended = true;
+        let barCode = getBarCodeValue();
+        if(pressedKeyIsENTER(keyPressed) && barCodeIsValid(barCode)) {
+            let exchangeType = getExchangeType();
+            sendAcceptanceRequest(barCode, exchangeType);
+            clearInputBarCodeField();
+        } else if(pressedKeyIsENTER(keyPressed)) {
+            alert("Nieprawidłowy kod kreskowy!")
         }
-    });
+    })
 });
 
-function isEnterKeyPressed(char) {
-    let enterKeyValue = 13;
-    if(char == enterKeyValue) {
+function getInputBarCode() {
+    return $("#input-bar-code");
+}
+
+function getBarCodeValue() {
+    return getInputBarCode().val()
+}
+
+function barCodeIsValid(barCode) {
+    if(barCode.length == 13) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function getExchangeType() {
+    return $('input[name="exchange"]:checked').val();
+}
+
+function clearInputBarCodeField() {
+    getInputBarCode().val("");
+}
+
+function sendAcceptanceRequest(barCode, exchangeType) {
+    $.ajax({
+        url: `http://localhost:8080/clothes/acceptance/${clientId}/${userId}/${barCode}/${exchangeType}`,
+        method: "post",
+        success: function (response) {
+            console.log(response)
+        }
+    })
+}
+
+
+
+function pressedKeyIsENTER(char) {
+    let ENTERKeyValue = 13;
+    if(char == ENTERKeyValue) {
         return true;
     } else {
         return false;

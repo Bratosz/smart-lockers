@@ -48,6 +48,10 @@ header {
     color: #E20015;
 }
 
+.gap-vertical-5 {
+    height: 5px;
+}
+
 .gap-vertical-20 {
     height: 20px;
 }

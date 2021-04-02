@@ -1,4 +1,5 @@
 let clientId = 1;
+const userId = 15;
 
 function loadPlants(clientId) {
     $.ajax({
