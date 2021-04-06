@@ -2,7 +2,6 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.bratosz.smartlockers.exception.ClothOrderException;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
@@ -145,7 +144,7 @@ public class OrderService {
                                User user) {
         deleteInactiveOrder(clothForExchange);
         Employee employee = clothForExchange.getEmployee();
-        Cloth clothForRelease = clothesService.createNewInstead(
+        Cloth clothForRelease = clothesService.createNewForAssignInsteadExisting(
                 clothForExchange.getOrdinalNumber(),
                 article,
                 size,

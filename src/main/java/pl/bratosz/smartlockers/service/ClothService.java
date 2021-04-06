@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.exception.ClothOrderException;
 import pl.bratosz.smartlockers.exception.NoActiveClothOrderException;
-import pl.bratosz.smartlockers.model.clothes.Article;
-import pl.bratosz.smartlockers.model.clothes.Cloth;
-import pl.bratosz.smartlockers.model.clothes.ClothSize;
-import pl.bratosz.smartlockers.model.clothes.ClothStatus;
+import pl.bratosz.smartlockers.model.clothes.*;
 import pl.bratosz.smartlockers.model.orders.*;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.OrdersRepository;
@@ -63,7 +60,7 @@ public class ClothService {
         this.user = userService.getUserById(userId);
     }
 
-    public Cloth createNewInstead(
+    public Cloth createNewForAssignInsteadExisting(
             int ordinalNumber,
             Article article,
             ClothSize size,
@@ -88,7 +85,7 @@ public class ClothService {
     public List<Cloth> getByBarCodes(long[] barCodes) {
         List<Cloth> clothes = new LinkedList<>();
         for(long barCode : barCodes) {
-            Cloth cloth = clothesRepository.getByBarCode(barCode);
+            Cloth cloth = clothesRepository.getByBarcode(barCode);
             clothes.add(cloth);
         }
         return clothes;
@@ -109,23 +106,44 @@ public class ClothService {
     public ResponseClothAssignment assign(long clientId,
                                           long userId,
                                           long employeeId,
-                                          long clothBarCode,
+                                          long barcode,
                                           AssignmentType assignmentType,
-                                          Cloth cloth) {
+                                          Cloth withdrawnCloth) {
         loadUser(userId);
         Employee employee = employeeService.getById(employeeId);
-        Cloth byBarCode = clothesRepository.getByBarCode(clothBarCode);
-        boolean clothIsPresent = clothIsPresent(clientId, cloth);
+        Cloth clothByBarcode = clothesRepository.getByBarcode(barcode);
+        boolean clothIsPresent = clothIsPresent(clientId, clothByBarcode);
         switch (assignmentType) {
-            case ROTATION_RELEASE:
+            case RELEASE_ROTATIONAL_CLOTH:
                 if(clothIsPresent) {
-                    return releaseAsRotational(cloth, employee);
+                    return releaseAsRotational(clothByBarcode, employee);
                 } else {
-                    return
+                    return ResponseClothAssignment.createForFailure(
+                            "Brak w bazie ubrania o podanym kodzie kreskowym");
+                }
+            case ASSIGN_WITHDRAWN_CLOTH:
+                if(clothIsPresent) {
+                    return ResponseClothAssignment.createForFailure(
+                            "Ubranie jest aktywne");
+                } else {
+                    assignAsWithdrawnCloth(withdrawnCloth, employee);
+                    return ResponseClothAssignment.createForSucceed();
                 }
         }
+        return null;
+    }
 
+    //SEPARATE ASSING METHOD TO ROTATION ASSIGNMENT AND WITHDRAWN CLOTH ASSIGNMENT
 
+    private ResponseClothAssignment releaseAsRotational(Cloth clothByBarcode, Employee employee) {
+        return ResponseClothAssignment.createForSucceed();
+    }
+
+    private void assignAsWithdrawnCloth(Cloth withdrawnCloth, Employee employee) {
+        ClothStatus clothStatus = clothStatusService.create(ClothDestination.FOR_DISPOSAL, user);
+        withdrawnCloth.setStatus(clothStatus);
+        withdrawnCloth.setEmployee(employee);
+        clothesRepository.save(withdrawnCloth);
     }
 
     public ResponseClothAcceptance accept(long clientId,
@@ -133,7 +151,7 @@ public class ClothService {
                                           long clothBarCode,
                                           OrderType orderType) {
         loadUser(userId);
-        Cloth cloth = clothesRepository.getByBarCode(clothBarCode);
+        Cloth cloth = clothesRepository.getByBarcode(clothBarCode);
         if (clothIsAbsent(clientId, cloth)) {
             return createClothNotFoundResponse(cloth, clothBarCode);
         } else if(clothIsReturned(cloth)) {
@@ -199,7 +217,8 @@ public class ClothService {
     }
 
     private boolean clothIsAbsent(long clientId, Cloth cloth) {
-        return cloth == null || isClothBelongsToOtherClient(cloth, clientId);
+        return cloth == null ||
+                isClothBelongsToOtherClient(cloth, clientId);
     }
 
     private ResponseClothAcceptance acceptForExchangeForNewOne(OrderType orderType,

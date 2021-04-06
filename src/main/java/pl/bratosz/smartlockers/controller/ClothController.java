@@ -39,13 +39,14 @@ public class ClothController {
         return clothesService.accept(clientId, userId, clothBarCode, orderType);
     }
 
-    @PostMapping("/assign/{clientId}/{userId}/{clothBarCode}/{assignmentType}")
+    @PostMapping("/assign/{clientId}/{userId}/{clothBarCode}/{assignmentType}/{employeeId}")
     public ResponseClothAssignment assign(
             @PathVariable long clientId,
             @PathVariable long userId,
             @PathVariable long clothBarCode,
             @PathVariable AssignmentType assignmentType,
-            @RequestBody Cloth cloth) {
-        return clothesService.assign(clientId, userId, clothBarCode, assignmentType, cloth);
+            @PathVariable long employeeId,
+            @RequestBody Cloth withdrawnCloth) {
+        return clothesService.assign(clientId, userId, clothBarCode, assignmentType, withdrawnCloth);
     }
 }

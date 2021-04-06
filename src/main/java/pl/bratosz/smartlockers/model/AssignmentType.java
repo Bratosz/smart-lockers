@@ -1,6 +1,6 @@
 package pl.bratosz.smartlockers.model;
 
 public enum AssignmentType {
-    ROTATION_RELEASE,
-    ASSIGN_WITHDRAW_CLOTH,
+    RELEASE_ROTATIONAL_CLOTH,
+    ASSIGN_WITHDRAWN_CLOTH,
 }

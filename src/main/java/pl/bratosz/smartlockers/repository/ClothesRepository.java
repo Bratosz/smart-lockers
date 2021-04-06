@@ -15,7 +15,7 @@ import java.util.List;
 public interface ClothesRepository extends JpaRepository<Cloth, Long> {
     Cloth getClothById(long id);
 
-    Cloth getByBarCode(long barCode);
+    Cloth getByBarcode(long barCode);
 
     @Transactional
     @Modifying

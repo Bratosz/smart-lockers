@@ -24,6 +24,7 @@ public class ClothStatus {
     private Date dateOfUpdate;
     @ManyToOne
     private Cloth cloth;
+    private AdditionalStatusInfo additionalStatusInfo;
 
     public ClothStatus() {
     }
@@ -102,4 +103,6 @@ public class ClothStatus {
     public ClothActualStatus getStatus() {
         return status;
     }
+
+
 }

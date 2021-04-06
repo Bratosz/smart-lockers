@@ -113,4 +113,8 @@ tr:nth-child(odd) {
     padding-right: 2px;
 }
 
+.input-select {
+    display: inline-block;
+}
+
 

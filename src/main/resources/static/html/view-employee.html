@@ -214,7 +214,7 @@
     <div>
         <div>
             <div>
-            <!--TSHIRT SELECTION-->
+                <!--TSHIRT SELECTION-->
 
                 <div>
                     <p>Wybierz koszulkę: </p>
@@ -270,7 +270,7 @@
                     </div>
                 </div>
 
-            <!--TROUSERS SELECTION-->
+                <!--TROUSERS SELECTION-->
 
                 <div>
                     <p>Wybierz spodnie: </p>
@@ -298,7 +298,7 @@
             </div>
             <div>
 
-            <!--SIZE SELECTION-->
+                <!--SIZE SELECTION-->
 
                 <div>
                     <p>Wybierz rozmiar:</p>
@@ -497,34 +497,72 @@
     <div class="gap-vertical-20"></div>
 
 
-
     <!--Clothing acceptance-->
 
     <div>
+        <div>
+            Przypisanie odzieży:
+        </div>
         <div class="acceptance-parameters">
-            <div>
-                Przypisanie dodatkowej odzieży:
+            <div class="gap-vertical-5"></div>
+            <div class="radio-list">
+                <input type="radio" id="assginment-2" name="assignment"
+                       value="ASSIGN_WITHDRAWN_CLOTH">
+                <label for="assginment-2">Zapisanie wycofanej(nadmiarowej) odzieży</label>
             </div>
             <div class="gap-vertical-5"></div>
             <div>
-                <div>
-                    <input type="radio" id="assignment-1" name="assignment"
-                           value="ROTATION_RELEASE" checked>
-                    <label for="assignment-1">Wydanie rotacji</label>
-                </div>
-                <div>
-                    <input type="radio" id="assginment-2" name="assignment"
-                           value="ASSIGN_WITHDRAW_CLOTH">
-                    <label for="assginment-2">Zapisanie wycofanej(nadmiarowej) odzieży</label>
-                </div>
+                    <span>Jak zwrócono: </span>
+                    <select id="withdraw-type">
+                        <option value="IN-THE-BAG">Oddana w worku</option>
+                        <option value="RETURNED_TO_SERVICE_MAN">Oddana serwisantowi</option>
+                </select>
             </div>
-            <div class="gap-vertical-20"></div>
-            <div>
-                <span>Przyjęcie odzieży: </span>
+            <div class="gap-vertical-5"></div>
+            <div class="input-select">
+                <span>Data wydania: </span>
+                <select id="select-month">
+                    <option value="1">01</option>
+                    <option value="2">02</option>
+                    <option value="3">03</option>
+                    <option value="4">04</option>
+                    <option value="5">05</option>
+                    <option value="6">06</option>
+                    <option value="7">07</option>
+                    <option value="8">08</option>
+                    <option value="9">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
             </div>
-            <input id="input-bar-code" type="number"/>
+            <div class="input-select">
+                <select id="select-year">
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                    <option value="2014">2014</option>
+                </select>
+            </div>
         </div>
-
+        <div class="acceptance-parameters">
+            <div class="gap-vertical-5"></div>
+            <div class="radio-list">
+                <input type="radio" id="assignment-1" name="assignment"
+                       value="RELEASE_ROTATIONAL_CLOTH" checked>
+                <label for="assignment-1">Wydanie rotacji</label>
+            </div>
+        </div>
+        <div class="gap-vertical-20"></div>
+        <div>
+            <span>Przyjęcie odzieży: </span>
+        </div>
+        <input id="input-bar-code" type="number"/>
+    </div>
 
 
     </div>
