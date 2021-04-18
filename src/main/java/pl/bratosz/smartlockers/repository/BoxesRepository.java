@@ -3,9 +3,11 @@ package pl.bratosz.smartlockers.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import pl.bratosz.smartlockers.model.*;
 
 import java.util.List;
@@ -35,7 +37,7 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             "l.plant.plantNumber = :plantNumber ")
     Box getBox(int lockerNumber, int boxNumber, Location location, int plantNumber);
 
-    Box getBoxById(long id);
+    Box getById(long id);
 
     @Query("select b from Box b " +
             "where b.locker.plant.id = :plantId " +
@@ -61,5 +63,10 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             @Param("departmentId") long departmentId,
             @Param("locationId") long locationId,
             @Param("boxStatus") Box.BoxStatus boxStatus);
+
+    @Transactional
+    @Modifying
+    @Query("delete from Box b where b.id = :id ")
+    void deleteHardById(long id);
 
 }

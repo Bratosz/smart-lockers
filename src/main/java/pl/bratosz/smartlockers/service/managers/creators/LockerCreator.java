@@ -9,6 +9,8 @@ import java.util.NoSuchElementException;
 
 public class LockerCreator {
     private Client client;
+    private Location location;
+    private Department department;
 
     public LockerCreator(Client client) {
         this.client = client;
@@ -23,7 +25,22 @@ public class LockerCreator {
                                 Department department,
                                 Location location) {
         Locker locker = new Locker(lockerNumber, lockerCapacity);
-        List<Box> boxes = BoxCreator.createBoxesForLocker(locker);
+        List<Box> boxes = BoxCreator.createBoxes(locker);
+        locker.setBoxes(boxes);
+        locker.setPlant(plant);
+        locker.setDepartment(department);
+        locker.setLocation(location);
+        return locker;
+    }
+
+    public static Locker createWithCustomBoxNumbers(
+            int lockerNumber,
+            List<Integer> boxNumbers,
+            Plant plant,
+            Department department,
+            Location location) {
+        Locker locker = new Locker(lockerNumber, boxNumbers.size());
+        List<Box> boxes = BoxCreator.createBoxesWithCustomNumbers(locker, boxNumbers);
         locker.setBoxes(boxes);
         locker.setPlant(plant);
         locker.setDepartment(department);
@@ -42,7 +59,7 @@ public class LockerCreator {
             Locker locker = new Locker();
             locker.setCapacity(capacity);
             BoxCreator boxCreator = new BoxCreator();
-            List<Box> boxes = boxCreator.createBoxesForLocker(locker);
+            List<Box> boxes = boxCreator.createBoxes(locker);
 
             locker.setLockerNumber(lockerNumber);
             locker.setPlant(plant);

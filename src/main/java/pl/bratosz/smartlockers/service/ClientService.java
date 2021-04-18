@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Locker;
+import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.repository.ClientRepository;
 import pl.bratosz.smartlockers.response.DataLoadedResponse;
 import pl.bratosz.smartlockers.service.exels.DataBaseLoader;
@@ -21,7 +22,6 @@ public class ClientService {
 
     public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
-
     }
 
     public Client create(String name) {
@@ -40,5 +40,10 @@ public class ClientService {
 
     public Client getById(long clientId) {
         return clientRepository.getById(clientId);
+    }
+
+    public void add(Article article, Client client) {
+        client.addArticle(article, 0);
+        clientRepository.save(client);
     }
 }

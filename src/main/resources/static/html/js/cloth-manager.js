@@ -1,3 +1,19 @@
+function writeClothesToTable($table, clothes) {
+    $table = removeTableRows($table);
+    clothes = sortClothesByArticleNumberAndOrdinalNumber(clothes);
+    return writeClothesInTable(clothes, $table);
+}
+
+function writeClothesInTable(clothes, $table) {
+    const $rowTemplate =  getRowTemplate($table);
+    for(let cloth of clothes) {
+        let $row = $rowTemplate.clone();
+        $row = writeClothToRow(cloth, $row);
+        $table.append($row);
+    }
+    return $table;
+}
+
 function extractClothes(desiredLifeCycleStatus, clothes) {
     let extractedClothes = [];
     for(let cloth of clothes) {
@@ -19,8 +35,7 @@ function getActualLifeCycleStatus(cloth) {
 }
 
 function clothIs(desiredLifeCycleStatus, cloth) {
-    let actualLifeCycleStatus = getActualLifeCycleStatus(cloth);
-    if(desiredLifeCycleStatus == actualLifeCycleStatus) {
+    if(desiredLifeCycleStatus == cloth.lifeCycleStatus) {
         return true;
     } else {
         return false;
@@ -35,7 +50,7 @@ function writeClothToRow(cloth, $row) {
     $row.find(".cell-article-name").text(cloth.article.name);
     $row.find(".cell-size").text(cloth.size);
     $row.find(".cell-assignment-date").text(formatDateDMY(cloth.assignment));
-    $row.find(".cell-id-bar-code").text(cloth.barCode);
+    $row.find(".cell-barcode").text(cloth.barcode);
     $row.find(".cell-release-date").text(formatDateDMY(cloth.releaseDate));
     $row.find(".cell-washing-date").text(formatDateDMY(cloth.lastWashing));
     return $row;
@@ -51,28 +66,33 @@ function sortClothesByArticleNumberAndOrdinalNumber(clothes) {
 
 
 
-function iterateClothesAndWriteInTable(clothes, $table) {
-    const $rowTemplate =  getRowTemplate($table);
-    for(let cloth of clothes) {
-        let $row = $rowTemplate.clone();
-        $row = writeClothToRow(cloth, $row);
-        $table.append($row);
-    }
-    return $table;
-}
-
-function writeClothesToTable($table, clothes) {
-    $table = removeTableRows($table);
-    clothes = sortClothesByArticleNumberAndOrdinalNumber(clothes);
-    return iterateClothesAndWriteInTable(clothes, $table);
-}
-
 function toStringCloth(cloth) {
     return cloth.article.clothType + " " +
         cloth.article.articleNumber + " " +
         "lp. " + cloth.ordinalNumber + " " +
         "rozm.: " + cloth.size;
 
+}
+
+
+
+function getSizeFromInput() {
+     return $('input[name="size"]:checked').val();
+}
+
+function getArticleFromInput() {
+    return $('input[name="article"]:checked').val();
+}
+
+function getOrdinalNumberFromInput() {
+    return $('#input-ordinal-number').val();
+}
+
+function getAssignmentDateFromInput() {
+    let year = $('#select-year').val().toString();
+    let month = $('#select-month').val().toString();
+    let day = "01";
+    return year + "-" + month + "-" + day;
 }
 
 

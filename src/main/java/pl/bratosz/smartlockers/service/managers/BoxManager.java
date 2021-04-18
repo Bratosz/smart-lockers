@@ -1,9 +1,11 @@
 package pl.bratosz.smartlockers.service.managers;
 
+import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.EmployeeGeneral;
 import pl.bratosz.smartlockers.model.users.User;
+import pl.bratosz.smartlockers.repository.BoxesRepository;
 
 import java.util.Date;
 
@@ -11,28 +13,19 @@ import static pl.bratosz.smartlockers.model.Box.BoxStatus.*;
 
 //Manager should be created before each operation
 
+@Service
 public class BoxManager {
-    private User user;
-    private Date date;
-    private Box box;
+    private BoxesRepository boxesRepository;
 
-    public BoxManager(User user) {
-        this.user = user;
-        this.date = new Date();
-    }
-
-    public BoxManager(User user, Date date) {
-        this.user = user;
-        this.date = date;
+    public BoxManager(BoxesRepository boxesRepository) {
+        this.boxesRepository = boxesRepository;
     }
 
     public Box release(Box box) {
-        EmployeeGeneral releasedEmployee = box.getEmployee();
-        if(employeeIsPresent(releasedEmployee)) {
+        if(box.getBoxStatus().equals(OCCUPY)) {
             box.setBoxStatus(FREE);
-            box.setEmployee(setDummy());
-            box.getReleasedEmployees().add((Employee) releasedEmployee);
-            return box;
+            box.setEmployee(setDummy(box));
+            return boxesRepository.save(box);
         } else {
             return box;
         }
@@ -48,7 +41,7 @@ public class BoxManager {
         }
     }
 
-    private EmployeeGeneral setDummy() {
+    private EmployeeGeneral setDummy(Box box) {
         return box.getEmployeeDummy();
     }
 

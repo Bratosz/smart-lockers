@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.exception.ClothOrderException;
 import pl.bratosz.smartlockers.exception.NoActiveClothOrderException;
@@ -34,14 +35,18 @@ public class ClothService {
     private OrderManager orderManager;
     private EmployeeService employeeService;
     private ClothStatusService clothStatusService;
+    private ArticleService articleService;
     private User user;
     private ClothesManager clothesManager;
 
     public ClothService(ClothesRepository clothesRepository,
                         OrdersRepository ordersRepository,
-                        OrderStatusService orderStatusService, UserService userService,
-                        OrderManager orderManager, EmployeeService employeeService, ClothStatusService clothStatusService,
-                        ClothesManager clothesManager) {
+                        OrderStatusService orderStatusService,
+                        UserService userService,
+                        OrderManager orderManager,
+                        @Lazy EmployeeService employeeService,
+                        ClothStatusService clothStatusService,
+                        ArticleService articleService, ClothesManager clothesManager) {
         this.clothesRepository = clothesRepository;
         this.ordersRepository = ordersRepository;
         this.orderStatusService = orderStatusService;
@@ -49,6 +54,7 @@ public class ClothService {
         this.orderManager = orderManager;
         this.employeeService = employeeService;
         this.clothStatusService = clothStatusService;
+        this.articleService = articleService;
         this.clothesManager = clothesManager;
     }
 
@@ -82,9 +88,9 @@ public class ClothService {
         return clothes;
     }
 
-    public List<Cloth> getByBarCodes(long[] barCodes) {
+    public List<Cloth> getByBarcodes(long[] barCodes) {
         List<Cloth> clothes = new LinkedList<>();
-        for(long barCode : barCodes) {
+        for (long barCode : barCodes) {
             Cloth cloth = clothesRepository.getByBarcode(barCode);
             clothes.add(cloth);
         }
@@ -103,47 +109,74 @@ public class ClothService {
         }
     }
 
-    public ResponseClothAssignment assign(long clientId,
-                                          long userId,
-                                          long employeeId,
-                                          long barcode,
-                                          AssignmentType assignmentType,
-                                          Cloth withdrawnCloth) {
+    public ResponseClothAssignment assignWithdrawnCloth(long clientId,
+                                                        long userId,
+                                                        long employeeId,
+                                                        int articleNumber,
+                                                        ClothSize size,
+                                                        Cloth withdrawnCloth) {
+        loadUser(userId);
+        Employee employee = employeeService.getById(employeeId);
+        Cloth clothByBarcode = clothesRepository.getByBarcode(withdrawnCloth.getBarcode());
+        if (clothIsPresent(clothByBarcode, clientId)) {
+            return ResponseClothAssignment.createForFailure(
+                    "Ubranie jest aktywne");
+        } else if (clothBelongsToOtherClient(clothByBarcode, clientId)) {
+            return ResponseClothAssignment.createForFailure(
+                    "Ubranie należy do innego klienta");
+        } else {
+            withdrawnCloth.setSize(size);
+            withdrawnCloth.setArticle(articleService.get(articleNumber));
+            return assignAsWithdrawnCloth(withdrawnCloth, employee);
+        }
+    }
+
+
+    public ResponseClothAssignment releaseRotationalCloth(long clientId, long userId, long employeeId, long barcode) {
         loadUser(userId);
         Employee employee = employeeService.getById(employeeId);
         Cloth clothByBarcode = clothesRepository.getByBarcode(barcode);
-        boolean clothIsPresent = clothIsPresent(clientId, clothByBarcode);
-        switch (assignmentType) {
-            case RELEASE_ROTATIONAL_CLOTH:
-                if(clothIsPresent) {
-                    return releaseAsRotational(clothByBarcode, employee);
-                } else {
-                    return ResponseClothAssignment.createForFailure(
-                            "Brak w bazie ubrania o podanym kodzie kreskowym");
-                }
-            case ASSIGN_WITHDRAWN_CLOTH:
-                if(clothIsPresent) {
-                    return ResponseClothAssignment.createForFailure(
-                            "Ubranie jest aktywne");
-                } else {
-                    assignAsWithdrawnCloth(withdrawnCloth, employee);
-                    return ResponseClothAssignment.createForSucceed();
-                }
+        if (clothIsPresent(clothByBarcode, clientId)) {
+            return releaseAsRotational(clothByBarcode, employee);
+        } else {
+            return ResponseClothAssignment.createForFailure(
+                    "Brak ubrania o podanym kodzie kreskowym");
         }
-        return null;
     }
-
-    //SEPARATE ASSING METHOD TO ROTATION ASSIGNMENT AND WITHDRAWN CLOTH ASSIGNMENT
 
     private ResponseClothAssignment releaseAsRotational(Cloth clothByBarcode, Employee employee) {
-        return ResponseClothAssignment.createForSucceed();
+        if(!clothIsRotational(clothByBarcode)) {
+            return ResponseClothAssignment.createForFailure("To nie jest odzież rotacyjna");
+        } else if(!clothCanBeReleasedAsRotational(clothByBarcode)) {
+            return ResponseClothAssignment.createForFailure(
+                    "Ta odzież została już wydana");
+        } else {
+            RotationalCloth rotationalCloth = (RotationalCloth) clothByBarcode;
+            rotationalCloth.setRotationTemporaryOwner(employee);
+            clothesRepository.save(rotationalCloth);
+            return ResponseClothAssignment.createForSucceed();
+        }
     }
 
-    private void assignAsWithdrawnCloth(Cloth withdrawnCloth, Employee employee) {
+    private boolean clothCanBeReleasedAsRotational(Cloth cloth) {
+        if(clothIsRotational(cloth)) {
+            RotationalCloth rotationalCloth = (RotationalCloth) cloth;
+            return rotationalCloth.isReturned();
+        } else {
+            return false;
+        }
+    }
+
+    private boolean clothIsRotational(Cloth cloth) {
+        return cloth.getClass().isInstance(RotationalCloth.class);
+    }
+
+    private ResponseClothAssignment assignAsWithdrawnCloth(Cloth withdrawnCloth, Employee employee) {
         ClothStatus clothStatus = clothStatusService.create(ClothDestination.FOR_DISPOSAL, user);
         withdrawnCloth.setStatus(clothStatus);
         withdrawnCloth.setEmployee(employee);
         clothesRepository.save(withdrawnCloth);
+        return ResponseClothAssignment.createForSucceed();
     }
 
     public ResponseClothAcceptance accept(long clientId,
@@ -154,7 +187,7 @@ public class ClothService {
         Cloth cloth = clothesRepository.getByBarcode(clothBarCode);
         if (clothIsAbsent(clientId, cloth)) {
             return createClothNotFoundResponse(cloth, clothBarCode);
-        } else if(clothIsReturned(cloth)) {
+        } else if (clothIsReturned(cloth)) {
             return ResponseClothAcceptance.createClothAlreadyReturned(cloth);
         } else {
             OrderType actualOrderType = getActualOrderType(cloth);
@@ -169,14 +202,12 @@ public class ClothService {
         }
     }
 
-    private boolean clothIsPresent(long clientId, Cloth cloth) {
+    private boolean clothIsPresent(Cloth cloth, long clientId) {
         return !clothIsAbsent(clientId, cloth);
     }
 
-
-
     private boolean clothIsReturned(Cloth cloth) {
-        if(cloth.getClothStatus().getActualStatus().equals(ACCEPTED_FOR_EXCHANGE)) {
+        if (cloth.getClothStatus().getActualStatus().equals(ACCEPTED_FOR_EXCHANGE)) {
             return true;
         } else {
             return false;
@@ -218,7 +249,7 @@ public class ClothService {
 
     private boolean clothIsAbsent(long clientId, Cloth cloth) {
         return cloth == null ||
-                isClothBelongsToOtherClient(cloth, clientId);
+                clothBelongsToOtherClient(cloth, clientId);
     }
 
     private ResponseClothAcceptance acceptForExchangeForNewOne(OrderType orderType,
@@ -317,22 +348,16 @@ public class ClothService {
     }
 
 
-    private boolean isClothBelongsToOtherClient(Cloth cloth, long clientId) {
-        if (clientId == cloth.getClientId()) {
-            return false;
-        } else {
+    private boolean clothBelongsToOtherClient(Cloth cloth, long clientId) {
+        if (cloth != null && clientId != cloth.getClientId()) {
             return true;
+        } else {
+            return false;
         }
     }
 
-    public List<Cloth> createExisting(List<Cloth> clothes, User user) {
-        List<Cloth> existingClothes = new LinkedList<>();
-        clothes = clothesRepository.saveAll(clothes);
-        for(Cloth cloth : clothes) {
-            existingClothes.add(
-                    clothesManager.createExisting(cloth, user));
-        }
-        return existingClothes;
+    public List<Cloth> createExisting(List<Cloth> clothes) {
+        return clothesRepository.saveAll(clothes);
     }
 
     public void hardDelete(Cloth cloth) {
@@ -341,5 +366,6 @@ public class ClothService {
         clothesRepository.deleteById(cloth.getId());
 
     }
+
 
 }

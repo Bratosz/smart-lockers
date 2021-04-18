@@ -3,6 +3,7 @@ package pl.bratosz.smartlockers.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Location;
 import pl.bratosz.smartlockers.model.Plant;
 
@@ -14,9 +15,11 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
             "p.plantNumber = :plantNumber and " +
             "l.name = :name ")
     Location getByNameAndPlantNumber(@Param("name")String name,
-                                     @Param("plant") int plantNumber);
+                                     @Param("plantNumber") int plantNumber);
 
     @Query("select l from Location l join l.client c where " +
             "c.id = :clientId order by l.name desc")
     List<Location> getAll(long clientId);
+
+    Location getBySurrogateAndClient(boolean surrogate, Client client);
 }

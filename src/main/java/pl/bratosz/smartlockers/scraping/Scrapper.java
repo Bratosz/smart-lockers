@@ -2,17 +2,19 @@ package pl.bratosz.smartlockers.scraping;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.date.FormatDate;
 import pl.bratosz.smartlockers.model.Box;
+import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Locker;
 import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
 
+import pl.bratosz.smartlockers.model.clothes.LifeCycleStatus;
 import pl.bratosz.smartlockers.service.ArticleService;
+import pl.bratosz.smartlockers.service.ClientService;
 import pl.bratosz.smartlockers.strings.MyString;
 
 import java.io.IOException;
@@ -21,12 +23,14 @@ import java.util.*;
 @Service
 public class Scrapper {
     private ArticleService articleService;
+    private ClientService clientService;
     private OnlineConnection connection;
     private String login;
     private String password;
 
-    public Scrapper(ArticleService articleService) {
+    public Scrapper(ArticleService articleService, ClientService clientService) {
         this.articleService = articleService;
+        this.clientService = clientService;
         login = "";
         password = "";
     }
@@ -64,7 +68,10 @@ public class Scrapper {
     }
 
     public void find(Locker locker) {
-        int lockerNumber = locker.getLockerNumber();
+        findLocker(locker.getLockerNumber());
+    }
+
+    public void findLocker(int lockerNumber) {
         searchByLockerNumber(lockerNumber);
     }
 
@@ -121,23 +128,39 @@ public class Scrapper {
     }
 
 
-    public List<Cloth> getClothes() {
+    public List<Cloth> getClothes(Client client) {
         Elements elements = connection.getActualPage().select(
                 "#ctl00_MainContent_GridView2 > tbody > tr");
         List<Cloth> clothes = new LinkedList<>();
         for (int i = 1; i < elements.size(); i++) {
             Elements td = elements.get(i).select("td");
+            Date release = getRelease(td);
             Cloth cloth = new Cloth(
                     getBarcode(td),
                     getAssignment(td),
                     getLastWashing(td),
-                    getRelease(td),
+                    release,
                     getOrdinalNo(td),
-                    getArticleByArticleNumber(td),
-                    getSize(td));
+                    getArticleByArticleNumber(td, client),
+                    getSize(td),
+                    getLifeCycleStatus(release));
             clothes.add(cloth);
         }
         return clothes;
+    }
+
+    private LifeCycleStatus getLifeCycleStatus(Date release) {
+        if(release.compareTo(FormatDate.getDefaultDate()) == 0) {
+            return LifeCycleStatus.BEFORE_RELEASE;
+        } else {
+            return LifeCycleStatus.IN_ROTATION;
+        }
+    }
+
+    public List<Element> getAllRows() {
+        Elements elements = connection.getActualPage().select(
+                "#ctl00_MainContent_GridView102 > tbody > tr");
+        return elements;
     }
 
     public int getBoxNumberByTableRow(int rowIndex) {
@@ -198,14 +221,14 @@ public class Scrapper {
         return Integer.parseInt(td.get(0).text());
     }
 
-    private Article getArticleByArticleNumber(Elements td) {
+    private Article getArticleByArticleNumber(Elements td, Client client) {
         int articleNumber = Integer.parseInt(td.get(1).text());
-        Article article = articleService.get(articleNumber);
-        if (article == null) {
-            String articleName = td.get(2).text();
-            return articleService.addNewArticle(articleNumber, articleName);
-        }
-        return article;
+        String articleName = getArticleName(td);
+        return articleService.get(articleNumber, articleName, client);
+    }
+
+    private String getArticleName(Elements td) {
+        return td.get(2).text();
     }
 
     private ClothSize getSize(Elements td) {
@@ -236,5 +259,13 @@ public class Scrapper {
         String boxNumber = boxesRows.get(rowIndex)
                 .select("td").get(5).text();
         return Integer.valueOf(boxNumber);
+    }
+
+    public void goToLockersView() {
+        connection.goToLockersView();
+    }
+
+    public void goToRotationView() {
+        connection.goToRotationView();
     }
 }

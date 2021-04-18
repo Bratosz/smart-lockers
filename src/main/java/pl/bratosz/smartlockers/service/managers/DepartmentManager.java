@@ -8,8 +8,8 @@ public class DepartmentManager {
     public static Department createDefaultDepartment(Client client) {
         Department d = new Department();
         d.setClient(client);
-        d.setName("Główny");
-        d.setDepartmentDefault(true);
+        d.setName("GŁÓWNY");
+        d.setSurrogate(true);
         return d;
     }
 }

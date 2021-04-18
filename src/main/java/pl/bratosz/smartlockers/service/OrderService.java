@@ -46,10 +46,10 @@ public class OrderService {
             OrderType orderType,
             int articleNumber,
             ClothSize size,
-            long[] barCodes,
+            long[] barcodes,
             long userId) {
         User user = userService.getUserById(userId);
-        List<Cloth> clothes = clothesService.getByBarCodes(barCodes);
+        List<Cloth> clothes = clothesService.getByBarcodes(barcodes);
         List<Cloth> clothesWithActiveOrders = getClothesWithActiveOrders(clothes);
         if (clothesWithActiveOrders.isEmpty()) {
             switch (orderType) {

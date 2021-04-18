@@ -1,10 +1,7 @@
 package pl.bratosz.smartlockers.service;
 
 import org.springframework.stereotype.Service;
-import pl.bratosz.smartlockers.model.Client;
-import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.DepartmentAlias;
-import pl.bratosz.smartlockers.model.Plant;
+import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.DepartmentsRepository;
 import pl.bratosz.smartlockers.service.managers.DepartmentManager;
 
@@ -33,8 +30,14 @@ public class DepartmentService {
     }
 
     public Department create(String departmentName, long clientId, int plantNumber) {
-        Client client = clientService.getById(clientId);
+        return create(departmentName, clientId, plantNumber, false);
+    }
 
+    public Department create(String departmentName,
+                             long clientId,
+                             int plantNumber,
+                             boolean surrogate) {
+        Client client = clientService.getById(clientId);
         Set<Plant> plants = new HashSet<>();
         plants.add(
                 plantService.getByNumber(plantNumber));
@@ -44,7 +47,7 @@ public class DepartmentService {
                 departmentAliasService.create(departmentName));
 
         Department department = new Department(
-                departmentName, client, plants, plantNumber, aliases);
+                departmentName, client, plants, plantNumber, aliases, surrogate);
         return departmentsRepository.save(department);
     }
 
@@ -66,7 +69,8 @@ public class DepartmentService {
         return departmentsRepository.getOne(id);
     }
 
-    public Department getByNameAndClient(String departmentAlias, Client client) {
+    public Department getBy(String departmentAlias, Box box) {
+        Client client = box.getLocker().getPlant().getClient();
         Set<Department> departments = client.getDepartments();
         for (Department d : departments) {
             if (d.getAliases().stream().anyMatch(
@@ -75,7 +79,7 @@ public class DepartmentService {
             }
         }
         Optional<Department> departmentDefault = departments.stream().filter(
-                d -> d.isDepartmentDefault()).findFirst();
+                d -> d.isSurrogate()).findFirst();
         if (departmentDefault.isPresent()) {
             return departmentDefault.get();
         } else {
@@ -85,9 +89,13 @@ public class DepartmentService {
     }
 
     public Department addAlias(long departmentId, String alias) {
-        Department dep = departmentsRepository.getDepartmetById(departmentId);
+        Department dep = departmentsRepository.getById(departmentId);
         DepartmentAlias departmentAlias = departmentAliasService.create(alias);
         dep.addAlias(departmentAlias);
         return departmentsRepository.save(dep);
+    }
+
+    public Department getSurrogateBy(Client client) {
+        return departmentsRepository.getBySurrogateAndClient(true, client);
     }
 }

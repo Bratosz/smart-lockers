@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import pl.bratosz.smartlockers.model.users.UserClient;
 
 import javax.persistence.*;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 public class Department {
@@ -49,7 +47,7 @@ public class Department {
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
     private Set<UserClient> userClients;
 
-    private boolean departmentDefault;
+    private boolean surrogate;
 
     public Department() {
     }
@@ -58,13 +56,15 @@ public class Department {
                       Client client,
                       Set<Plant> plants,
                       int mainPlantNumber,
-                      List<DepartmentAlias> aliases
+                      List<DepartmentAlias> aliases,
+                      boolean isSurrogate
     ) {
         this.name = name;
         this.client = client;
         this.plants = plants;
         this.mainPlantNumber = mainPlantNumber;
         addAliases(aliases);
+        this.surrogate = isSurrogate;
     }
 
     public void addAliases(List<DepartmentAlias> aliases) {
@@ -162,12 +162,12 @@ public class Department {
         this.aliases = aliases;
     }
 
-    public boolean isDepartmentDefault() {
-        return departmentDefault;
+    public boolean isSurrogate() {
+        return surrogate;
     }
 
-    public void setDepartmentDefault(boolean departmentDefault) {
-        this.departmentDefault = departmentDefault;
+    public void setSurrogate(boolean surrogate) {
+        this.surrogate = surrogate;
     }
 
     public void addAlias(DepartmentAlias departmentAlias) {

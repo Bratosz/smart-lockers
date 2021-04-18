@@ -1,12 +1,10 @@
 package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import org.apache.xmlbeans.impl.xb.xsdschema.All;
+import pl.bratosz.smartlockers.model.clothes.Article;
 
 import javax.persistence.*;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Client {
@@ -27,6 +25,14 @@ public class Client {
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private Set<Location> locations;
+
+    @ElementCollection
+    @CollectionTable(name = "article_prices",
+    joinColumns = {@JoinColumn(
+            name = "client_id", referencedColumnName = "id")})
+    @MapKeyJoinColumn(name = "article_id")
+    @Column(name = "price")
+    private Map<Article, Double> articlesWithPrices;
 
     Client() {
     }
@@ -91,5 +97,19 @@ public class Client {
         Optional<Plant> plantOpt = plants.stream().filter(p -> p.getPlantNumber() == plantNumber)
                 .findFirst();
         return plantOpt.orElseThrow(NoSuchElementException::new);
+    }
+
+    public Map<Article, Double> getArticlesWithPrices() {
+        return articlesWithPrices;
+    }
+
+    public void setArticlesWithPrices(Map<Article, Double> articlesWithPrices) {
+        this.articlesWithPrices = articlesWithPrices;
+    }
+
+    public void addArticle(Article article, double price) {
+        if(this.articlesWithPrices == null)
+            articlesWithPrices = new HashMap<>();
+        articlesWithPrices.put(article, price);
     }
 }

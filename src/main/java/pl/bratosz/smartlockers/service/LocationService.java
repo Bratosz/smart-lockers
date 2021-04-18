@@ -7,7 +7,6 @@ import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.repository.LocationRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LocationService {
@@ -28,8 +27,12 @@ public class LocationService {
     }
 
     public Location create(long clientId, String locationName) {
+        return create(clientId, locationName, false);
+    }
+
+    public Location create(long clientId, String locationName, boolean surrogate) {
         Client client = clientService.getById(clientId);
-        Location location = new Location(locationName, client);
+        Location location = new Location(locationName, client, surrogate);
         return locationRepository.save(location);
     }
 
@@ -49,5 +52,9 @@ public class LocationService {
             return null;
         }
         return locationRepository.getOne(id);
+    }
+
+    public Location getSurrogateBy(Client client) {
+        return locationRepository.getBySurrogateAndClient(true, client);
     }
 }

@@ -27,19 +27,21 @@ public class EmployeeController {
 
     @JsonView(Views.InternalForEmployees.class)
     @GetMapping("/{id}")
-    public Employee getEmployeeById(@PathVariable Long id) throws RuntimeException {
+    public Employee getEmployeeById(
+            @PathVariable Long id) throws RuntimeException {
         if (id < 0) throw new WrongIdException("Passed id is: " + id + ". It should be higher or equal to 0");
         return employeeService.getById(id);
     }
 
     @JsonView(Views.InternalForEmployees.class)
     @PostMapping("/create_employee/{plantId}/{departmentId}/{lockerNumber}/{boxNumber}/{firstName}/{lastName}")
-    public ResponseEntity<String> createEmployee(@PathVariable long plantId,
-                                                 @PathVariable long departmentId,
-                                                 @PathVariable int lockerNumber,
-                                                 @PathVariable int boxNumber,
-                                                 @PathVariable String firstName,
-                                                 @PathVariable String lastName) throws RuntimeException {
+    public ResponseEntity<String> createEmployee(
+            @PathVariable long plantId,
+            @PathVariable long departmentId,
+            @PathVariable int lockerNumber,
+            @PathVariable int boxNumber,
+            @PathVariable String firstName,
+            @PathVariable String lastName) throws RuntimeException {
         firstName = firstName.toUpperCase();
         lastName = lastName.toUpperCase();
         employeeService.createEmployee(plantId, departmentId, lockerNumber, boxNumber, firstName, lastName);
@@ -92,11 +94,11 @@ public class EmployeeController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/dismiss_by_id/{employeeId}/{userId}")
-    public Employee dismissById(
+    @PostMapping("/dismiss-by-id/{employeeId}/{userId}")
+    public Employee dismissBy(
             @PathVariable long employeeId,
             @PathVariable long userId) {
-        return employeeService.dismissById(employeeId, userId);
+        return employeeService.dismissBy(employeeId, userId);
     }
 
     @JsonView(Views.InternalForEmployees.class)

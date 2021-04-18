@@ -46,19 +46,19 @@ function refreshOrders() {
 }
 
 function addOrder() {
-    let barCodes = new Array;
+    let barcodes = new Array;
     let articleNumber;
     let size;
     let orderType = $("#select-order-type").val();
     $('#table-of-clothes-body').find('input[type="checkbox"]:checked').each(function () {
-        let clothId = parseInt($(this).closest('tr').find('.cell-id-bar-code').text());
-        barCodes.push(clothId);
+        let clothBarcode = parseInt($(this).closest('tr').find('.cell-barcode').text());
+        barcodes.push(clothBarcode);
     });
     articleNumber = $('input[name="cloth"]:checked').val();
     if (typeof articleNumber === "undefined") {
         articleNumber = 0;
     }
-    size = $('input[name="size"]:checked').val();
+    size = getSizeFromInput();
     if (typeof size === "undefined") {
         size = "SIZE_SAME";
     }
@@ -66,7 +66,7 @@ function addOrder() {
         url: `http://localhost:8080/orders/place/${articleNumber}/${size}/${orderType}/${userId}`,
         method: "post",
         contentType: "application/json",
-        data: JSON.stringify(barCodes),
+        data: JSON.stringify(barcodes),
         success: function () {
             refreshOrders();
         }
@@ -94,7 +94,7 @@ function performActionOnOrders() {
 
 function updateClothes() {
     $.ajax({
-        url: `http://localhost:8080/scrap/update-clothes/${boxId}`,
+        url: `http://localhost:8080/scrap/update-clothes/${boxId}/${userId}`,
         method: "get",
         success: function () {
             location.reload();
@@ -130,6 +130,7 @@ function reloadBox() {
 
             displayClothes(inRotation);
             displayAcceptedClothes(accepted);
+            displayWithdrawnClothes(withdrawn);
             displayOrders(activeOrders);
         }
     })
@@ -156,6 +157,10 @@ function displayRotationalClothes(clothes) {
 
 function displayAcceptedClothes(clothes) {
     writeClothesToTable($("#table-of-accepted-clothes-body"), clothes);
+}
+
+function displayWithdrawnClothes(clothes) {
+    writeClothesToTable($("#table-of-withdrawn-clothes-body"), clothes);
 }
 
 function displayOrders(clothOrders) {

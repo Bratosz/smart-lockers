@@ -1,31 +1,7 @@
-
 loadPlants(clientId);
 loadDepartments(clientId);
 loadLocations(clientId);
 reloadBoxes(clientId);
-
-function reloadBoxes(clientId) {
-    $.ajax({
-        url: `http://localhost:8080/lockers/and_boxes/${clientId}`,
-        method: "get",
-        success: function (lockers) {
-            removeActualTableRowsLockers();
-            displayBoxes(lockers);
-        }
-    });
-}
-
-function dismissEmployee(employeeId) {
-    $.ajax({
-        url: `http://localhost:8080/employees/dismiss_by_id/${userId}/${employeeId}`,
-        method: "post",
-        success: function (box) {
-            console.log("Zwolniono pracownika");
-            console.log(box);
-            reloadBoxes();
-        }
-    })
-}
 
 $("#button-filter").click(function () {
     let plantId = $("#select-plant").val();
@@ -42,7 +18,6 @@ $("#button-filter").click(function () {
     })
 });
 
-
 $("#button-input-lastname").click(function () {
     const lastName = $("#input-lastname").val();
     $.ajax({
@@ -55,7 +30,7 @@ $("#button-input-lastname").click(function () {
     })
 });
 
-$("#button-get-lockers-by-number").click(function () {
+$("#button-get-locker-by-number").click(function () {
     let plantId = $("#select-plant").val();
     let lockerNumber = $("#input-locker-number").val();
     $.ajax({
@@ -73,79 +48,27 @@ $("#button-input-first-name").click(function () {
     $.ajax({
         url: `http://localhost:8080/employees/find_by_first_name/${firstName}`,
         method: "get",
-        success: function(employees) {
+        success: function (employees) {
             console.log(employees);
             displayEmployees(employees);
         }
     })
 });
 
-function displayBoxes(lockers){
-    $("#table-rows > tr:not(#row-template)").remove();
-    const $rowTemplate = $("#row-template");
-    console.log($rowTemplate);
-    for (let i = 0; i < lockers.length; i++) {
-        let locker = lockers[i];
-        let boxes = locker.boxes.sort(function (a,b) {
-            return a.boxNumber - b.boxNumber;
-        });
-        for (let j = 0; j < boxes.length; j++) {
-            let box = boxes[j];
-            let employee= box.employee;
-            const $row = $rowTemplate.clone();
-            $row.removeAttr("id");
-            $row.css("display", "table-row");
-            $row.find(".cell-id").text(employee.id);
-            $row.find(".cell-first-name").text(employee.firstName);
-            $row.find(".cell-last-name").text(employee.lastName);
-            $row.find(".cell-locker").text(locker.lockerNumber);
-            $row.find(".cell-box-number").text(box.boxNumber);
-            $row.find(".cell-plant-number").text(locker.plant.plantNumber);
-            $row.find(".cell-department").text(locker.department.name);
-            $row.find(".cell-location").text(locker.location.name);
-            $row.find(".cell-status").text(box.boxStatus);
-            $row.find(".button-view-employee").click(function () {
-                window.location.href = `view-employee.html?id=${locker.boxes[j].id}`;
-            });
-            $row.find(".button-dismiss-employee").click(function() {
-                dismissEmployee(employee.id);
-            });
-
-            $("#table-rows").append($row);
+function reloadBoxes(clientId) {
+    $.ajax({
+        url: getActualLocation() + `/lockers/${clientId}`,
+        method: "get",
+        success: function (lockers) {
+            let boxes = getBoxesFromLockers(lockers);
+            writeDataToTable(boxes, $("#table-of-boxes"), writeBoxToRowWithLockerData);
         }
-    }
+    })
+
 }
 
 function displayEmployees(employees) {
-    $("#table-rows > tr:not(#row-template)").remove();
-    const $rowTemplate = $("#row-template");
-    console.log($rowTemplate);
-    console.log(employees);
-    for (let i = 0; i < employees.length; i++) {
-            let employee = employees[i];
-            let box = employee.box;
-            let locker = box.locker;
-            let $row = $rowTemplate.clone();
-            $row.removeAttr("id");
-            $row.css("display", "table-row");
-            $row.find(".cell-id").text(employee.id);
-            $row.find(".cell-first-name").text(employee.firstName);
-            $row.find(".cell-last-name").text(employee.lastName);
-            $row.find(".cell-locker").text(locker.lockerNumber);
-            $row.find(".cell-box-number").text(box.boxNumber);
-            $row.find(".cell-plant-number").text(locker.plant.plantNumber);
-            $row.find(".cell-department").text(locker.department.name);
-            $row.find(".cell-location").text(locker.location.name);
-            $row.find(".cell-status").text(box.boxStatus);
-            $row.find(".button-view-employee").click(function () {
-                window.location.href = `view-employee.html?id=${box.id}`;
-            });
-            $row.find(".button-dismiss-employee").click(function() {
-                console.log("działa");
-                dismissEmployee(employee.id);
-            });
-            $("#table-rows").append($row);
-    }
+    let boxes = getBoxesFromEmployees(employees);
 }
 
 

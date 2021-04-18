@@ -6,6 +6,8 @@ header {
 
 .header-element {
     display: inline-block;
+    font-size: 25px;
+    font-weight: bold;
 }
 
 #col-size-6 {
@@ -113,8 +115,29 @@ tr:nth-child(odd) {
     padding-right: 2px;
 }
 
-.input-select {
+.display-inline {
     display: inline-block;
 }
+
+.input-field-small {
+    width: 20px;
+    text-align: center;
+}
+
+.input-field-medium {
+    width: 110px;
+}
+
+.align-right {
+    text-align: right;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
 
 

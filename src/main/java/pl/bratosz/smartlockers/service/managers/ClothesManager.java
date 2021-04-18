@@ -54,7 +54,7 @@ public class ClothesManager {
                                 ClothSize size,
                                 User user) {
         cloth = new Cloth();
-        cloth.setBarCode(barCode);
+        cloth.setBarcode(barCode);
         cloth.setAssignment(assignment);
         cloth.setLastWashing(lastWashing);
         cloth.setReleaseDate(release);

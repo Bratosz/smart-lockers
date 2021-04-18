@@ -6,3 +6,14 @@ function removeTableRows($table) {
     $table.find("tr:not(tr:nth-child(1))").remove();
     return $table;
 }
+
+function writeDataToTable(sortedElements, $table, writingMethod) {
+    removeTableRows($table);
+    const $rowTemplate = getRowTemplate($table);
+    for(let e of sortedElements) {
+        let $row = $rowTemplate.clone();
+        $row = writingMethod(e, $row);
+        $table.append($row);
+    }
+    return $table;
+}

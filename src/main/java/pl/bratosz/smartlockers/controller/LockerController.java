@@ -35,7 +35,7 @@ public class LockerController {
         return lockers.subList(0, 2);
     }
 
-    @JsonView(Views.Public.class)
+    @JsonView(Views.InternalForLockers.class)
     @GetMapping("/{clientId}")
     public List<Locker> getAll(
             @PathVariable long clientId) {
@@ -48,6 +48,18 @@ public class LockerController {
             @PathVariable long plantId,
             @PathVariable int lockerNumber) {
         return lockersService.getLockersByPlantAndNumber(plantId, lockerNumber);
+    }
+
+    @JsonView(Views.InternalForLockers.class)
+    @GetMapping("/get/{lockerId}")
+    public Locker getBy(@PathVariable long lockerId) {
+        return lockersService.getBy(lockerId);
+    }
+
+    @JsonView(Views.InternalForBoxes.class)
+    @GetMapping("/get-boxes/{lockerId}")
+    public List<Box> getBoxesBy(@PathVariable long lockerId) {
+        return lockersService.getBoxesBy(lockerId);
     }
 
     @JsonView(Views.Public.class)
@@ -102,7 +114,7 @@ public class LockerController {
             @PathVariable int plantNumber,
             @PathVariable String department,
             @PathVariable String location) {
-        return lockersService.createLocker(
+        return lockersService.create(
                 lockerNumber, capacity, plantNumber, department, location);
     }
 

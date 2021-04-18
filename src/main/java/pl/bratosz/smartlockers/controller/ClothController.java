@@ -3,12 +3,14 @@ package pl.bratosz.smartlockers.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pl.bratosz.smartlockers.model.AssignmentType;
+import pl.bratosz.smartlockers.model.clothes.ClothSize;
 import pl.bratosz.smartlockers.model.orders.OrderType;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.response.ResponseClothAcceptance;
 import pl.bratosz.smartlockers.response.ResponseClothAssignment;
 import pl.bratosz.smartlockers.service.ClothService;
+
+import javax.xml.ws.Response;
 
 import static pl.bratosz.smartlockers.model.Views.*;
 
@@ -39,14 +41,25 @@ public class ClothController {
         return clothesService.accept(clientId, userId, clothBarCode, orderType);
     }
 
-    @PostMapping("/assign/{clientId}/{userId}/{clothBarCode}/{assignmentType}/{employeeId}")
-    public ResponseClothAssignment assign(
+    @PostMapping("/assign-withdrawn-cloth/{clientId}/{userId}/{employeeId}/{articleNumber}/{size}")
+    public ResponseClothAssignment assignWithdrawnCloth(
             @PathVariable long clientId,
             @PathVariable long userId,
-            @PathVariable long clothBarCode,
-            @PathVariable AssignmentType assignmentType,
             @PathVariable long employeeId,
+            @PathVariable int articleNumber,
+            @PathVariable ClothSize size,
             @RequestBody Cloth withdrawnCloth) {
-        return clothesService.assign(clientId, userId, clothBarCode, assignmentType, withdrawnCloth);
+        return clothesService.assignWithdrawnCloth(
+                clientId, userId, employeeId, articleNumber, size, withdrawnCloth);
+    }
+
+    @PostMapping("/release-rotational-cloth/{clientId}/{userId}/{employeeId}/{barcode}")
+    public ResponseClothAssignment releaseRotationalCloth(
+            long clientId,
+            long userId,
+            long employeeId,
+            long barcode) {
+        return clothesService.releaseRotationalCloth(
+                clientId, userId, employeeId, barcode);
     }
 }

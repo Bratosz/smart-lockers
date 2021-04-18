@@ -1,4 +1,3 @@
-
 loadPlants(clientId);
 loadDepartments(clientId);
 loadLocations(clientId);
@@ -34,6 +33,9 @@ function displayLockers(lockers) {
         $row.find(".cell-plant-number").text(locker.plant.plantNumber);
         $row.find(".cell-department").text(locker.department.name);
         $row.find(".cell-location").text(locker.location.name);
+        $row.find(".button-view-locker").click(function () {
+            window.location.href = `view-locker.html?id=${locker.id}`;
+        });
         $("#table-rows-lockers").append($row);
     }
 }

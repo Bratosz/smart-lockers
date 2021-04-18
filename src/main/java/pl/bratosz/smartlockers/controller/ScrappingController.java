@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.Views;
+import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.LockersLoadReport;
 import pl.bratosz.smartlockers.service.ScrapingService;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/scrap")
@@ -43,6 +43,18 @@ public class ScrappingController {
     @JsonView(Views.Public.class)
     public LockersLoadReport loadPlantBoxByBox(@PathVariable long plantId) {
         return scrapingService.loadPlantBoxByBox(plantId);
+    }
+
+    @PostMapping("/load-plant-locker-by-locker/{plantId}/{firstLockerNumber}/{lastLockerNumber}/{capacity}/{withClothes}")
+    @JsonView(Views.Public.class)
+    public StandardResponse loadLockersWithClothes(
+            @PathVariable long plantId,
+            @PathVariable int firstLockerNumber,
+            @PathVariable int lastLockerNumber,
+            @PathVariable int capacity,
+            @PathVariable boolean withClothes) {
+        return scrapingService.loadLockers(
+                plantId, firstLockerNumber, lastLockerNumber, capacity, withClothes);
     }
 
     @PostMapping("/load-locker/{lockerId}")

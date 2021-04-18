@@ -8,6 +8,7 @@ import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.users.UserEmployee;
 
 import javax.persistence.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -39,8 +40,9 @@ public class Employee extends EmployeeGeneral {
     @JsonView(Views.Public.class)
     private String note;
 
-    @ManyToMany(mappedBy = "releasedEmployees", fetch = FetchType.LAZY)
-    private List<Box> pastBoxes;
+    @JsonView(Views.Public.class)
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    private List<SimpleBox> pastBoxes;
 
     public Employee() {
     }
@@ -107,20 +109,22 @@ public class Employee extends EmployeeGeneral {
         this.note = note;
     }
 
-    public List<Box> getPastBoxes() {
+    public List<SimpleBox> getPastBoxes() {
         return pastBoxes;
     }
 
-    public void setPastBoxes(List<Box> pastBoxes) {
+    public void setPastBoxes(List<SimpleBox> pastBoxes) {
         this.pastBoxes = pastBoxes;
     }
 
-    public void setAsPastBox(Box box) {
+    public void setAsPastBox(SimpleBox box) {
+        if(pastBoxes == null) {
+            pastBoxes = new LinkedList<>();
+        }
         pastBoxes.add(box);
-        this.box = null;
     }
 
-    public Box getLastBox() {
+    public SimpleBox getLastBox() {
         int last = pastBoxes.size() - 1;
         return pastBoxes.get(last);
     }

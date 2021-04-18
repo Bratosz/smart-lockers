@@ -18,6 +18,7 @@ public class LockersLoadReport {
 
     public LockersLoadReport(int plantNumber) {
         this.plantNumber = plantNumber;
+        duplicatedBoxes = new LinkedList<>();
     }
 
     public int getLoadedBoxesAmount() {

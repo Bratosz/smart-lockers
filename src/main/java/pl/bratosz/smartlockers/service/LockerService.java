@@ -53,7 +53,7 @@ public class LockerService {
         return lockersRepository.getLockersFromRange(plantNumber, firstLocker, lastLocker);
     }
 
-    public Locker createLocker(
+    public Locker create(
             int lockerNumber,
             int capacity,
             int plantNumber,
@@ -63,8 +63,28 @@ public class LockerService {
         Department department = departmentService.getByNameAndPlantNumber(departmentName, plantNumber);
         Location location = locationService.getByNameAndPlantNumber(locationName, plantNumber);
 
+        return create(lockerNumber, capacity, plant, department, location);
+    }
+
+    public Locker create(
+            int lockerNumber,
+            int capacity,
+            Plant plant,
+            Department department,
+            Location location) {
         Locker locker = LockerCreator.create(
                 lockerNumber, capacity, plant, department, location);
+        return lockersRepository.save(locker);
+    }
+
+    public Locker createWithCustomBoxNumbers(
+            int lockerNumber,
+            List<Integer> boxNumbers,
+            Location location,
+            Department department,
+            Plant plant) {
+        Locker locker = LockerCreator.createWithCustomBoxNumbers(
+                lockerNumber, boxNumbers, plant, department, location);
         return lockersRepository.save(locker);
     }
 
@@ -145,7 +165,7 @@ public class LockerService {
         }
     }
 
-    public Locker getLockerById(long lockerId) {
+    public Locker getBy(long lockerId) {
         return lockersRepository.getLockerById(lockerId);
     }
 
@@ -159,5 +179,9 @@ public class LockerService {
             throw new BoxNotAvailableException(
                     "Locker number is grater than locker capacity");
         }
+    }
+
+    public List<Box> getBoxesBy(long lockerId) {
+        return lockersRepository.getLockerById(lockerId).getBoxes();
     }
 }

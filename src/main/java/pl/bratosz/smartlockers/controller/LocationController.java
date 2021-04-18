@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Location;
 import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.service.LocationService;
+import pl.bratosz.smartlockers.strings.MyString;
 
 import java.util.List;
 
@@ -26,8 +27,15 @@ public class LocationController {
     @PostMapping("/create/{clientId}/{locationName}")
     public Location create(@PathVariable long clientId,
                            @PathVariable String locationName) {
-        locationName = locationName.toUpperCase().trim();
+        locationName = MyString.create(locationName).get();
         return locationService.create(clientId, locationName);
+    }
+
+    public Location create(long clientId,
+                           String locationName,
+                           boolean surrogate) {
+        locationName = MyString.create(locationName).get();
+        return locationService.create(clientId, locationName, surrogate);
     }
 
     @PostMapping("/assign_to_plant/{locationId}/{plantNumber}")

@@ -46,7 +46,10 @@ public class Cloth {
     protected List<ClothStatus> statusHistory;
 
     @JsonView(Views.Public.class)
-    long barCode;
+    protected LifeCycleStatus lifeCycleStatus;
+
+    @JsonView(Views.Public.class)
+    long barcode;
 
     @JsonView(Views.Public.class)
     protected Date assignment;
@@ -91,7 +94,7 @@ public class Cloth {
     }
 
     public Cloth(
-        long barCode,
+        long barcode,
         Date assignment,
         Date lastWashing,
         Date releaseDate,
@@ -99,7 +102,7 @@ public class Cloth {
         Article article,
         ClothSize size
     ) {
-        this.barCode = barCode;
+        this.barcode = barcode;
         this.assignment = assignment;
         setLastWashing(lastWashing);
         this.releaseDate = releaseDate;
@@ -107,6 +110,25 @@ public class Cloth {
         this.article = article;
         this.size = size;
         active = true;
+    }
+
+    public Cloth(long barcode,
+                 Date assignment,
+                 Date lastWashing,
+                 Date releaseDate,
+                 int ordinalNumber,
+                 Article article,
+                 ClothSize size,
+                 LifeCycleStatus lifeCycleStatus) {
+        this.barcode = barcode;
+        this.assignment = assignment;
+        setLastWashing(lastWashing);
+        this.releaseDate = releaseDate;
+        this.ordinalNumber = ordinalNumber;
+        this.article = article;
+        this.size = size;
+        active = true;
+        this.lifeCycleStatus = lifeCycleStatus;
     }
 
     public long getId() {
@@ -184,12 +206,12 @@ public class Cloth {
         statusHistory.add(status);
     }
 
-    public long getBarCode() {
-        return barCode;
+    public long getBarcode() {
+        return barcode;
     }
 
-    public void setBarCode(long barCode) {
-        this.barCode = barCode;
+    public void setBarcode(long barcode) {
+        this.barcode = barcode;
     }
 
     public Date getAssignment() {
@@ -253,5 +275,13 @@ public class Cloth {
 
     public long getClientId() {
         return getEmployee().getDepartment().getClient().getId();
+    }
+
+    public LifeCycleStatus getLifeCycleStatus() {
+        return lifeCycleStatus;
+    }
+
+    public void setLifeCycleStatus(LifeCycleStatus lifeCycleStatus) {
+        this.lifeCycleStatus = lifeCycleStatus;
     }
 }

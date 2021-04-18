@@ -3,6 +3,7 @@ package pl.bratosz.smartlockers.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Department;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public interface DepartmentsRepository extends JpaRepository<Department, Long> {
             "c.id = :clientId order by d.mainPlantNumber")
     List<Department> getAll(long clientId);
 
-    Department getDepartmetById(long departmentId);
+    Department getById(long departmentId);
+
+    Department getBySurrogateAndClient(boolean surrogate, Client client);
 }

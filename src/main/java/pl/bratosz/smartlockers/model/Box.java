@@ -27,17 +27,11 @@ public class Box {
     @OneToOne(fetch = FetchType.LAZY)
     private EmployeeDummy employeeDummy;
 
-    @JsonView(Views.DismissedEmployees.class)
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "boxes_occupied_in_past",
-            joinColumns = @JoinColumn(name = "box_id"),
-            inverseJoinColumns = @JoinColumn(name = "employee_id"))
-    private List<Employee> releasedEmployees;
-
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class, Views.InternalForClothes.class})
     @ManyToOne
     private Locker locker;
+
+    private boolean duplicated;
 
     public Box() {
     }
@@ -92,13 +86,6 @@ public class Box {
         this.employeeDummy = employeeDummy;
     }
 
-    public List<Employee> getReleasedEmployees() {
-        return releasedEmployees;
-    }
-
-    public void setReleasedEmployees(List<Employee> releasedEmployees) {
-        this.releasedEmployees = releasedEmployees;
-    }
 
     public Locker getLocker() {
         return locker;
@@ -139,7 +126,11 @@ public class Box {
         }
     }
 
+    public boolean isDuplicated() {
+        return duplicated;
+    }
 
-
-
+    public void setDuplicated(boolean duplicated) {
+        this.duplicated = duplicated;
+    }
 }

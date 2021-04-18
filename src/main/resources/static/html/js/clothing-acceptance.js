@@ -6,7 +6,6 @@ $(document).ready(function () {
                 let exchangeType = getExchangeType();
                 sendAcceptanceRequest(barcode, exchangeType);
                 clearInput($(this));
-                reloadBox();
             } else {
                 alert("Nieprawidłowy kod kreskowy!");
             }
@@ -14,8 +13,13 @@ $(document).ready(function () {
     })
 });
 
-function getWithdrawnCloth() {
-    let cloth
+function getWithdrawnCloth(barcode) {
+    let withdrawnCloth = {
+        ordinalNumber: getOrdinalNumberFromInput(),
+        barcode: barcode,
+        assignment: getAssignmentDateFromInput()
+    };
+    return withdrawnCloth;
 }
 
 $(document).ready(function () {
@@ -26,8 +30,10 @@ $(document).ready(function () {
             if(barcodeIsValid(barcode)) {
                 const assignmentType = getAssignmentType();
                 if(assignmentType == "ASSIGN_WITHDRAWN_CLOTH") {
-                    let withDrawnCloth = getWithdrawnCloth();
-                    sendRequestForAssignWithdrawnCloth(withDrawnCloth)
+                    let withDrawnCloth = getWithdrawnCloth(barcode);
+                    let article = getArticleFromInput();
+                    let size = getSizeFromInput();
+                    sendRequestForAssignWithdrawnCloth(withDrawnCloth, article, size)
                 } else if (assignmentType == "RELEASE_ROTATIONAL_CLOTH") {
                     sentRequestForReleaseRotationalCloth(barcode)
                 }
@@ -57,16 +63,26 @@ function getExchangeType() {
 }
 
 function clearInput($input) {
-    $input().val("");
+    $input.val("");
 }
 
-function sendRequestForAssignWithdrawnCloth() {
-
+function sendRequestForAssignWithdrawnCloth(withdrawnCloth, article, size) {
+    let n = clientId + 1;
+    $.ajax({
+        url: `http://localhost:8080/clothes/assign-withdrawn-cloth/${clientId}/${userId}/${employeeId}/${article}/${size}`,
+        method: "post",
+        contentType: "application/json",
+        data: JSON.stringify(withdrawnCloth),
+        success: function (response) {
+            console.log(response);
+        }
+    })
 }
 
 function sentRequestForReleaseRotationalCloth(barcode) {
     $.ajax({
-        url: `http://localhost:8080/clothes/rotation-release/${clientId}/${userId}/${barcode}/${employeeId}`,
+        url: `http://localhost:8080/clothes/release-rotational-cloth` +
+            `/${clientId}/${userId}/${employeeId}/${barcode}`,
         method: "post",
         success: function (response) {
             console.log(response);
@@ -79,7 +95,7 @@ function sendAcceptanceRequest(barcode) {
         url: `http://localhost:8080/clothes/acceptance/${clientId}/${userId}/${barcode}/${exchangeType}`,
         method: "post",
         contentType: "application/json",
-        data: JSON.stringify(barCodes),
+        data: JSON.stringify(response),
         success: function (response) {
             console.log(response)
         }

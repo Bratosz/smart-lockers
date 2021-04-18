@@ -48,6 +48,14 @@ public class DepartmentController {
         return departmentService.create(departmentName, clientId, mainPlantNumber);
     }
 
+    public Department create(String departmentName,
+                             long clientId,
+                             int mainPlantNumber,
+                             boolean surrogate) {
+        departmentName = MyString.create(departmentName).get();
+        return departmentService.create(departmentName, clientId, mainPlantNumber, surrogate);
+    }
+
     @PostMapping("/add_plant/{departmentId}/{plantNumber}")
     public Department addPlant(@PathVariable long departmentId, @PathVariable int plantNumber) {
         return departmentService.addPlant(departmentId, plantNumber);

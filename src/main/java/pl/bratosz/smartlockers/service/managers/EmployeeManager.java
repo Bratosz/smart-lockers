@@ -5,19 +5,22 @@ import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothDestination;
 import pl.bratosz.smartlockers.model.users.User;
+import pl.bratosz.smartlockers.service.SimpleBoxService;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class EmployeeManager {
     private ClothesManager clothesManager;
+    private BoxManager boxManager;
     private Employee employee;
+    private SimpleBoxService simpleBoxService;
     private User user;
 
-    public EmployeeManager(ClothesManager clothesManager) {
+    public EmployeeManager(ClothesManager clothesManager, BoxManager boxManager, SimpleBoxService simpleBoxService) {
         this.clothesManager = clothesManager;
+        this.boxManager = boxManager;
+        this.simpleBoxService = simpleBoxService;
     }
 
     //ubrania do ustawienia do wycofania,
@@ -27,14 +30,15 @@ public class EmployeeManager {
     public Employee dismiss(Employee employee, User user) {
         this.employee = employee;
         this.user = user;
-        updateEmployeeForDismiss();
-        updateBoxForDismiss();
+        updateBoxAndSetAsPastBoxForDismiss();
         updateClothesForDismiss();
-        return employee;
+        updateEmployeeForDismiss();
+        return this.employee;
     }
 
     private void updateEmployeeForDismiss() {
         employee.setActive(false);
+        employee.setBox(null);
     }
 
     private void updateClothesForDismiss() {
@@ -43,10 +47,10 @@ public class EmployeeManager {
         employee.setClothes(clothes);
     }
 
-    private void updateBoxForDismiss() {
+    private void updateBoxAndSetAsPastBoxForDismiss() {
         Box box = employee.getBox();
-        BoxManager boxManager = new BoxManager(user);
-        box = boxManager.release(box);
-        employee.setAsPastBox(box);
+        boxManager.release(box);
+        employee.setAsPastBox(
+                simpleBoxService.createSimpleBox(box, employee));
     }
 }

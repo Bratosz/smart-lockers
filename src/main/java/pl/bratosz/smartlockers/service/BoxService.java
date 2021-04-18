@@ -5,6 +5,7 @@ import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
+import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.managers.creators.BoxCreator;
 import pl.bratosz.smartlockers.service.managers.BoxManager;
 
@@ -22,18 +23,14 @@ public class BoxService {
     private BoxManager boxManager;
     private EmployeeService employeeService;
 
-    public BoxService(BoxesRepository boxesRepository) {
+    public BoxService(BoxesRepository boxesRepository, BoxManager boxManager) {
         this.boxesRepository = boxesRepository;
+        this.boxManager = boxManager;
     }
 
-    public void loadUserAndManager(long userId) {
-        user = userService.getUserById(userId);
-        boxManager = new BoxManager(this.user);
-    }
 
-    public void loadUserAndManager(User user) {
+    public void loadUser(User user) {
         this.user = user;
-        boxManager = new BoxManager(this.user);
     }
 
     public Box findNextFreeBox(Department department, int plantNumber, Location location) throws BoxNotAvailableException {
@@ -47,7 +44,7 @@ public class BoxService {
 
     public Box releaseBoxAndDismissEmployee(long boxId, long userId) {
         user = userService.getUserById(userId);
-        Box box = boxesRepository.getBoxById(boxId);
+        Box box = boxesRepository.getById(boxId);
 
         box = boxManager.release(box);
         return boxesRepository.save(box);
@@ -68,7 +65,7 @@ public class BoxService {
                                            long plantId, Department targetDep,
                                            Location targetLocation, int targetPlantNumber, long userId) {
         user = userService.getUserById(userId);
-        loadUserAndManager(user);
+        loadUser(user);
         Box oldBox = getBox(plantId, lockerNumber, boxNumber);
         Box freeBox = findNextFreeBox(targetDep, targetPlantNumber, targetLocation);
         EmployeeGeneral employee = extractEmployee(oldBox);
@@ -79,7 +76,7 @@ public class BoxService {
                                  int targetLockerNumber, int targetBoxNumber,
                                  long targetPlantId) throws BoxNotAvailableException {
         User user = userService.getUserById(userId);
-        loadUserAndManager(user);
+        loadUser(user);
         Box newBox = getBox(targetPlantId, targetLockerNumber, targetBoxNumber);
 
         if (newBox.getBoxStatus().equals(OCCUPY)) {
@@ -106,12 +103,12 @@ public class BoxService {
     }
 
     public Box getBoxById(Long id) {
-        return boxesRepository.getBoxById(id);
+        return boxesRepository.getById(id);
     }
 
     public List<Box> createBoxesForLocker(Locker locker) {
         BoxCreator boxCreator = new BoxCreator();
-        List<Box> boxes = boxCreator.createBoxesForLocker(locker);
+        List<Box> boxes = boxCreator.createBoxes(locker);
         return boxes;
     }
 
@@ -151,10 +148,14 @@ public class BoxService {
     }
 
     public Employee extractEmployee(Box box) {
-        Box releasedBox = boxManager.release(box);
-        updateBox(releasedBox);
-        List<Employee> releasedEmployees = releasedBox.getReleasedEmployees();
-        return releasedEmployees.get(releasedEmployees.size() - 1);
+        if(box.getBoxStatus().equals(OCCUPY)) {
+            Employee employeeToRelease = (Employee)box.getEmployee();
+            Box releasedBox = boxManager.release(box);
+            updateBox(releasedBox);
+            return employeeService.release(employeeToRelease, releasedBox);
+        } else {
+            throw new IllegalStateException("Box is already empty");
+        }
     }
 
     private void updateBox(Box box) {
@@ -162,5 +163,21 @@ public class BoxService {
     }
 
 
+    public Box createAdditionalDuplicatedBox(int boxNumber, Locker locker) {
+        Box box = BoxCreator.createBox(boxNumber, locker);
+        box.setDuplicated(true);
+        return boxesRepository.save(box);
+    }
+
+    public StandardResponse hardDeleteBy(long boxId) {
+        Box box = boxesRepository.getById(boxId);
+        if(box.getBoxStatus().equals(OCCUPY)) {
+            return new StandardResponse("Szafka jest zajęta. Aby ją usunąć " +
+                    "zwolnij najpierw pracownika, który się w niej znajduje", false);
+        } else {
+            boxesRepository.deleteHardById(box.getId());
+            return new StandardResponse("Usunięto szafkę", true);
+        }
+    }
 }
 

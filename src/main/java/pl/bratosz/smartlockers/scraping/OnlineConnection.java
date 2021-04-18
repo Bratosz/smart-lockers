@@ -14,6 +14,7 @@ public class OnlineConnection {
     final String startURL = "http://klsonline24.pl";
     final String loginURL = startURL + "/default.aspx";
     final String lockersViewURL = startURL + "/baza.aspx";
+    final String rotationViewURL = startURL + "/rotacja.aspx";
     String referrer = "https://google.com/";
     final String userAgentChrome = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36";
@@ -31,7 +32,23 @@ public class OnlineConnection {
             cookies = response.cookies();
             referrer = response.url().toString();
             actualResponse = logIn(login, password);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void goToLockersView() {
+        try {
             actualPage = connectTo(lockersViewURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void goToRotationView() {
+        try {
+            actualPage = connectTo(rotationViewURL, 30);
+            System.out.println("something");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -90,6 +107,17 @@ public class OnlineConnection {
                     .followRedirects(true)
                     .execute();
             return actualResponse.parse();
+    }
+
+    private Document connectTo(String url, int timeoutInSeconds) throws IOException {
+        actualResponse = Jsoup.connect(url)
+                .userAgent(userAgentChrome)
+                .referrer(referrer)
+                .timeout(timeoutInSeconds * 1000)
+                .cookies(cookies)
+                .followRedirects(true)
+                .execute();
+        return actualResponse.parse();
     }
 
     public Document checkConnection() throws IOException {

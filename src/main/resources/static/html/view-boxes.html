@@ -6,6 +6,10 @@
     <title>SL - Boxy</title>
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/smart-lockers.js"></script>
+    <script src="js/table-manager.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/boxes-manager.js"></script>
+    <script src="js/employees-manager.js"></script>
     <script src="js/view-boxes.js" defer></script>
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -72,6 +76,7 @@
     <br>
 
     <!--Form-->
+    <!--Input lastname-->
     <div class="headerRow">
         <div class="col-lg-4">
             <form class="form-inline">
@@ -88,6 +93,7 @@
             </form>
         </div>
     </div>
+    <!--Input first name-->
     <div class="headerRow">
         <div class="col-lg-4">
             <form class="form-inline">
@@ -104,15 +110,17 @@
             </form>
         </div>
     </div>
+    <!--Input locker number-->
     <div class="headerRow">
         <div class="col-lg-4">
             <form class="form-inline">
                 <div class="form-group">
                     <div class="input-group mb-3">
-                        <input type="text" id="input-locker-number" class="form-control" placeholder="Numer szafki" aria-label="Szafa"
-                               aria-describedby="input-locker-boxNumber">
+                        <input type="text" id="input-locker-number" class="form-control"
+                               placeholder="Numer szafki">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" id="button-get-lockers-by-number">Szukaj
+                            <button class="btn btn-outline-secondary" type="button"
+                                    id="button-get-lockers-by-number">Szukaj
                             </button>
                         </div>
                     </div>
@@ -120,8 +128,6 @@
             </form>
         </div>
     </div>
-
-
     <!--Filtering-->
     <div class="headerRow">
         <div class="col-lg-4">
@@ -155,10 +161,9 @@
             <th>Lokalizacja</th>
             <th>Status</th>
             <th></th>
-            <th></th>
         </tr>
         </thead>
-        <tbody id="table-rows">
+        <tbody id="table-of-boxes">
         <tr id="row-template" style="display: none">
             <td class="cell-id"></td>
             <td class="cell-first-name"></td>
@@ -170,7 +175,6 @@
             <td class="cell-location"></td>
             <td class="cell-status"></td>
             <td><input type="button" value="pokaż" class="button-view-employee"></td>
-            <td><input type="button" value="Zwolnij" class="button-dismiss-employee"></td>
         </tr>
         </tbody>
     </table>

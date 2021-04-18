@@ -32,12 +32,16 @@ public class Location {
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private Set<Locker> lockers;
 
+    @JsonView(Views.Public.class)
+    private boolean surrogate;
+
     public Location() {
     }
 
-    public Location(String name, Client client) {
+    public Location(String name, Client client, boolean surrogate) {
         this.name = name;
         this.client = client;
+        this.surrogate = surrogate;
     }
 
     public long getId() {
@@ -86,5 +90,13 @@ public class Location {
 
     public void setDepartments(Set<Department> departments) {
         this.departments = departments;
+    }
+
+    public boolean isSurrogate() {
+        return surrogate;
+    }
+
+    public void setSurrogate(boolean surrogate) {
+        this.surrogate = surrogate;
     }
 }

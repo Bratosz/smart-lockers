@@ -58,6 +58,8 @@ public class ClientController {
                 "MANTRANS", clientId, 386);
         Department department4 = departmentController.create(
                 "JIT LOGISTYKA", clientId, 384);
+        Department department5 = departmentController.create(
+                "ZASTĘPCZY", clientId, 384, true);
         long id1 = locationController.create(
                 clientId, "Stara szatnia - piwnica").getId();
         long id2 = locationController.create(
@@ -72,18 +74,21 @@ public class ClientController {
                 clientId, "Nowa hala - produkcja").getId();
         long id7 = locationController.create(
                 clientId, "SEGRO").getId();
+        long id8 = locationController.create(
+                clientId, "ZASTĘPCZA", true).getId();
 
         locationController.assignToPlant(id1, 384);
         locationController.assignToPlant(id2, 384);
         locationController.assignToPlant(id3, 384);
         locationController.assignToPlant(id4, 384);
+        locationController.assignToPlant(id8, 384);
 
         locationController.assignToPlant(id5, 385);
         locationController.assignToPlant(id6, 385);
 
         locationController.assignToPlant(id7, 386);
 
-        lockerController.create(1,1, 10, 1,1,1);
+//        lockerController.create(1,1, 10, 1,1,1);
 
 
         userService.create("Admin", "Admin");

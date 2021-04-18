@@ -23,13 +23,15 @@ public class EmployeeService {
     private BoxService boxService;
     private PlantService plantService;
     private DepartmentService departmentService;
+    private SimpleBoxService simpleBoxService;
     private UserService userService;
     private ClothService clothService;
     private User user;
     private EmployeeManager employeeManager;
 
     public EmployeeService(EmployeesRepository employeesRepository, EmployeeGeneralRepository employeeGeneralRepository, BoxService boxesService,
-                           PlantService plantService, DepartmentService departmentService, UserService userService, ClothService clothService) {
+                           PlantService plantService, DepartmentService departmentService,
+                           UserService userService, ClothService clothService, EmployeeManager employeeManager) {
         this.employeesRepository = employeesRepository;
         this.employeeGeneralRepository = employeeGeneralRepository;
         this.boxService = boxesService;
@@ -37,6 +39,7 @@ public class EmployeeService {
         this.departmentService = departmentService;
         this.userService = userService;
         this.clothService = clothService;
+        this.employeeManager = employeeManager;
     }
 
     private void loadUser(User user) {
@@ -78,15 +81,28 @@ public class EmployeeService {
                                    Box box,
                                    String firstName,
                                    String lastName) {
-        Client client = box.getLocker().getPlant().getClient();
-        Department department = departmentService.getByNameAndClient(departmentName, client);
         if(box.getBoxStatus().equals(OCCUPY)) {
             throw new BoxNotAvailableException("Box is occupy by"
                     + box.getEmployee().getLastName() + " " + box.getEmployee().getFirstName());
         }
+        Department department = departmentService.getBy(departmentName, box);
         Employee employee = new Employee(firstName, lastName, department, true);
         employee.addToBox(box);
         employee.addClothes(clothes);
+        return employeesRepository.save(employee);
+    }
+
+    public Employee create(
+            String firstName,
+            String lastName,
+            Box box,
+            String departmentName) {
+        if(box.getBoxStatus().equals(OCCUPY)) {
+            throw new BoxNotAvailableException("Szafka jest zajęta");
+        }
+        Department department = departmentService.getBy(departmentName, box);
+        Employee employee = new Employee(firstName, lastName, department, true);
+        employee.addToBox(box);
         return employeesRepository.save(employee);
     }
 
@@ -155,9 +171,9 @@ public class EmployeeService {
 
 
 
-    public Employee dismissById(long employeeId,
-                                long userId) {
-        user = userService.getUserById(userId);
+    public Employee dismissBy(long employeeId,
+                              long userId) {
+        loadUser(userId);
         Employee employee = getById(employeeId);
         Box box = employee.getBox();
 
@@ -242,4 +258,14 @@ public class EmployeeService {
     public Box changeEmployeeBox(long userId, int lockerNumber, int boxNumber, int plantNumber, int targetLockerNumber, int targetBoxNumber, int targetPlantNumber) {
         return new Box();
     }
+
+
+    public Employee release(Employee employeeToRelease, Box box) {
+        employeeToRelease.setAsPastBox(
+                simpleBoxService.createSimpleBox(box, employeeToRelease));
+        employeeToRelease.setBox(null);
+        return employeesRepository.save(employeeToRelease);
+    }
+
+
 }

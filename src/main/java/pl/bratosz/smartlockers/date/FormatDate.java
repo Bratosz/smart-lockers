@@ -33,4 +33,8 @@ public class FormatDate {
                     "yyyy-MM-dd. Passed date was: " + date);
         }
     }
+
+    public static Date getDefaultDate() {
+        return new Date(0);
+    }
 }

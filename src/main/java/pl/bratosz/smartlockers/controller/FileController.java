@@ -153,7 +153,7 @@ public class FileController {
                     String locationName = row.getCell(5).getStringCellValue();
                     Location location = locationService.getByNameAndPlantNumber(locationName, plantNumberCell);
 
-                    //creating emploee and assign it to the next free box
+                    //creating emploee and assignWithdrawnCloth it to the next free box
                     Employee createdEmployee = employeeService.createEmployeeAndAssignToBox(
                             plantNumberCell, department, location, employee);
                     Box box = createdEmployee.getBox();

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Box;
 import pl.bratosz.smartlockers.model.EmployeeGeneral;
 import pl.bratosz.smartlockers.model.Views;
+import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.BoxService;
 import java.util.List;
 
@@ -50,6 +51,12 @@ public class BoxController {
                                  @PathVariable long locationId,
                                  @PathVariable Box.BoxStatus boxStatus) {
         return boxesService.getFiltered(plantId, departmentId, locationId, boxStatus);
+    }
+
+    @JsonView(Views.Public.class)
+    @DeleteMapping("/delete/{boxId}")
+    public StandardResponse deleteBy(@PathVariable long boxId) {
+        return boxesService.hardDeleteBy(boxId);
     }
 
 }
