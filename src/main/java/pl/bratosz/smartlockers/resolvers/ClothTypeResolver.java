@@ -17,8 +17,9 @@ public class ClothTypeResolver {
         clothTypes.put("FARTUSZEK", ClothType.APRON);
         clothTypes.put("FARTUCH", ClothType.APRON);
         clothTypes.put("T-SHIRT", ClothType.SHIRT);
+        clothTypes.put("TSHIRT", ClothType.SHIRT);
         clothTypes.put("POLO", ClothType.SHIRT);
-        clothTypes.put("Kurtka", ClothType.JACKET);
+        clothTypes.put("KURTKA", ClothType.JACKET);
     }
 
     public ClothType resolve(String clothName) {

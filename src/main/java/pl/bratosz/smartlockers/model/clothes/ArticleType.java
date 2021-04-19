@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.model.clothes;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothType;
@@ -10,8 +11,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-public class Article {
-
+public class ArticleType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -27,14 +27,17 @@ public class Article {
     private ClothType clothType;
 
     @JsonView(Views.InternalForEmployees.class)
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "articleType")
     private Set<Cloth> clothes;
 
-    public Article() {
+    @OneToMany(mappedBy = "articleType")
+    private Set<ClientArticle> clientArticle;
+
+    public ArticleType() {
 
     }
 
-    public Article(int articleNumber, String name, ClothType clothType) {
+    public ArticleType(int articleNumber, String name, ClothType clothType) {
         this.articleNumber = articleNumber;
         this.name = name;
         this.clothType = clothType;
@@ -78,5 +81,13 @@ public class Article {
 
     public void setClothes(Set<Cloth> clothes) {
         this.clothes = clothes;
+    }
+
+    public Set<ClientArticle> getClientArticle() {
+        return clientArticle;
+    }
+
+    public void setClientArticle(Set<ClientArticle> clientArticle) {
+        this.clientArticle = clientArticle;
     }
 }

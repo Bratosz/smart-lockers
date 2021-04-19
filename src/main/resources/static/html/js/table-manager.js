@@ -17,3 +17,13 @@ function writeDataToTable(sortedElements, $table, writingMethod) {
     }
     return $table;
 }
+
+function writeArticleToRow(article, $row) {
+    $row.removeAttr('id');
+    $row.css('display', 'table-row');
+    $row.find('.cell-id').val();
+    $row.find('.cell-article-number').val();
+    $row.find('.cell-article-name').val();
+    $row.find('.cell-article-cloth-type').val();
+    $row.find('.cell-article-redemption-price').val();
+}

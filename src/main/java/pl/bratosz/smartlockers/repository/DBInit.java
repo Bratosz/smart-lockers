@@ -42,11 +42,11 @@
 //                Box box = new Box(j, Box.BoxStatus.OCCUPY, dismissedEmp.getId());
 //
 //                List<Employee> dismissedEmployees = new LinkedList<>();
-//                dismissedEmployees.add(dismissedEmp);
+//                dismissedEmployees.addArticle(dismissedEmp);
 //
 //                box.setEmployee(employee);
 //                box.setReleasedEmployees(dismissedEmployees);
-//                boxes.add(box);
+//                boxes.addArticle(box);
 //
 //            }
 //            locker.setBoxes(boxes);

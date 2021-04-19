@@ -1,9 +1,7 @@
 package pl.bratosz.smartlockers.service.managers.creators;
 
 import pl.bratosz.smartlockers.model.Employee;
-import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
-import pl.bratosz.smartlockers.model.clothes.ClothSize;
 import pl.bratosz.smartlockers.model.orders.*;
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForRelease;
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForExchangeAndRelease;

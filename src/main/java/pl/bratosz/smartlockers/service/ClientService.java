@@ -4,8 +4,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Client;
+import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Locker;
-import pl.bratosz.smartlockers.model.clothes.Article;
+import pl.bratosz.smartlockers.model.clothes.ArticleType;
 import pl.bratosz.smartlockers.repository.ClientRepository;
 import pl.bratosz.smartlockers.response.DataLoadedResponse;
 import pl.bratosz.smartlockers.service.exels.DataBaseLoader;
@@ -16,12 +17,14 @@ import java.util.List;
 @Service
 public class ClientService {
     private ClientRepository clientRepository;
+    private ClientArticleService clientArticleService;
 
     @Autowired
     private LockerService lockerService;
 
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, ClientArticleService clientArticleService) {
         this.clientRepository = clientRepository;
+        this.clientArticleService = clientArticleService;
     }
 
     public Client create(String name) {
@@ -42,8 +45,9 @@ public class ClientService {
         return clientRepository.getById(clientId);
     }
 
-    public void add(Article article, Client client) {
-        client.addArticle(article, 0);
+    public void addArticle(ArticleType articleType, Client client) {
+        ClientArticle article = clientArticleService.createDefault(articleType, client);
+        client.addArticle(article);
         clientRepository.save(client);
     }
 }

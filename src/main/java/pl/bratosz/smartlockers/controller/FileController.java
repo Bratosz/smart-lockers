@@ -371,9 +371,9 @@ public class FileController {
 
             //get all employees with particular name
             List<Employee> employeesFromDB = employeeService.getByFirstNameAndLastName(firstName, lastName);
-            //add employees to final list
+            //addArticle employees to final list
             employeesFromDB.stream().forEach(employee -> employeesToFile.add(employee));
-            //if there is no employee then add it to list with omitted employees
+            //if there is no employee then addArticle it to list with omitted employees
             if (employeesFromDB.size() == 0) {
                 omittedEmployees.add(new SimpleEmployee(firstName, lastName));
             }

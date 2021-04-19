@@ -45,7 +45,8 @@ public class ScrappingController {
         return scrapingService.loadPlantBoxByBox(plantId);
     }
 
-    @PostMapping("/load-plant-locker-by-locker/{plantId}/{firstLockerNumber}/{lastLockerNumber}/{capacity}/{withClothes}")
+    @PostMapping("/load-plant-locker-by-locker/" +
+            "{plantId}/{firstLockerNumber}/{lastLockerNumber}/{capacity}/{withClothes}")
     @JsonView(Views.Public.class)
     public StandardResponse loadLockersWithClothes(
             @PathVariable long plantId,

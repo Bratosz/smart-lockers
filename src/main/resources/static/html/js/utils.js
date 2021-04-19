@@ -22,3 +22,10 @@ function addFieldToObjects(fieldName, content, objects) {
     }
     return result;
 }
+
+function sort(collection, property) {
+    collection.sort(function (a,b) {
+        return a[property] - b[property];
+    });
+    return collection
+}

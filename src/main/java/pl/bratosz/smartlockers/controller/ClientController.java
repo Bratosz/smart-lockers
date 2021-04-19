@@ -88,7 +88,7 @@ public class ClientController {
 
         locationController.assignToPlant(id7, 386);
 
-//        lockerController.create(1,1, 10, 1,1,1);
+//        lockerController.createDefault(1,1, 10, 1,1,1);
 
 
         userService.create("Admin", "Admin");

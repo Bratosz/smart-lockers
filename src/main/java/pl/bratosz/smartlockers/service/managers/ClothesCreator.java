@@ -34,7 +34,7 @@ public class ClothesCreator {
     }
 
     public Cloth createNewInstead(int ordinalNumber,
-                                  Article article,
+                                  ArticleType articleType,
                                   ClothSize size,
                                   Employee employee) {
         ClothStatus clothStatus = clothStatusService.create(FOR_ASSIGN, user);
@@ -43,7 +43,7 @@ public class ClothesCreator {
         cloth.setActive(false);
         cloth.setCreated(new Date());
         cloth.setOrdinalNumber(ordinalNumber);
-        cloth.setArticle(article);
+        cloth.setArticleType(articleType);
         cloth.setSize(size);
         cloth.setEmployee(employee);
         return cloth;
@@ -83,7 +83,7 @@ public class ClothesCreator {
     }
 
     private void setOrdinalNumber() {
-        int articleNumber = cloth.getArticle().getArticleNumber();
+        int articleNumber = cloth.getArticleType().getArticleNumber();
         List<Cloth> clothes = cloth.getEmployee().getClothes();
         int ordinalNumber = resolveOrdinalNumber(clothes, articleNumber);
         cloth.setOrdinalNumber(ordinalNumber);
@@ -91,7 +91,7 @@ public class ClothesCreator {
 
     private int resolveOrdinalNumber(List<Cloth> clothes, int articleNumber) {
         int articlesAmount = (int) clothes.stream()
-                .filter(c -> c.getArticle().getArticleNumber() == articleNumber)
+                .filter(c -> c.getArticleType().getArticleNumber() == articleNumber)
                 .count();
         return articlesAmount + 1;
     }

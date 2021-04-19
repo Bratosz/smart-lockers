@@ -35,7 +35,7 @@ public class ClothService {
     private OrderManager orderManager;
     private EmployeeService employeeService;
     private ClothStatusService clothStatusService;
-    private ArticleService articleService;
+    private ArticleTypeService articleTypeService;
     private User user;
     private ClothesManager clothesManager;
 
@@ -46,7 +46,7 @@ public class ClothService {
                         OrderManager orderManager,
                         @Lazy EmployeeService employeeService,
                         ClothStatusService clothStatusService,
-                        ArticleService articleService, ClothesManager clothesManager) {
+                        ArticleTypeService articleTypeService, ClothesManager clothesManager) {
         this.clothesRepository = clothesRepository;
         this.ordersRepository = ordersRepository;
         this.orderStatusService = orderStatusService;
@@ -54,7 +54,7 @@ public class ClothService {
         this.orderManager = orderManager;
         this.employeeService = employeeService;
         this.clothStatusService = clothStatusService;
-        this.articleService = articleService;
+        this.articleTypeService = articleTypeService;
         this.clothesManager = clothesManager;
     }
 
@@ -68,13 +68,13 @@ public class ClothService {
 
     public Cloth createNewForAssignInsteadExisting(
             int ordinalNumber,
-            Article article,
+            ArticleType articleType,
             ClothSize size,
             Employee employee,
             User user
     ) {
         loadUser(user);
-        Cloth newCloth = clothesManager.createNewInstead(ordinalNumber, article, size, employee);
+        Cloth newCloth = clothesManager.createNewInstead(ordinalNumber, articleType, size, employee);
         return clothesRepository.save(newCloth);
     }
 
@@ -126,7 +126,7 @@ public class ClothService {
                     "Ubranie należy do innego klienta");
         } else {
             withdrawnCloth.setSize(size);
-            withdrawnCloth.setArticle(articleService.get(articleNumber));
+            withdrawnCloth.setArticleType(articleTypeService.get(articleNumber));
             return assignAsWithdrawnCloth(withdrawnCloth, employee);
         }
     }
@@ -264,7 +264,7 @@ public class ClothService {
                     clothForExchange,
                     orderType,
                     orderStatus,
-                    clothForExchange.getArticle(),
+                    clothForExchange.getArticleType(),
                     clothForExchange.getSize(),
                     user);
             return ResponseClothAcceptance.createNewOrderAddedAndClothAcceptedResponse(clothOrder);

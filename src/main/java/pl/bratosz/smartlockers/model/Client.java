@@ -1,7 +1,6 @@
 package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import pl.bratosz.smartlockers.model.clothes.Article;
 
 import javax.persistence.*;
 import java.util.*;
@@ -26,13 +25,9 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private Set<Location> locations;
 
-    @ElementCollection
-    @CollectionTable(name = "article_prices",
-    joinColumns = {@JoinColumn(
-            name = "client_id", referencedColumnName = "id")})
-    @MapKeyJoinColumn(name = "article_id")
-    @Column(name = "price")
-    private Map<Article, Double> articlesWithPrices;
+    @JsonView(Views.Public.class)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private Set<ClientArticle> articles;
 
     Client() {
     }
@@ -99,17 +94,17 @@ public class Client {
         return plantOpt.orElseThrow(NoSuchElementException::new);
     }
 
-    public Map<Article, Double> getArticlesWithPrices() {
-        return articlesWithPrices;
+    public Set<ClientArticle> getArticles() {
+        return articles;
     }
 
-    public void setArticlesWithPrices(Map<Article, Double> articlesWithPrices) {
-        this.articlesWithPrices = articlesWithPrices;
+    public void setArticles(Set<ClientArticle> articles) {
+        this.articles = articles;
     }
 
-    public void addArticle(Article article, double price) {
-        if(this.articlesWithPrices == null)
-            articlesWithPrices = new HashMap<>();
-        articlesWithPrices.put(article, price);
+    public void addArticle(ClientArticle article) {
+        if(this.articles == null)
+            this.articles = new HashSet<>();
+        this.articles.add(article);
     }
 }

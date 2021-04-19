@@ -6,7 +6,8 @@
     <title>SL - Artykuły</title>
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/smart-lockers.js"></script>
-    <script src="js/view-lockers.js" defer></script>
+    <script src="js/utils.js"></script>
+    <script src="js/articles.js" defer></script>
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
@@ -73,6 +74,37 @@
             <span class="navbar-text"></span>
         </div>
     </nav>
+
+    <main>
+        <div>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Numer art.</th>
+                    <th>Nazwa art.</th>
+                    <th>Rodzaj odzieży</th>
+                    <th>Cena wykupu</th>
+                    <th>Nowa cena</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="table-of-articles">
+                <tr id="row-template" style="display: none">
+                    <td class="cell-id"></td>
+                    <td class="cell-article-number"></td>
+                    <td class="cell-article-name"></td>
+                    <td class="cell-article-cloth-type"></td>
+                    <td class="cell-article-redemption-price"></td>
+                    <td><input class="input-number-new-redemption-price"
+                               type="number"></td>
+                    <td><input type="button" value="zapisz"
+                               class="button-save"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
 
     
 </div>
