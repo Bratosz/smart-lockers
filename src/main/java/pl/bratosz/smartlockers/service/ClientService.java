@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Locker;
-import pl.bratosz.smartlockers.model.clothes.ArticleType;
+import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.repository.ClientRepository;
 import pl.bratosz.smartlockers.response.DataLoadedResponse;
 import pl.bratosz.smartlockers.service.exels.DataBaseLoader;
@@ -45,7 +45,7 @@ public class ClientService {
         return clientRepository.getById(clientId);
     }
 
-    public void addArticle(ArticleType articleType, Client client) {
+    public void addArticle(Article articleType, Client client) {
         ClientArticle article = clientArticleService.createDefault(articleType, client);
         client.addArticle(article);
         clientRepository.save(client);

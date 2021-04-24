@@ -3,7 +3,7 @@ package pl.bratosz.smartlockers.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Employee;
-import pl.bratosz.smartlockers.model.clothes.ArticleType;
+import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
 import pl.bratosz.smartlockers.model.orders.ActionType;
@@ -25,7 +25,7 @@ import static pl.bratosz.smartlockers.model.orders.OrderStatus.OrderStage.READY_
 public class OrderService {
     private OrdersRepository ordersRepository;
     private UserService userService;
-    private ArticleTypeService articleTypeService;
+    private ArticleService articleService;
     @Autowired
     private ClothService clothesService;
     private OrderStatusService orderStatusService;
@@ -33,11 +33,11 @@ public class OrderService {
 
     public OrderService(OrdersRepository ordersRepository,
                         UserService userService,
-                        ArticleTypeService articleTypeService,
+                        ArticleService articleService,
                         OrderStatusService orderStatusService, OrderManager orderManager) {
         this.ordersRepository = ordersRepository;
         this.userService = userService;
-        this.articleTypeService = articleTypeService;
+        this.articleService = articleService;
         this.orderStatusService = orderStatusService;
         this.orderManager = orderManager;
     }
@@ -103,10 +103,10 @@ public class OrderService {
                                                             List<Cloth> clothesForExchange,
                                                             User user,
                                                             OrderType orderType) {
-        ArticleType articleType = articleTypeService.get(articleNumber);
+        Article article = articleService.get(articleNumber);
         for (Cloth cloth : clothesForExchange) {
             OrderStatus orderStatus = orderStatusService.create(orderType, user);
-            placeOne(cloth, orderType, orderStatus, articleType, size, user);
+            placeOne(cloth, orderType, orderStatus, article, size, user);
         }
         return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
     }
@@ -118,7 +118,7 @@ public class OrderService {
             OrderType orderType) {
         for (Cloth cloth : clothesForExchange) {
             OrderStatus orderStatus = orderStatusService.create(orderType, user);
-            placeOne(cloth, orderType, orderStatus, cloth.getArticleType(), size, user);
+            placeOne(cloth, orderType, orderStatus, cloth.getArticle(), size, user);
         }
         return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
 
@@ -129,7 +129,7 @@ public class OrderService {
                                                      OrderType orderType) {
         for (Cloth cloth : clothesForExchange) {
             OrderStatus orderStatus = orderStatusService.create(orderType, user);
-            placeOne(cloth, orderType, orderStatus, cloth.getArticleType(), cloth.getSize(), user);
+            placeOne(cloth, orderType, orderStatus, cloth.getArticle(), cloth.getSize(), user);
         }
         return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
     }
@@ -139,14 +139,14 @@ public class OrderService {
     public ClothOrder placeOne(Cloth clothForExchange,
                                OrderType orderType,
                                OrderStatus orderStatus,
-                               ArticleType articleType,
+                               Article article,
                                ClothSize size,
                                User user) {
         deleteInactiveOrder(clothForExchange);
         Employee employee = clothForExchange.getEmployee();
         Cloth clothForRelease = clothesService.createNewForAssignInsteadExisting(
                 clothForExchange.getOrdinalNumber(),
-                articleType,
+                article,
                 size,
                 employee,
                 user);

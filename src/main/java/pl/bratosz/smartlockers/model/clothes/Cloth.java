@@ -27,7 +27,7 @@ public class Cloth {
 
     @JsonView({Views.InternalForBoxes.class, Views.InternalForClothOrders.class})
     @ManyToOne
-    protected ArticleType articleType;
+    protected Article article;
 
     @JsonView(Views.InternalForClothes.class)
     @OneToOne(mappedBy = "clothToExchange", cascade = CascadeType.PERSIST)
@@ -67,13 +67,13 @@ public class Cloth {
 
     public Cloth(
             int ordinalNumber,
-            ArticleType articleType,
+            Article article,
             ClothSize size,
             Employee employee,
             Date created
     ) {
         this.ordinalNumber = ordinalNumber;
-        this.articleType = articleType;
+        this.article = article;
         this.size = size;
         this.employee = employee;
         this.created = created;
@@ -81,14 +81,14 @@ public class Cloth {
     }
 
     public Cloth(
-            ArticleType articleType,
+            Article article,
             ClothSize size,
             Employee employee,
             Date created
     ) {
         this.size = size;
         this.created = created;
-        this.articleType = articleType;
+        this.article = article;
         this.employee = employee;
         active = false;
     }
@@ -99,7 +99,7 @@ public class Cloth {
         Date lastWashing,
         Date releaseDate,
         int ordinalNumber,
-        ArticleType articleType,
+        Article article,
         ClothSize size
     ) {
         this.barcode = barcode;
@@ -107,7 +107,7 @@ public class Cloth {
         setLastWashing(lastWashing);
         this.releaseDate = releaseDate;
         this.ordinalNumber = ordinalNumber;
-        this.articleType = articleType;
+        this.article = article;
         this.size = size;
         active = true;
     }
@@ -117,7 +117,7 @@ public class Cloth {
                  Date lastWashing,
                  Date releaseDate,
                  int ordinalNumber,
-                 ArticleType articleType,
+                 Article article,
                  ClothSize size,
                  LifeCycleStatus lifeCycleStatus) {
         this.barcode = barcode;
@@ -125,7 +125,7 @@ public class Cloth {
         setLastWashing(lastWashing);
         this.releaseDate = releaseDate;
         this.ordinalNumber = ordinalNumber;
-        this.articleType = articleType;
+        this.article = article;
         this.size = size;
         active = true;
         this.lifeCycleStatus = lifeCycleStatus;
@@ -163,12 +163,12 @@ public class Cloth {
         this.ordinalNumber = ordinalNumber;
     }
 
-    public ArticleType getArticleType() {
-        return articleType;
+    public Article getArticle() {
+        return article;
     }
 
-    public void setArticleType(ArticleType articleType) {
-        this.articleType = articleType;
+    public void setArticle(Article article) {
+        this.article = article;
     }
 
     public ClothOrder getExchangeOrder() {
@@ -269,7 +269,7 @@ public class Cloth {
 
     @Override
     public String toString() {
-        return getArticleType().getName() + " " + getSize() + " " + "lp. " +
+        return getArticle().getName() + " " + getSize() + " " + "lp. " +
                 getOrdinalNumber();
     }
 

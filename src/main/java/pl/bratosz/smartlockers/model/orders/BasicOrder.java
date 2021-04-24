@@ -1,6 +1,6 @@
 package pl.bratosz.smartlockers.model.orders;
 
-import pl.bratosz.smartlockers.model.clothes.ArticleType;
+import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public interface BasicOrder {
 
     long getId();
 
-    ArticleType getArticle();
+    Article getArticle();
 
     ClothSize getSize();
 

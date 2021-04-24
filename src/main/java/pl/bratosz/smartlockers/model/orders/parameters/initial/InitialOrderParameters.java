@@ -1,23 +1,23 @@
 package pl.bratosz.smartlockers.model.orders.parameters.initial;
 
-import pl.bratosz.smartlockers.model.clothes.ArticleType;
+import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
 
 public class InitialOrderParameters implements InitialForNewOne {
-    private ArticleType articleType;
+    private Article article;
     private ClothSize size;
     private Cloth clothToExchange;
 
-    public InitialOrderParameters(ArticleType articleType, ClothSize size, Cloth clothToExchange) {
-        this.articleType = articleType;
+    public InitialOrderParameters(Article article, ClothSize size, Cloth clothToExchange) {
+        this.article = article;
         this.size = size;
         this.clothToExchange = clothToExchange;
     }
 
     @Override
-    public ArticleType getArticleType() {
-        return articleType;
+    public Article getArticle() {
+        return article;
     }
 
     @Override

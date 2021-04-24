@@ -3,21 +3,18 @@ package pl.bratosz.smartlockers.model.clothes;
 import com.fasterxml.jackson.annotation.JsonView;
 import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Views;
-import pl.bratosz.smartlockers.model.clothes.Cloth;
-import pl.bratosz.smartlockers.model.clothes.ClothType;
-import pl.bratosz.smartlockers.model.orders.ClothOrder;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-public class ArticleType {
+public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @JsonView(Views.Public.class)
-    private int articleNumber;
+    private int number;
 
     @JsonView(Views.Public.class)
     private String name;
@@ -27,18 +24,18 @@ public class ArticleType {
     private ClothType clothType;
 
     @JsonView(Views.InternalForEmployees.class)
-    @OneToMany(mappedBy = "articleType")
+    @OneToMany(mappedBy = "article")
     private Set<Cloth> clothes;
 
-    @OneToMany(mappedBy = "articleType")
-    private Set<ClientArticle> clientArticle;
+    @OneToMany(mappedBy = "article")
+    private Set<ClientArticle> clientArticles;
 
-    public ArticleType() {
+    public Article() {
 
     }
 
-    public ArticleType(int articleNumber, String name, ClothType clothType) {
-        this.articleNumber = articleNumber;
+    public Article(int number, String name, ClothType clothType) {
+        this.number = number;
         this.name = name;
         this.clothType = clothType;
     }
@@ -51,12 +48,12 @@ public class ArticleType {
         this.id = id;
     }
 
-    public int getArticleNumber() {
-        return articleNumber;
+    public int getNumber() {
+        return number;
     }
 
-    public void setArticleNumber(int articleNumber) {
-        this.articleNumber = articleNumber;
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     public String getName() {
@@ -83,11 +80,11 @@ public class ArticleType {
         this.clothes = clothes;
     }
 
-    public Set<ClientArticle> getClientArticle() {
-        return clientArticle;
+    public Set<ClientArticle> getClientArticles() {
+        return clientArticles;
     }
 
-    public void setClientArticle(Set<ClientArticle> clientArticle) {
-        this.clientArticle = clientArticle;
+    public void setClientArticles(Set<ClientArticle> clientArticles) {
+        this.clientArticles = clientArticles;
     }
 }

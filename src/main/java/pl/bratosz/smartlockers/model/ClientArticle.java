@@ -1,7 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import pl.bratosz.smartlockers.model.clothes.ArticleType;
+import pl.bratosz.smartlockers.model.clothes.Article;
 
 import javax.persistence.*;
 
@@ -13,7 +13,7 @@ public class ClientArticle {
 
     @JsonView(Views.Public.class)
     @ManyToOne
-    private ArticleType articleType;
+    private Article article;
 
     @JsonView(Views.Public.class)
     private double redemptionPrice;
@@ -21,7 +21,7 @@ public class ClientArticle {
     @JsonView(Views.Public.class)
     private boolean available;
 
-    @JsonView(Views.Public.class)
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Client client;
 
@@ -36,12 +36,12 @@ public class ClientArticle {
         this.id = id;
     }
 
-    public ArticleType getArticleType() {
-        return articleType;
+    public Article getArticle() {
+        return article;
     }
 
-    public void setArticleType(ArticleType articleType) {
-        this.articleType = articleType;
+    public void setArticle(Article article) {
+        this.article = article;
     }
 
     public double getRedemptionPrice() {

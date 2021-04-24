@@ -23,9 +23,42 @@ function addFieldToObjects(fieldName, content, objects) {
     return result;
 }
 
-function sort(collection, property) {
-    collection.sort(function (a,b) {
-        return a[property] - b[property];
-    });
-    return collection
+function sort(collection, prop1st, prop2nd) {
+    if(prop2nd === undefined) {
+        collection.sort(function (a,b) {
+            return compare(fetchFrom(a, prop1st), fetchFrom(b, prop1st));
+        });
+        return collection;
+    } else {
+        collection.sort(function (a,b) {
+            return compare(fetchFrom(a, prop1st), fetchFrom(b, prop1st))
+                || compare(fetchFrom(a, prop2nd), fetchFrom(b, prop2nd));
+        });
+        return collection;
+    }
+}
+
+function compare(a,b) {
+    if(a < b) return -1;
+    if(a > b) return 1;
+    return 0;
+
+}
+
+function fetchFrom(obj, prop){
+    //property not found
+    if(typeof obj === 'undefined') return false;
+
+    //index of next property split
+    var index = prop.indexOf('.');
+
+    //property split found; recursive call
+    if(index > -1){
+        //get object at property (before split), pass on remainder
+        return fetchFrom(
+            obj[prop.substring(0, index)], prop.substr(index+1));
+    }
+
+    //no split; get property
+    return obj[prop];
 }
