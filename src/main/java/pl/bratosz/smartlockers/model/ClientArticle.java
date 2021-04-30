@@ -9,6 +9,7 @@ import javax.persistence.*;
 public class ClientArticle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(Views.Public.class)
     private long id;
 
     @JsonView(Views.Public.class)
@@ -21,9 +22,14 @@ public class ClientArticle {
     @JsonView(Views.Public.class)
     private boolean available;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Client client;
+
+    @JsonView(Views.Public.class)
+    private int depreciationPercentageCap;
+
+    @JsonView(Views.Public.class)
+    private int depreciationPeriod;
 
     public ClientArticle() {
     }
@@ -66,5 +72,25 @@ public class ClientArticle {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+    public int getDepreciationPercentageCap() {
+        return depreciationPercentageCap;
+    }
+
+    public void setDepreciationPercentageCap(int depreciationPercentageCap) {
+        this.depreciationPercentageCap = depreciationPercentageCap;
+    }
+
+    public int getDepreciationPeriod() {
+        return depreciationPeriod;
+    }
+
+    public void setDepreciationPeriod(int depreciationPeriod) {
+        this.depreciationPeriod = depreciationPeriod;
+    }
+
+    public void addClient(Client client) {
+        client.addArticle(this);
+        setClient(client);
     }
 }

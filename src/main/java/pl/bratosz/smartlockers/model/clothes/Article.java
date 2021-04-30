@@ -24,7 +24,7 @@ public class Article {
     private ClothType clothType;
 
     @JsonView(Views.InternalForEmployees.class)
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "clientArticle")
     private Set<Cloth> clothes;
 
     @OneToMany(mappedBy = "article")

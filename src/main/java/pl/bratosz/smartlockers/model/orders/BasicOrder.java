@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.model.orders;
 
+import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
 
@@ -11,7 +12,7 @@ public interface BasicOrder {
 
     long getId();
 
-    Article getArticle();
+    ClientArticle getClientArticle();
 
     ClothSize getSize();
 

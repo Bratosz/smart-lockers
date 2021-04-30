@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.model.orders;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
@@ -60,8 +61,8 @@ public class ClothOrder implements OrderForRelease, OrderForExchangeAndRelease {
     }
 
     @Override
-    public Article getArticle() {
-        return clothToRelease.getArticle();
+    public ClientArticle getClientArticle() {
+        return clothToRelease.getClientArticle();
     }
 
     @Override

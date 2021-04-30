@@ -11,37 +11,20 @@ import pl.bratosz.smartlockers.resolvers.ClothTypeResolver;
 @Service
 public class ArticleService {
     private ArticlesRepository articlesRepository;
-    private ClientService clientService;
 
-    public ArticleService(ArticlesRepository articlesRepository, ClientService clientService) {
+    public ArticleService(ArticlesRepository articlesRepository) {
         this.articlesRepository = articlesRepository;
-        this.clientService = clientService;
     }
 
     public Article get(int articleNumber) {
         return articlesRepository.getBy(articleNumber);
     }
 
-    public Article get(int articleNumber, String articleName, Client client) {
-        return client.getArticles()
-                .stream()
-                .map(article -> article.getArticle())
-                .filter(articleType -> articleType.getNumber() == articleNumber)
-                .findFirst()
-                .orElseGet(() ->
-                        addNewArticleType(articleNumber, articleName, client));
-    }
-
-    public Article addNewArticleType(int articleNumber, String articleName, Client client) {
-        Article article = articlesRepository.getBy(articleNumber);
-        if(article == null) {
+    public Article addNewArticle(int articleNumber, String articleName) {
             ClothTypeResolver clothTypeResolver = new ClothTypeResolver();
             ClothType clothType = clothTypeResolver.resolve(articleName);
-            article = articlesRepository.save(
+            return articlesRepository.save(
                     new Article(articleNumber, articleName, clothType));
-        }
-        clientService.addArticle(article, client);
-        return article;
     }
 
     public Article determineDesiredArticle(int articleNumber, Article article) throws ArticleNotExistException {

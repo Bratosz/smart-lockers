@@ -18,3 +18,7 @@ function writeDataToTable(sortedElements, $table, writingMethod) {
     return $table;
 }
 
+function refreshRow(element, $row, writingMethod) {
+    writingMethod(element, $row);
+}
+

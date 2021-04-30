@@ -13,8 +13,8 @@ let lockerNumber,
 
 reloadBox();
 
-$("#button-load-employee").click(function () {
-    loadEmployee();
+$("#button-load-to-managed-employees").click(function () {
+    addToManagedEmployees();
 });
 
 $("#refresh-button").click(function () {
@@ -36,13 +36,12 @@ $('#button-add-order').click(function () {
 
 function refreshOrders() {
     $.ajax({
-            url: `http://localhost:8080/orders/get-by-employee/${employeeId}`,
-            method: "get",
-            success: function (actualOrders) {
-                displayOrders(actualOrders);
-            }
+        url: `http://localhost:8080/orders/get-by-employee/${employeeId}`,
+        method: "get",
+        success: function (actualOrders) {
+            displayOrders(actualOrders);
         }
-    )
+    })
 }
 
 function addOrder() {
@@ -145,7 +144,19 @@ function loadEmployee() {
             location.reload();
         }
     })
-};
+}
+
+function addToManagedEmployees() {
+    $.ajax({
+        url: getActualLocation() + `/users/add-employee-to-management-list` +
+            `/${employeeId}` +
+            `/${userId}`,
+        method: "post",
+        success: function (response) {
+            window.alert(response.message)
+        }
+    })
+}
 
 function displayClothes(clothes) {
     writeClothesToTable($("#table-of-clothes-body"), clothes);

@@ -29,17 +29,19 @@ public class OrderController {
     }
 
     @JsonView(Views.InternalForClothOrders.class)
-    @PostMapping("/place/{articleNumber}/{size}/{orderType}/{userId}")
+    @PostMapping("/place/{articleNumber}/{size}/{orderType}/{clientId}/{userId}")
     public ResponseOrdersCreated place(@PathVariable OrderType orderType,
                                        @PathVariable int articleNumber,
                                        @PathVariable ClothSize size,
                                        @RequestBody long[] barCodes,
+                                       @PathVariable long clientId,
                                        @PathVariable long userId) {
         return orderService.placeMany(
                 orderType,
                 articleNumber,
                 size,
                 barCodes,
+                clientId,
                 userId);
     }
 

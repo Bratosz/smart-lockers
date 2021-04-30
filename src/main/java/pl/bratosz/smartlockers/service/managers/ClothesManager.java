@@ -26,15 +26,15 @@ public class ClothesManager {
     }
 
     public Cloth createNewInstead(int ordinalNumber,
-                                  Article article,
+                                  ClientArticle clientArticle,
                                   ClothSize size,
                                   Employee employee) {
-        return creator.createNewInstead(ordinalNumber, article, size, employee);
+        return creator.createNewInstead(ordinalNumber, clientArticle, size, employee);
     }
 
-    public Cloth createNew(Article article, ClothSize size, Employee employee, User user) {
+    public Cloth createNew(ClientArticle clientArticle, ClothSize size, Employee employee, User user) {
         Cloth prototype = new Cloth(
-                article,
+                clientArticle,
                 size,
                 employee,
                 new Date());
@@ -50,7 +50,7 @@ public class ClothesManager {
                                 Date lastWashing,
                                 Date release,
                                 int ordinalNo,
-                                Article article,
+                                ClientArticle clientArticle,
                                 ClothSize size,
                                 User user) {
         cloth = new Cloth();
@@ -59,7 +59,7 @@ public class ClothesManager {
         cloth.setLastWashing(lastWashing);
         cloth.setReleaseDate(release);
         cloth.setOrdinalNumber(ordinalNo);
-        cloth.setArticle(article);
+        cloth.setClientArticle(clientArticle);
         cloth.setSize(size);
         return createExisting(cloth, user);
     }

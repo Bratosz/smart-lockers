@@ -35,7 +35,7 @@ public class ClothService {
     private OrderManager orderManager;
     private EmployeeService employeeService;
     private ClothStatusService clothStatusService;
-    private ArticleService articleService;
+    private ClientArticleService clientArticleService;
     private User user;
     private ClothesManager clothesManager;
 
@@ -46,7 +46,8 @@ public class ClothService {
                         OrderManager orderManager,
                         @Lazy EmployeeService employeeService,
                         ClothStatusService clothStatusService,
-                        ArticleService articleService, ClothesManager clothesManager) {
+                        ClientArticleService clientArticleService,
+                        ClothesManager clothesManager) {
         this.clothesRepository = clothesRepository;
         this.ordersRepository = ordersRepository;
         this.orderStatusService = orderStatusService;
@@ -54,7 +55,7 @@ public class ClothService {
         this.orderManager = orderManager;
         this.employeeService = employeeService;
         this.clothStatusService = clothStatusService;
-        this.articleService = articleService;
+        this.clientArticleService = clientArticleService;
         this.clothesManager = clothesManager;
     }
 
@@ -68,13 +69,13 @@ public class ClothService {
 
     public Cloth createNewForAssignInsteadExisting(
             int ordinalNumber,
-            Article article,
+            ClientArticle clientArticle,
             ClothSize size,
             Employee employee,
             User user
     ) {
         loadUser(user);
-        Cloth newCloth = clothesManager.createNewInstead(ordinalNumber, article, size, employee);
+        Cloth newCloth = clothesManager.createNewInstead(ordinalNumber, clientArticle, size, employee);
         return clothesRepository.save(newCloth);
     }
 
@@ -116,7 +117,7 @@ public class ClothService {
                                                         ClothSize size,
                                                         Cloth withdrawnCloth) {
         loadUser(userId);
-        Employee employee = employeeService.getById(employeeId);
+        Employee employee = employeeService.getBy(employeeId);
         Cloth clothByBarcode = clothesRepository.getByBarcode(withdrawnCloth.getBarcode());
         if (clothIsPresent(clothByBarcode, clientId)) {
             return ResponseClothAssignment.createForFailure(
@@ -126,7 +127,7 @@ public class ClothService {
                     "Ubranie należy do innego klienta");
         } else {
             withdrawnCloth.setSize(size);
-            withdrawnCloth.setArticle(articleService.get(articleNumber));
+            withdrawnCloth.setClientArticle(clientArticleService.get(articleNumber, clientId));
             return assignAsWithdrawnCloth(withdrawnCloth, employee);
         }
     }
@@ -134,7 +135,7 @@ public class ClothService {
 
     public ResponseClothAssignment releaseRotationalCloth(long clientId, long userId, long employeeId, long barcode) {
         loadUser(userId);
-        Employee employee = employeeService.getById(employeeId);
+        Employee employee = employeeService.getBy(employeeId);
         Cloth clothByBarcode = clothesRepository.getByBarcode(barcode);
         if (clothIsPresent(clothByBarcode, clientId)) {
             return releaseAsRotational(clothByBarcode, employee);
@@ -264,7 +265,7 @@ public class ClothService {
                     clothForExchange,
                     orderType,
                     orderStatus,
-                    clothForExchange.getArticle(),
+                    clothForExchange.getClientArticle(),
                     clothForExchange.getSize(),
                     user);
             return ResponseClothAcceptance.createNewOrderAddedAndClothAcceptedResponse(clothOrder);

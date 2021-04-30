@@ -12,6 +12,18 @@ import java.util.List;
 public interface ClientArticlesRepository extends JpaRepository<ClientArticle, Long> {
 
     @Query("select a from ClientArticle a where a.client.id = :clientId")
-    List<ClientArticle> getBy(
+    List<ClientArticle> getAllBy(
+            @Param("clientId") long clientId);
+
+
+    @Query("select a from ClientArticle a where a.id = :id")
+    ClientArticle getBy(
+            @Param("id") long id);
+
+    @Query("select a from ClientArticle a where " +
+            " a.article.number = :articleNumber and " +
+            " a.client.id = :clientId ")
+    ClientArticle getBy(
+            @Param("articleNumber") int articleNumber,
             @Param("clientId") long clientId);
 }

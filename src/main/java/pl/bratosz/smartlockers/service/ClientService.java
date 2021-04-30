@@ -44,10 +44,4 @@ public class ClientService {
     public Client getById(long clientId) {
         return clientRepository.getById(clientId);
     }
-
-    public void addArticle(Article articleType, Client client) {
-        ClientArticle article = clientArticleService.createDefault(articleType, client);
-        client.addArticle(article);
-        clientRepository.save(client);
-    }
 }

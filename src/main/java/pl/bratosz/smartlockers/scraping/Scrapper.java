@@ -4,17 +4,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.date.FormatDate;
-import pl.bratosz.smartlockers.model.Box;
-import pl.bratosz.smartlockers.model.Client;
-import pl.bratosz.smartlockers.model.Locker;
-import pl.bratosz.smartlockers.model.Plant;
+import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
 
 import pl.bratosz.smartlockers.model.clothes.LifeCycleStatus;
-import pl.bratosz.smartlockers.service.ArticleService;
-import pl.bratosz.smartlockers.service.ClientService;
+import pl.bratosz.smartlockers.service.ClientArticleService;
 import pl.bratosz.smartlockers.strings.MyString;
 
 import java.io.IOException;
@@ -22,15 +18,13 @@ import java.util.*;
 
 @Service
 public class Scrapper {
-    private ArticleService articleService;
-    private ClientService clientService;
+    private ClientArticleService clientArticleService;
     private OnlineConnection connection;
     private String login;
     private String password;
 
-    public Scrapper(ArticleService articleService, ClientService clientService) {
-        this.articleService = articleService;
-        this.clientService = clientService;
+    public Scrapper(ClientArticleService clientArticleService) {
+        this.clientArticleService = clientArticleService;
         login = "";
         password = "";
     }
@@ -221,10 +215,10 @@ public class Scrapper {
         return Integer.parseInt(td.get(0).text());
     }
 
-    private Article getArticleByArticleNumber(Elements td, Client client) {
+    private ClientArticle getArticleByArticleNumber(Elements td, Client client) {
         int articleNumber = Integer.parseInt(td.get(1).text());
         String articleName = getArticleName(td);
-        return articleService.get(articleNumber, articleName, client);
+        return clientArticleService.get(articleNumber, client, articleName);
     }
 
     private String getArticleName(Elements td) {

@@ -6,6 +6,7 @@ import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.RotationalCloth;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.users.UserEmployee;
+import pl.bratosz.smartlockers.model.users.UserOurStaff;
 
 import javax.persistence.*;
 import java.util.LinkedList;
@@ -43,6 +44,8 @@ public class Employee extends EmployeeGeneral {
     @JsonView(Views.Public.class)
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
     private List<SimpleBox> pastBoxes;
+
+    private UserOurStaff userManaging;
 
     public Employee() {
     }
@@ -141,5 +144,13 @@ public class Employee extends EmployeeGeneral {
 
     public void setClothOrders(List<ClothOrder> clothOrders) {
         this.clothOrders = clothOrders;
+    }
+
+    public UserOurStaff getUserManaging() {
+        return userManaging;
+    }
+
+    public void setUserManaging(UserOurStaff userManaging) {
+        this.userManaging = userManaging;
     }
 }

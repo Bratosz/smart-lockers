@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.service.managers;
 
 import org.springframework.stereotype.Service;
+import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.*;
 import pl.bratosz.smartlockers.model.users.User;
@@ -34,7 +35,7 @@ public class ClothesCreator {
     }
 
     public Cloth createNewInstead(int ordinalNumber,
-                                  Article article,
+                                  ClientArticle clientArticle,
                                   ClothSize size,
                                   Employee employee) {
         ClothStatus clothStatus = clothStatusService.create(FOR_ASSIGN, user);
@@ -43,7 +44,7 @@ public class ClothesCreator {
         cloth.setActive(false);
         cloth.setCreated(new Date());
         cloth.setOrdinalNumber(ordinalNumber);
-        cloth.setArticle(article);
+        cloth.setClientArticle(clientArticle);
         cloth.setSize(size);
         cloth.setEmployee(employee);
         return cloth;
@@ -83,7 +84,7 @@ public class ClothesCreator {
     }
 
     private void setOrdinalNumber() {
-        int articleNumber = cloth.getArticle().getNumber();
+        int articleNumber = cloth.getClientArticle().getArticle().getNumber();
         List<Cloth> clothes = cloth.getEmployee().getClothes();
         int ordinalNumber = resolveOrdinalNumber(clothes, articleNumber);
         cloth.setOrdinalNumber(ordinalNumber);
@@ -91,7 +92,7 @@ public class ClothesCreator {
 
     private int resolveOrdinalNumber(List<Cloth> clothes, int articleNumber) {
         int articlesAmount = (int) clothes.stream()
-                .filter(c -> c.getArticle().getNumber() == articleNumber)
+                .filter(c -> c.getClientArticle().getArticle().getNumber() == articleNumber)
                 .count();
         return articlesAmount + 1;
     }

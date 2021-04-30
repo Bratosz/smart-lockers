@@ -23,6 +23,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../style.css" type="text/css"/>
 
 </head>
 <body>
@@ -78,6 +79,43 @@
 
     <main>
         <div>
+            <div class="gap-vertical-20"></div>
+            <div class="display-inline">
+                <div class="display-inline">
+                    <span>Okres amortyzacji (w miesiącach) </span>
+                </div>
+                <div class="display-inline">
+                    <select class="select-std" id="select-depreciation-period">
+                        <option value="42">42</option>
+                        <option value="36">36</option>
+                        <option value="24">24</option>
+                        <option value="12">12</option>
+                    </select>
+                    <input id="button-set-depreciation-period" type="button" value="Ustaw">
+                </div>
+            </div>
+            <div class="display-inline width-100"></div>
+            <div class="display-inline">
+                <div class="display-inline">
+                    <span>Amortyzacja do </span>
+                </div>
+                <div class="display-inline">
+                    <div class="display-inline">
+                        <input type="radio" id="percentage-cap-1" name="percentage-cap"
+                               value="100" checked>
+                        <label for="percentage-cap-1">100%</label>
+                    </div>
+                    <div class="display-inline">
+                        <input type="radio" id="percentage-cap-2" name="percentage-cap"
+                               value="50">
+                        <label for="percentage-cap-2">50%</label>
+                    </div>
+                    <input id="button-set-depreciation-cap" type="button" value="Ustaw">
+                </div>
+            </div>
+        </div>
+        <div class="gap-vertical-5"></div>
+        <div>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -85,6 +123,8 @@
                     <th>Numer art.</th>
                     <th>Nazwa art.</th>
                     <th>Rodzaj odzieży</th>
+                    <th>Okres Amortyzacji</th>
+                    <th>Amortyzacja</th>
                     <th>Cena wykupu</th>
                     <th>Nowa cena</th>
                     <th></th>
@@ -95,7 +135,9 @@
                     <td class="cell-id"></td>
                     <td class="cell-article-number"></td>
                     <td class="cell-article-name"></td>
-                    <td class="cell-article-cloth-type"></td>
+                    <td class="cell-cloth-type"></td>
+                    <td class="cell-depreciation-period"></td>
+                    <td class="cell-depreciation-cap"></td>
                     <td class="cell-article-redemption-price"></td>
                     <td><input class="input-new-redemption-price"
                                type="number"></td>

@@ -46,8 +46,8 @@ function writeClothToRow(cloth, $row) {
     $row.removeAttr("id");
     $row.css("display", "table-row");
     $row.find(".cell-ordinal-number").text(cloth.ordinalNumber);
-    $row.find(".cell-article-type-number").text(cloth.article.number);
-    $row.find(".cell-article-type-name").text(cloth.article.name);
+    $row.find(".cell-article-number").text(cloth.clientArticle.article.number);
+    $row.find(".cell-article-name").text(cloth.clientArticle.article.name);
     $row.find(".cell-size").text(cloth.size);
     $row.find(".cell-assignment-date").text(formatDateDMY(cloth.assignment));
     $row.find(".cell-barcode").text(cloth.barcode);
@@ -58,7 +58,7 @@ function writeClothToRow(cloth, $row) {
 
 function sortClothesByArticleNumberAndOrdinalNumber(clothes) {
     clothes.sort(function(a,b) {
-        return a.article.number - b.article.number
+        return a.clientArticle.article.number - b.clientArticle.article.number
             || a.ordinalNumber - b.ordinalNumber;
     });
     return clothes;

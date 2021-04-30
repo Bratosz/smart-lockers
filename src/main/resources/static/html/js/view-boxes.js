@@ -61,7 +61,9 @@ function reloadBoxes(clientId) {
         method: "get",
         success: function (lockers) {
             let boxes = getBoxesFromLockers(lockers);
-            writeDataToTable(boxes, $("#table-of-boxes"), writeBoxToRowWithLockerData);
+            writeDataToTable(boxes,
+                $("#table-of-boxes"),
+                writeBoxToRowWithLockerData);
         }
     })
 

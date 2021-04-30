@@ -2,6 +2,7 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Article;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
@@ -25,7 +26,7 @@ import static pl.bratosz.smartlockers.model.orders.OrderStatus.OrderStage.READY_
 public class OrderService {
     private OrdersRepository ordersRepository;
     private UserService userService;
-    private ArticleService articleService;
+    private ClientArticleService clientArticleService;
     @Autowired
     private ClothService clothesService;
     private OrderStatusService orderStatusService;
@@ -33,11 +34,12 @@ public class OrderService {
 
     public OrderService(OrdersRepository ordersRepository,
                         UserService userService,
-                        ArticleService articleService,
-                        OrderStatusService orderStatusService, OrderManager orderManager) {
+                        ClientArticleService clientArticleService,
+                        OrderStatusService orderStatusService,
+                        OrderManager orderManager) {
         this.ordersRepository = ordersRepository;
         this.userService = userService;
-        this.articleService = articleService;
+        this.clientArticleService = clientArticleService;
         this.orderStatusService = orderStatusService;
         this.orderManager = orderManager;
     }
@@ -47,6 +49,7 @@ public class OrderService {
             int articleNumber,
             ClothSize size,
             long[] barcodes,
+            long clientId,
             long userId) {
         User user = userService.getUserById(userId);
         List<Cloth> clothes = clothesService.getByBarcodes(barcodes);
@@ -58,7 +61,7 @@ public class OrderService {
                 case CHANGE_SIZE:
                     return exchangeForAnotherSize(size, clothes, user, orderType);
                 case CHANGE_ARTICLE:
-                    return exchangeForAnotherArticle(articleNumber, size, clothes, user, orderType);
+                    return exchangeForAnotherArticle(articleNumber, size, clothes, orderType, clientId, user);
                 default:
                     throw new IllegalStateException("Unexpected value: " + orderType);
             }
@@ -101,12 +104,13 @@ public class OrderService {
     private ResponseOrdersCreated exchangeForAnotherArticle(int articleNumber,
                                                             ClothSize size,
                                                             List<Cloth> clothesForExchange,
-                                                            User user,
-                                                            OrderType orderType) {
-        Article article = articleService.get(articleNumber);
+                                                            OrderType orderType,
+                                                            long clientId,
+                                                            User user) {
+        ClientArticle clientArticle = clientArticleService.get(articleNumber, clientId);
         for (Cloth cloth : clothesForExchange) {
             OrderStatus orderStatus = orderStatusService.create(orderType, user);
-            placeOne(cloth, orderType, orderStatus, article, size, user);
+            placeOne(cloth, orderType, orderStatus, clientArticle, size, user);
         }
         return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
     }
@@ -118,7 +122,7 @@ public class OrderService {
             OrderType orderType) {
         for (Cloth cloth : clothesForExchange) {
             OrderStatus orderStatus = orderStatusService.create(orderType, user);
-            placeOne(cloth, orderType, orderStatus, cloth.getArticle(), size, user);
+            placeOne(cloth, orderType, orderStatus, cloth.getClientArticle(), size, user);
         }
         return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
 
@@ -129,7 +133,7 @@ public class OrderService {
                                                      OrderType orderType) {
         for (Cloth cloth : clothesForExchange) {
             OrderStatus orderStatus = orderStatusService.create(orderType, user);
-            placeOne(cloth, orderType, orderStatus, cloth.getArticle(), cloth.getSize(), user);
+            placeOne(cloth, orderType, orderStatus, cloth.getClientArticle(), cloth.getSize(), user);
         }
         return ResponseOrdersCreated.createForOrdersCreated(orderType, clothesForExchange.size());
     }
@@ -139,14 +143,14 @@ public class OrderService {
     public ClothOrder placeOne(Cloth clothForExchange,
                                OrderType orderType,
                                OrderStatus orderStatus,
-                               Article article,
+                               ClientArticle clientArticle,
                                ClothSize size,
                                User user) {
         deleteInactiveOrder(clothForExchange);
         Employee employee = clothForExchange.getEmployee();
         Cloth clothForRelease = clothesService.createNewForAssignInsteadExisting(
                 clothForExchange.getOrdinalNumber(),
-                article,
+                clientArticle,
                 size,
                 employee,
                 user);
