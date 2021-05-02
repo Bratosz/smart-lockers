@@ -45,8 +45,6 @@ public class Employee extends EmployeeGeneral {
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
     private List<SimpleBox> pastBoxes;
 
-    private UserOurStaff userManaging;
-
     public Employee() {
     }
 
@@ -144,13 +142,5 @@ public class Employee extends EmployeeGeneral {
 
     public void setClothOrders(List<ClothOrder> clothOrders) {
         this.clothOrders = clothOrders;
-    }
-
-    public UserOurStaff getUserManaging() {
-        return userManaging;
-    }
-
-    public void setUserManaging(UserOurStaff userManaging) {
-        this.userManaging = userManaging;
     }
 }

@@ -1,20 +1,17 @@
 package pl.bratosz.smartlockers.model.users;
 
-import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.orders.OrderStatus;
 
 
 
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import java.util.HashSet;
-import java.util.Set;
+import javax.persistence.OneToOne;
 
 @Entity
 public class UserOurStaff extends User {
 
-    @OneToMany(mappedBy = "user")
-    private Set<Employee> employeesToManage;
+    @OneToOne
+    private ManagementList managementList;
 
     private Position position;
 
@@ -40,16 +37,12 @@ public class UserOurStaff extends User {
         this.position = position;
     }
 
-    public Set<Employee> getEmployeesToManage() {
-        return employeesToManage;
+    public ManagementList getManagementList() {
+        return managementList;
     }
 
-    public void setEmployeesToManage(Set<Employee> employeesToManage) {
-        this.employeesToManage = employeesToManage;
-    }
-
-    public void add(Employee employeeToManage) {
-        employeeToManage.setUserManaging(this);
-        employeesToManage.add(employeeToManage);
+    public void setManagementList(ManagementList managementList) {
+        managementList.setManagingUser(this);
+        this.managementList = managementList;
     }
 }

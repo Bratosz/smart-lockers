@@ -117,7 +117,7 @@ public class ClothService {
                                                         ClothSize size,
                                                         Cloth withdrawnCloth) {
         loadUser(userId);
-        Employee employee = employeeService.getBy(employeeId);
+        Employee employee = employeeService.getById(employeeId);
         Cloth clothByBarcode = clothesRepository.getByBarcode(withdrawnCloth.getBarcode());
         if (clothIsPresent(clothByBarcode, clientId)) {
             return ResponseClothAssignment.createForFailure(
@@ -135,7 +135,7 @@ public class ClothService {
 
     public ResponseClothAssignment releaseRotationalCloth(long clientId, long userId, long employeeId, long barcode) {
         loadUser(userId);
-        Employee employee = employeeService.getBy(employeeId);
+        Employee employee = employeeService.getById(employeeId);
         Cloth clothByBarcode = clothesRepository.getByBarcode(barcode);
         if (clothIsPresent(clothByBarcode, clientId)) {
             return releaseAsRotational(clothByBarcode, employee);

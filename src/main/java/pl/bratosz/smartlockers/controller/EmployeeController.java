@@ -30,7 +30,7 @@ public class EmployeeController {
     public Employee getEmployeeById(
             @PathVariable Long id) throws RuntimeException {
         if (id < 0) throw new WrongIdException("Passed id is: " + id + ". It should be higher or equal to 0");
-        return employeeService.getBy(id);
+        return employeeService.getById(id);
     }
 
     @JsonView(Views.InternalForEmployees.class)

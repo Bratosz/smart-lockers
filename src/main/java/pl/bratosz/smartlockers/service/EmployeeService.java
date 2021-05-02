@@ -141,7 +141,7 @@ public class EmployeeService {
         return employeesRepository.save(employee);
     }
 
-    public Employee getBy(Long id) {
+    public Employee getById(Long id) {
         return employeesRepository.getEmployeeById(id);
     }
 
@@ -174,7 +174,7 @@ public class EmployeeService {
     public Employee dismissBy(long employeeId,
                               long userId) {
         loadUser(userId);
-        Employee employee = getBy(employeeId);
+        Employee employee = getById(employeeId);
         Box box = employee.getBox();
 
         if(box.getBoxStatus().equals(OCCUPY)) {
@@ -191,13 +191,13 @@ public class EmployeeService {
 
 
     public Employee changeEmployeeLastName(String lastName, Long id) {
-        Employee employee = getBy(id);
+        Employee employee = getById(id);
         employee.setLastName(lastName);
         return employeesRepository.save(employee);
     }
 
     public Employee changeEmployeeFirstNameById(String firstName, Long id) {
-        Employee employee = getBy(id);
+        Employee employee = getById(id);
         employee.setFirstName(firstName);
         return employeesRepository.save(employee);
     }
@@ -209,14 +209,14 @@ public class EmployeeService {
 
     public Employee changeEmployeeFirstNameAndLastNameById(Employee updatedEmployee,
                                                            Long id) {
-        Employee employee = getBy(id);
+        Employee employee = getById(id);
         employee.setFirstName(updatedEmployee.getFirstName());
         employee.setLastName(updatedEmployee.getLastName());
         return employeesRepository.save(employee);
     }
 
     public Employee changeDepartment(Department department, Long id) {
-        Employee employee = getBy(id);
+        Employee employee = getById(id);
         employee.setDepartment(department);
         return employeesRepository.save(employee);
     }
