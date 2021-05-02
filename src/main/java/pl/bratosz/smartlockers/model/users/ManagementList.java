@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.model.users;
 
 import pl.bratosz.smartlockers.model.Employee;
+import pl.bratosz.smartlockers.model.SimpleEmployee;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +19,8 @@ public class ManagementList {
     @OneToMany
     private Set<Employee> employees;
 
-    private List<String> missedEmployees;
+    @Embedded
+    private List<SimpleEmployee> missedEmployees;
 
     @OneToOne(mappedBy = "managementList")
     private UserOurStaff managingUser;
@@ -42,11 +44,11 @@ public class ManagementList {
         this.employees = employees;
     }
 
-    public List<String> getMissedEmployees() {
+    public List<SimpleEmployee> getMissedEmployees() {
         return missedEmployees;
     }
 
-    public void setMissedEmployees(List<String> missedEmployees) {
+    public void setMissedEmployees(List<SimpleEmployee> missedEmployees) {
         this.missedEmployees = missedEmployees;
     }
 

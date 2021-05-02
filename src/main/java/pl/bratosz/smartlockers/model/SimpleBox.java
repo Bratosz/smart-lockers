@@ -1,11 +1,7 @@
 package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.sun.deploy.uitoolkit.impl.awt.AWTPluginUIToolkit;
-import com.sun.javafx.geom.transform.Identity;
-
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 public class SimpleBox {

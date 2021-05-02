@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>SL - Szafy</title>
+    <title>SL - lista robocza</title>
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/smart-lockers.js"></script>
-    <script src="js/view-lockers.js" defer></script>
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
@@ -21,6 +20,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../style.css" type="text/css"/>
 
 </head>
 <body>
@@ -49,8 +49,8 @@
         <div class="collapse navbar-collapse" id="navbarText">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item actionToDo">
-                <a class="nav-link" href="view-lockers.html">Szafy</a>
-            </li>
+                    <a class="nav-link" href="view-lockers.html">Szafy</a>
+                </li>
                 <li class="nav-item actionToDo">
                     <a class="nav-link" href="view-boxes.html">Boxy</a>
                 </li>
@@ -84,25 +84,30 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Id</th>
-                <th>Numer</th>
-                <th>Pojemność</th>
+                <th>ID</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Szafa</th>
+                <th>Box</th>
                 <th>Numer zakładu</th>
                 <th>Oddział</th>
                 <th>Lokalizacja</th>
+                <th>Status</th>
                 <th></th>
             </tr>
             </thead>
-            <tbody id="table-rows-lockers">
-            <tr id="row-template-lockers" style="display: none">
+            <tbody id="table-of-boxes">
+            <tr id="row-template" style="display: none">
                 <td class="cell-id"></td>
-                <td class="cell-locker-number"></td>
-                <td class="cell-capacity"></td>
+                <td class="cell-first-name"></td>
+                <td class="cell-last-name"></td>
+                <td class="cell-locker"></td>
+                <td class="cell-box-number"></td>
                 <td class="cell-plant-number"></td>
                 <td class="cell-department"></td>
                 <td class="cell-location"></td>
-                <td><input type="button" value="pokaż"
-                           class="button-view-locker"></td>
+                <td class="cell-status"></td>
+                <td><input type="button" value="pokaż" class="button-view-employee"></td>
             </tr>
             </tbody>
         </table>

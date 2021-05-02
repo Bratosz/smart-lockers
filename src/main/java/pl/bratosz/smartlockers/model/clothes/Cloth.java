@@ -1,10 +1,12 @@
 package pl.bratosz.smartlockers.model.clothes;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.calculator.RedemptionCalc;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Entity
@@ -63,7 +65,12 @@ public class Cloth {
     @JsonView(Views.Public.class)
     protected boolean active;
 
-    public Cloth(){}
+
+    @JsonView(Views.Public.class)
+    protected BigDecimal actualRedemptionPrice;
+
+    public Cloth() {
+    }
 
     public Cloth(
             int ordinalNumber,
@@ -94,13 +101,13 @@ public class Cloth {
     }
 
     public Cloth(
-        long barcode,
-        Date assignment,
-        Date lastWashing,
-        Date releaseDate,
-        int ordinalNumber,
-        ClientArticle clientArticle,
-        ClothSize size
+            long barcode,
+            Date assignment,
+            Date lastWashing,
+            Date releaseDate,
+            int ordinalNumber,
+            ClientArticle clientArticle,
+            ClothSize size
     ) {
         this.barcode = barcode;
         this.assignment = assignment;
@@ -193,7 +200,7 @@ public class Cloth {
     }
 
     public ClothStatus getClothStatus() {
-        return statusHistory.get(statusHistory.size() -1);
+        return statusHistory.get(statusHistory.size() - 1);
     }
 
     public void setStatusHistory(List<ClothStatus> statusHistory) {
@@ -202,7 +209,7 @@ public class Cloth {
 
     public void setStatus(ClothStatus status) {
         status.setCloth(this);
-        if(statusHistory == null) statusHistory = new LinkedList<>();
+        if (statusHistory == null) statusHistory = new LinkedList<>();
         statusHistory.add(status);
     }
 
@@ -252,6 +259,20 @@ public class Cloth {
 
     public void setReleaseOrder(ClothOrder releaseOrder) {
         this.releaseOrder = releaseOrder;
+    }
+
+    public BigDecimal getActualRedemptionPrice() {
+        if (active) {
+            return RedemptionCalc.calculate(
+                    releaseDate,
+                    clientArticle);
+        } else {
+            return BigDecimal.valueOf(0);
+        }
+    }
+
+    public void setActualRedemptionPrice(BigDecimal actualRedemptionPrice) {
+        this.actualRedemptionPrice = actualRedemptionPrice;
     }
 
     @Override

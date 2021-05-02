@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.service;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.orders.OrderStatus;
@@ -17,7 +18,10 @@ public class UserService {
     private EmployeeService employeeService;
     private ManagementListService managementListService;
 
-    public UserService(UsersRepository usersRepository, UsersOurStaffRepository usersOurStaffRepository, EmployeeService employeeService, ManagementListService managementListService) {
+    public UserService(UsersRepository usersRepository,
+                       UsersOurStaffRepository usersOurStaffRepository,
+                       @Lazy EmployeeService employeeService,
+                       ManagementListService managementListService) {
         this.usersRepository = usersRepository;
         this.usersOurStaffRepository = usersOurStaffRepository;
         this.employeeService = employeeService;

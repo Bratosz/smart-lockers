@@ -1,5 +1,6 @@
 package pl.bratosz.smartlockers.service;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.comparators.BoxNumberSorter;
 import pl.bratosz.smartlockers.comparators.PlantNumberSorter;
@@ -29,9 +30,14 @@ public class EmployeeService {
     private User user;
     private EmployeeManager employeeManager;
 
-    public EmployeeService(EmployeesRepository employeesRepository, EmployeeGeneralRepository employeeGeneralRepository, BoxService boxesService,
-                           PlantService plantService, DepartmentService departmentService,
-                           UserService userService, ClothService clothService, EmployeeManager employeeManager) {
+    public EmployeeService(EmployeesRepository employeesRepository,
+                           EmployeeGeneralRepository employeeGeneralRepository,
+                           BoxService boxesService,
+                           PlantService plantService,
+                           DepartmentService departmentService,
+                           UserService userService,
+                           ClothService clothService,
+                           EmployeeManager employeeManager) {
         this.employeesRepository = employeesRepository;
         this.employeeGeneralRepository = employeeGeneralRepository;
         this.boxService = boxesService;

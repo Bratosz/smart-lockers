@@ -9,6 +9,11 @@ public class SimpleEmployee {
     private int locker;
     private int box;
 
+    public SimpleEmployee(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public SimpleEmployee(String firstName,
                           String lastName,
                           int locker,

@@ -10,8 +10,6 @@ import pl.bratosz.smartlockers.response.ResponseClothAcceptance;
 import pl.bratosz.smartlockers.response.ResponseClothAssignment;
 import pl.bratosz.smartlockers.service.ClothService;
 
-import javax.xml.ws.Response;
-
 import static pl.bratosz.smartlockers.model.Views.*;
 
 @RestController
