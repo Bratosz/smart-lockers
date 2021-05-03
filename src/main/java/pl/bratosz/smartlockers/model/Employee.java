@@ -6,9 +6,9 @@ import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.RotationalCloth;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 import pl.bratosz.smartlockers.model.users.UserEmployee;
-import pl.bratosz.smartlockers.model.users.UserOurStaff;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +44,10 @@ public class Employee extends EmployeeGeneral {
     @JsonView(Views.Public.class)
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
     private List<SimpleBox> pastBoxes;
+
+    @JsonView(Views.InternalForEmployeesForOurStaff.class)
+    private BigDecimal redemptionPrice;
+
 
     public Employee() {
     }
@@ -134,6 +138,14 @@ public class Employee extends EmployeeGeneral {
     public String toString() {
         return box.getLocker().getLockerNumber() + "/" + box.getBoxNumber() + " " +
                 lastName + " " + firstName;
+    }
+
+    public BigDecimal getRedemptionPrice() {
+        return redemptionPrice;
+    }
+
+    public void setRedemptionPrice(BigDecimal redemptionPrice) {
+        this.redemptionPrice = redemptionPrice;
     }
 
     public List<ClothOrder> getClothOrders() {

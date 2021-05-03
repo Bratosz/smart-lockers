@@ -8,7 +8,7 @@ import pl.bratosz.smartlockers.property.FileStorageProperties;
 
 @SpringBootApplication
 @EnableConfigurationProperties({
-        FileStorageProperties.class
+        FileStorageProperties.class,
 })
 public class SmartLockersApplication {
 

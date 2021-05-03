@@ -1,9 +1,9 @@
 package pl.bratosz.smartlockers.controller;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.web.bind.annotation.*;
+import pl.bratosz.smartlockers.model.Views;
+import pl.bratosz.smartlockers.model.users.ManagementList;
 import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.UserService;
 
@@ -22,5 +22,12 @@ public class UserController {
             @PathVariable("employeeId") long employeeId,
             @PathVariable("userId") long userId) {
         return userService.addEmployeeToManagementList(employeeId, userId);
+    }
+
+    @JsonView(Views.InternalForEmployeesForOurStaff.class)
+    @GetMapping("/management-list/{userId}")
+    public ManagementList getManagementList(
+            @PathVariable("userId") long userId) {
+        return userService.getManagementList(userId);
     }
 }

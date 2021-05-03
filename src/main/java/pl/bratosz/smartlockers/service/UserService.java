@@ -91,4 +91,13 @@ public class UserService {
             return false;
         }
     }
+
+    public ManagementList getManagementList(long userId) {
+        ManagementList managementList = usersOurStaffRepository
+                .getById(userId)
+                .getManagementList();
+        return managementList.calculateRedemptionPrices();
+
+
+    }
 }

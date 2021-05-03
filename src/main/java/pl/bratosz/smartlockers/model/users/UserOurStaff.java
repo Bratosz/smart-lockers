@@ -1,5 +1,7 @@
 package pl.bratosz.smartlockers.model.users;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.model.orders.OrderStatus;
 
 
@@ -11,6 +13,7 @@ import javax.persistence.OneToOne;
 public class UserOurStaff extends User {
 
     @OneToOne
+    @JsonView(Views.Public.class)
     private ManagementList managementList;
 
     private Position position;

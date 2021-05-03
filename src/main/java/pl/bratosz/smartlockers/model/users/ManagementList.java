@@ -1,11 +1,17 @@
 package pl.bratosz.smartlockers.model.users;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.calculator.CalcCloth;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.SimpleEmployee;
+import pl.bratosz.smartlockers.model.Views;
+import pl.bratosz.smartlockers.model.clothes.Cloth;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class ManagementList {
@@ -17,6 +23,7 @@ public class ManagementList {
     private long actualClientId;
 
     @OneToMany
+    @JsonView(Views.InternalForEmployeesForOurStaff.class)
     private Set<Employee> employees;
 
     @Embedded
@@ -70,5 +77,26 @@ public class ManagementList {
 
     public void addEmployee(Employee employeeToManage) {
         employees.add(employeeToManage);
+    }
+
+    public ManagementList calculateRedemptionPrices() {
+        Set<Employee> employeesWithPrices = getEmployees().stream().map(employee -> {
+            employee.getClothes()
+                    .stream()
+                    .forEach(cloth -> cloth.setActualRedemptionPrice(
+                            CalcCloth.calculateRedemptionPrice(cloth)));
+            return sumRedemptionPricesFromClothes(employee);
+        }).collect(Collectors.toSet());
+        setEmployees(employeesWithPrices);
+        return this;
+    }
+
+    private Employee sumRedemptionPricesFromClothes(Employee employee) {
+        float redemptionPrice = 0;
+        List<Cloth> clothes = employee.getClothes();
+        for(Cloth c : clothes)
+            redemptionPrice = redemptionPrice + c.getActualRedemptionPrice().floatValue();
+        employee.setRedemptionPrice(BigDecimal.valueOf(redemptionPrice));
+        return employee;
     }
 }

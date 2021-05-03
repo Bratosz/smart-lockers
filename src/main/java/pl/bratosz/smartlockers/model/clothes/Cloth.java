@@ -1,7 +1,6 @@
 package pl.bratosz.smartlockers.model.clothes;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import pl.bratosz.smartlockers.calculator.RedemptionCalc;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.orders.ClothOrder;
 
@@ -64,7 +63,6 @@ public class Cloth {
 
     @JsonView(Views.Public.class)
     protected boolean active;
-
 
     @JsonView(Views.Public.class)
     protected BigDecimal actualRedemptionPrice;
@@ -262,13 +260,7 @@ public class Cloth {
     }
 
     public BigDecimal getActualRedemptionPrice() {
-        if (active) {
-            return RedemptionCalc.calculate(
-                    releaseDate,
-                    clientArticle);
-        } else {
-            return BigDecimal.valueOf(0);
-        }
+        return actualRedemptionPrice;
     }
 
     public void setActualRedemptionPrice(BigDecimal actualRedemptionPrice) {

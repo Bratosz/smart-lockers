@@ -37,4 +37,7 @@ public class Views {
     }
 
     public static class InternalForClothOrders extends Public {}
+
+    public static class InternalForEmployeesForOurStaff extends InternalForEmployees{
+    }
 }

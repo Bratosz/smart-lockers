@@ -23,16 +23,23 @@ function addFieldToObjects(fieldName, content, objects) {
     return result;
 }
 
-function sort(collection, prop1st, prop2nd) {
-    if(prop2nd === undefined) {
+function sort(collection, prop1st, prop2nd, prop3rd) {
+    if(prop2nd === undefined && prop3rd === undefined) {
         collection.sort(function (a,b) {
             return compare(fetchFrom(a, prop1st), fetchFrom(b, prop1st));
+        });
+        return collection;
+    } else if (prop2nd === undefined) {
+        collection.sort(function (a,b) {
+            return compare(fetchFrom(a, prop1st), fetchFrom(b, prop1st))
+                || compare(fetchFrom(a, prop2nd), fetchFrom(b, prop2nd));
         });
         return collection;
     } else {
         collection.sort(function (a,b) {
             return compare(fetchFrom(a, prop1st), fetchFrom(b, prop1st))
-                || compare(fetchFrom(a, prop2nd), fetchFrom(b, prop2nd));
+                || compare(fetchFrom(a, prop2nd), fetchFrom(b, prop2nd))
+                || compare(fetchFrom(a, prop3rd), fetchFrom(b, prop3rd));
         });
         return collection;
     }

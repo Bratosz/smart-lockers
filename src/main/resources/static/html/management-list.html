@@ -6,6 +6,9 @@
     <title>SL - lista robocza</title>
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/smart-lockers.js"></script>
+    <script src="js/table-manager.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/management-list.js" defer></script>
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
@@ -92,11 +95,11 @@
                 <th>Numer zakładu</th>
                 <th>Oddział</th>
                 <th>Lokalizacja</th>
-                <th>Status</th>
+                <th>Cena wykupu</th>
                 <th></th>
             </tr>
             </thead>
-            <tbody id="table-of-boxes">
+            <tbody id="table-of-employees">
             <tr id="row-template" style="display: none">
                 <td class="cell-id"></td>
                 <td class="cell-first-name"></td>
@@ -106,7 +109,7 @@
                 <td class="cell-plant-number"></td>
                 <td class="cell-department"></td>
                 <td class="cell-location"></td>
-                <td class="cell-status"></td>
+                <td class="cell-redemption-price"></td>
                 <td><input type="button" value="pokaż" class="button-view-employee"></td>
             </tr>
             </tbody>
