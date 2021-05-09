@@ -1,40 +1,55 @@
 let clientId = 1;
 const userId = 6;
 
-function loadPlants(clientId) {
+function loadPlants($selectPlant, clientId) {
     $.ajax({
-        url: `http://localhost:8080/plant/get_all/${clientId}`,
-        method: `get`,
+        url: getPlantsByClient(clientId),
+        method: 'get',
         success: function (plants) {
-            console.log(plants);
-            let select = $("#select-plant");
-            appendOptionsToSelect(plants, select)
+            appendOptionsToSelect(plants, $selectPlant);
         }
     })
 }
 
-function loadDepartments(clientId) {
+function getPlantsByClient(clientId) {
+    return getActualLocation() + `/plants/get-all/${clientId}`;
+}
+
+function getLockersByPlant(plantId) {
+    return getActualLocation() + `/lockers/get-by-plant/${plantId}`;
+}
+
+function getLockersByClient(clientId) {
+    return getActualLocation() + `/lockers/get-by-client/${clientId}`;
+}
+
+function getLockersFiltered(plantId, departmentId, locationId) {
+    return getActualLocation() + `/lockers/get-filtered` +
+        `/${plantId}` +
+        `/${departmentId}` +
+        `/${locationId}`;
+}
+
+function loadDepartments($selectDepartment, clientId) {
     $.ajax({
         url: `http://localhost:8080/department/get_all/${clientId}`,
         method: `get`,
         success: function (departments) {
             console.log(departments);
-            let select = $("#select-department");
-            select.append(createSelectPlaceholder("Wybierz oddział"));
-            appendOptionsToSelect(departments, select);
+            $selectDepartment.append(createSelectPlaceholder("Wybierz oddział"));
+            appendOptionsToSelect(departments, $selectDepartment);
         }
     })
 }
 
-function loadLocations(clientId) {
+function loadLocations($selectLocation, clientId) {
     $.ajax({
         url: `http://localhost:8080/location/get_all/${clientId}`,
         method: `get`,
         success: function (locations) {
             console.log(locations);
-            let select = $("#select-location");
-            select.append(createSelectPlaceholder("Wybierz lokalizację"));
-            appendOptionsToSelect(locations, select);
+            $selectLocation.append(createSelectPlaceholder("Wybierz lokalizację"));
+            appendOptionsToSelect(locations, $selectLocation);
         }
     })
 }

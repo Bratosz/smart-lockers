@@ -61,8 +61,8 @@ public class EmployeeService {
         return employeesRepository.findAll();
     }
 
-    public List<Employee> getEmployeesByLastName(String lastName) {
-        return employeesRepository.getEmployeesByLastName(lastName);
+    public List<Employee> getEmployeesByLastName(String lastName, long clientId) {
+        return employeesRepository.getEmployeesByLastName(lastName, clientId);
     }
 
     public Employee createEmployee(long plantId,

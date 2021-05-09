@@ -65,7 +65,7 @@ public class Cloth {
     protected boolean active;
 
     @JsonView(Views.Public.class)
-    protected BigDecimal actualRedemptionPrice;
+    protected Double actualRedemptionPrice;
 
     public Cloth() {
     }
@@ -211,6 +211,14 @@ public class Cloth {
         statusHistory.add(status);
     }
 
+    public Double getActualRedemptionPrice() {
+        return actualRedemptionPrice;
+    }
+
+    public void setActualRedemptionPrice(Double actualRedemptionPrice) {
+        this.actualRedemptionPrice = actualRedemptionPrice;
+    }
+
     public long getBarcode() {
         return barcode;
     }
@@ -257,14 +265,6 @@ public class Cloth {
 
     public void setReleaseOrder(ClothOrder releaseOrder) {
         this.releaseOrder = releaseOrder;
-    }
-
-    public BigDecimal getActualRedemptionPrice() {
-        return actualRedemptionPrice;
-    }
-
-    public void setActualRedemptionPrice(BigDecimal actualRedemptionPrice) {
-        this.actualRedemptionPrice = actualRedemptionPrice;
     }
 
     @Override

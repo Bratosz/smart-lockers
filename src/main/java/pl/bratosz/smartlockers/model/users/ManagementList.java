@@ -92,11 +92,11 @@ public class ManagementList {
     }
 
     private Employee sumRedemptionPricesFromClothes(Employee employee) {
-        float redemptionPrice = 0;
+        double redemptionPrice = 0;
         List<Cloth> clothes = employee.getClothes();
         for(Cloth c : clothes)
-            redemptionPrice = redemptionPrice + c.getActualRedemptionPrice().floatValue();
-        employee.setRedemptionPrice(BigDecimal.valueOf(redemptionPrice));
+            redemptionPrice = redemptionPrice + c.getActualRedemptionPrice();
+        employee.setRedemptionPrice(redemptionPrice);
         return employee;
     }
 }

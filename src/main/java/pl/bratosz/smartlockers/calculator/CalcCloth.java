@@ -13,7 +13,7 @@ import java.util.Date;
 public class CalcCloth {
 
 
-    public static BigDecimal calculateRedemptionPrice(Cloth cloth) {
+    public static Double calculateRedemptionPrice(Cloth cloth) {
         ClientArticle clientArticle = cloth.getClientArticle();
         Date releaseDate = cloth.getReleaseDate();
         int depreciationPeriod = clientArticle.getDepreciationPeriod();
@@ -21,22 +21,22 @@ public class CalcCloth {
         float percentPerMonth = getPercentRedemptionPerMonth(
                 clientArticle.getDepreciationPercentageCap(),
                 depreciationPeriod);
-        BigDecimal bigDecimal = calculatePrice(
+        return calculatePrice(
                 monthsBetween,
                 depreciationPeriod,
                 percentPerMonth,
                 clientArticle.getRedemptionPrice());
-        return bigDecimal;
     }
 
-    private static BigDecimal calculatePrice(
+    private static double calculatePrice(
             int monthsBetween,
             int depreciationPeriod,
             float percentPerMonth,
             double redemptionPrice) {
         if(monthsBetween > depreciationPeriod) monthsBetween = depreciationPeriod;
         double priceForMonth = redemptionPrice * (percentPerMonth / 100f);
-        return BigDecimal.valueOf(redemptionPrice - (priceForMonth * monthsBetween));
+        redemptionPrice = redemptionPrice - (priceForMonth * monthsBetween);
+        return Math.round(redemptionPrice * 100d) / 100d;
     }
 
     private static int getMonthsBetween(Date releaseDate, LocalDateTime now) {

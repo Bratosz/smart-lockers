@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/plant")
+@RequestMapping("/plants")
 public class PlantController {
 
     private PlantService plantService;
@@ -20,7 +20,7 @@ public class PlantController {
     }
 
     @JsonView(Views.PlantBasicInfo.class)
-    @GetMapping("/get_all/{clientId}")
+    @GetMapping("/get-all/{clientId}")
     public List<Plant> getAll(@PathVariable long clientId) {
         return plantService.getAll(clientId);
     }

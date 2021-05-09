@@ -62,4 +62,20 @@ public interface LockersRepository extends JpaRepository<Locker, Long> {
             @Param("lockerNumber") int lockerNumber);
 
     Locker getLockerById(long lockerId);
+
+    @Query("select l from Locker l where " +
+            "l.plant.id = :plantId " +
+            "and l.lockerNumber between :startingLockerNumber " +
+            "and :endLockerNumber " +
+            "order by l.lockerNumber")
+    List<Locker> getLockers(
+            @Param("startingLockerNumber") int startingLockerNumber,
+            @Param("endLockerNumber") int endLockerNumber,
+            @Param("plantId")long plantId);
+
+    @Query("select l from Locker l where " +
+            "l.plant.id = :plantId " +
+            "order by l.lockerNumber")
+    List<Locker> getAllByPlantId(
+            @Param("plantId") long plantId);
 }

@@ -21,7 +21,9 @@ $("#button-filter").click(function () {
 $("#button-input-lastname").click(function () {
     const lastName = $("#input-lastname").val();
     $.ajax({
-        url: `http://localhost:8080/employees/find/${lastName}`,
+        url: getActualLocation() + `/employees/find-by-last-name` +
+            `/${lastName}` +
+            `/${clientId}`,
         method: "get",
         success: function (employees) {
             console.log(employees);

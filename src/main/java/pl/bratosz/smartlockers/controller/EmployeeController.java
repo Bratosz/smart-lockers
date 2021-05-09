@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.exception.WrongIdException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.service.EmployeeService;
+import pl.bratosz.smartlockers.strings.MyString;
 
 import java.util.List;
 
@@ -65,10 +66,12 @@ public class EmployeeController {
     }
 
     @JsonView(Views.InternalForEmployees.class)
-    @GetMapping("/find/{lastName}")
-    public List<Employee> getEmployeesByLastName(@PathVariable String lastName) {
-        lastName.toUpperCase().trim();
-        return employeeService.getEmployeesByLastName(lastName);
+    @GetMapping("/find-by-last-name/{lastName}/{clientId}")
+    public List<Employee> getEmployeesByLastName(
+            @PathVariable String lastName,
+            @PathVariable long clientId) {
+         lastName = MyString.create(lastName).get();
+        return employeeService.getEmployeesByLastName(lastName, clientId);
     }
 
     @JsonView(Views.InternalForEmployees.class)

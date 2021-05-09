@@ -35,11 +35,18 @@ public class LockerController {
         return lockers.subList(0, 2);
     }
 
-    @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/{clientId}")
-    public List<Locker> getAll(
+    @JsonView(Views.LockersWithoutBoxes.class)
+    @GetMapping("/get-by-client/{clientId}")
+    public List<Locker> getAllByClientId(
             @PathVariable long clientId) {
         return lockersRepository.getAllByClientId(clientId);
+    }
+
+    @JsonView(Views.LockersWithoutBoxes.class)
+    @GetMapping("/get-by-plant/{plantId}")
+    public List<Locker> getByAllByPlant(
+            @PathVariable long plantId) {
+        return lockersService.getAllByPlant(plantId);
     }
 
     @JsonView(Views.InternalForLockers.class)
@@ -62,8 +69,8 @@ public class LockerController {
         return lockersService.getBoxesBy(lockerId);
     }
 
-    @JsonView(Views.Public.class)
-    @GetMapping("/filter/{plantId}/{departmentId}/{locationId}")
+    @JsonView(Views.LockersWithoutBoxes.class)
+    @GetMapping("/get-filtered/{plantId}/{departmentId}/{locationId}")
     public List<Locker> getFiltered(
             @PathVariable long plantId,
             @PathVariable long departmentId,
@@ -74,9 +81,30 @@ public class LockerController {
                 locationId);
     }
 
+    @JsonView(Views.LockersWithoutBoxes.class)
+    @PostMapping("/change-department-and-location" +
+            "/{startingLockerNumber}" +
+            "/{endLockerNumber}" +
+            "/{plantId}" +
+            "/{departmentId}" +
+            "/{locationId}")
+    public List<Locker> changeDepartmentAndLocation(
+            @PathVariable int startingLockerNumber,
+            @PathVariable int endLockerNumber,
+            @PathVariable long plantId,
+            @PathVariable long departmentId,
+            @PathVariable long locationId) {
+        return lockersService.changeDepartmentAndLocation(
+                startingLockerNumber,
+                endLockerNumber,
+                plantId,
+                departmentId,
+                locationId);
+    }
+
     @PostMapping("/createDefault" +
             "/{startingLockerNumber}" +
-            "/{endingLockerNumber}" +
+            "/{endLockerNumber}" +
             "/{capacity}" +
             "/{plantId}" +
             "/{departmentId}" +
@@ -84,14 +112,14 @@ public class LockerController {
     @JsonView(Views.InternalForLockers.class)
     public List<Locker> create(
             @PathVariable int startingLockerNumber,
-            @PathVariable int endingLockerNumber,
+            @PathVariable int endLockerNumber,
             @PathVariable int capacity,
             @PathVariable long plantId,
             @PathVariable long departmentId,
             @PathVariable long locationId) {
         return lockersService.create(
                 startingLockerNumber,
-                endingLockerNumber,
+                endLockerNumber,
                 capacity,
                 plantId,
                 departmentId,

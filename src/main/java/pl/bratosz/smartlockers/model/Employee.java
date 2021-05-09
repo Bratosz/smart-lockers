@@ -16,19 +16,19 @@ import java.util.Set;
 @Entity
 public class Employee extends EmployeeGeneral {
 
-    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
+    @JsonView({Views.EmployeeCompleteInfo.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Cloth> clothes;
 
-    @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})
+    @JsonView({Views.EmployeeCompleteInfo.class, Views.InternalForBoxes.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<ClothOrder> clothOrders;
 
-    @JsonView(Views.Public.class)
+    @JsonView(Views.EmployeeCompleteInfo.class)
     @OneToMany(mappedBy = "rotationTemporaryOwner", cascade = CascadeType.ALL)
     private Set<RotationalCloth> rotationalClothes;
 
-    @JsonView(Views.Public.class)
+    @JsonView(Views.EmployeeCompleteInfo.class)
     @ManyToOne(cascade = CascadeType.ALL)
     private Department department;
 
@@ -38,15 +38,15 @@ public class Employee extends EmployeeGeneral {
     @JsonView(Views.Public.class)
     private boolean active;
 
-    @JsonView(Views.Public.class)
+    @JsonView(Views.EmployeeCompleteInfo.class)
     private String note;
 
-    @JsonView(Views.Public.class)
+    @JsonView(Views.EmployeeCompleteInfo.class)
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
     private List<SimpleBox> pastBoxes;
 
     @JsonView(Views.InternalForEmployeesForOurStaff.class)
-    private BigDecimal redemptionPrice;
+    private Double redemptionPrice;
 
 
     public Employee() {
@@ -140,11 +140,11 @@ public class Employee extends EmployeeGeneral {
                 lastName + " " + firstName;
     }
 
-    public BigDecimal getRedemptionPrice() {
+    public Double getRedemptionPrice() {
         return redemptionPrice;
     }
 
-    public void setRedemptionPrice(BigDecimal redemptionPrice) {
+    public void setRedemptionPrice(Double redemptionPrice) {
         this.redemptionPrice = redemptionPrice;
     }
 

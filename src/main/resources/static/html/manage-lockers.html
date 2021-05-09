@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>SL - Artykuły</title>
+    <title>SL - zarządzaj szafami</title>
     <script src="../js/jquery-3.3.1.min.js"></script>
     <script src="../js/smart-lockers.js"></script>
-    <script src="../js/utils.js"></script>
     <script src="../js/table-manager.js"></script>
-    <script src="../js/articles.js" defer></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/row-writer.js"></script>
+    <script src="../js/manage-lockers.js" defer></script>
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
@@ -24,7 +25,6 @@
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../style.css" type="text/css"/>
-
 </head>
 <body>
 
@@ -55,6 +55,9 @@
                     <a class="nav-link" href="view-lockers.html">Szafy</a>
                 </li>
                 <li class="nav-item actionToDo">
+                    <a class="nav-link" href="manage-lockers.html">Zarządzaj szafami</a>
+                </li>
+                <li class="nav-item actionToDo">
                     <a class="nav-link" href="view-boxes.html">Boxy</a>
                 </li>
                 <li class="nav-item actionToDo">
@@ -72,45 +75,53 @@
                 <li class="nav-item actionToDo">
                     <a class="nav-link" href="articles.html">Artykuły</span></a>
                 </li>
+                <li class="nav-item actionToDo">
+                    <a class="nav-link" href="management-list.html">Lista robocza</span></a>
+                </li>
             </ul>
             <span class="navbar-text"></span>
         </div>
     </nav>
 
     <main>
+        <div class="gap-vertical-5"></div>
         <div>
-            <div class="gap-vertical-20"></div>
-            <div class="display-inline">
+            <!--FILTRATION-->
+            <div>
                 <div class="display-inline">
-                    <span>Okres amortyzacji (w miesiącach) </span>
+                    <select class="form-control" id="select-plant"></select>
                 </div>
                 <div class="display-inline">
-                    <select class="select-std" id="select-depreciation-period">
-                        <option value="42">42</option>
-                        <option value="36">36</option>
-                        <option value="24">24</option>
-                        <option value="12">12</option>
-                    </select>
-                    <input id="button-set-depreciation-period" type="button" value="Ustaw">
+                    <select class="form-control" id="select-department"></select>
+                </div>
+                <div class="display-inline">
+                    <select class="form-control" id="select-location"></select>
+                </div>
+                <div class="display-inline">
+                    <input id="button-filter" type="button" value="Filtruj">
                 </div>
             </div>
-            <div class="display-inline width-100"></div>
-            <div class="display-inline">
+            <!--MODIFYING-->
+            <div class="gap-vertical-5"></div>
+            <div class="gap-vertical-5"></div>
+            <div>
                 <div class="display-inline">
-                    <span>Amortyzacja do </span>
+                    <span>Od</span>
+                    <input id="input-starting-locker-number" type="number" class="input-small">
                 </div>
                 <div class="display-inline">
-                    <div class="display-inline">
-                        <input type="radio" id="percentage-cap-1" name="percentage-cap"
-                               value="100" checked>
-                        <label for="percentage-cap-1">100%</label>
-                    </div>
-                    <div class="display-inline">
-                        <input type="radio" id="percentage-cap-2" name="percentage-cap"
-                               value="50">
-                        <label for="percentage-cap-2">50%</label>
-                    </div>
-                    <input id="button-set-depreciation-cap" type="button" value="Ustaw">
+                    <span>do</span>
+                    <input id="input-end-locker-number" type="number" class="input-small">
+                </div>
+                <div class="display-inline">
+                    <select class="form-control" id="select-department-for-change"></select>
+                </div>
+                <div class="display-inline">
+                    <select class="form-control" id="select-location-for-change"></select>
+                </div>
+                <div class="display-inline">
+                    <input id="button-change-department-and-location"
+                           type="button" value="Zamień na wybrane">
                 </div>
             </div>
         </div>
@@ -119,37 +130,30 @@
             <table class="table table-striped">
                 <thead>
                 <tr>
+                    <th>Numer</th>
+                    <th>Pojemność</th>
+                    <th>Numer zakładu</th>
+                    <th>Oddział</th>
+                    <th>Lokalizacja</th>
                     <th>Id</th>
-                    <th>Numer art.</th>
-                    <th>Nazwa art.</th>
-                    <th>Rodzaj odzieży</th>
-                    <th>Okres Amortyzacji</th>
-                    <th>Amortyzacja</th>
-                    <th>Cena wykupu</th>
-                    <th>Nowa cena</th>
                     <th></th>
                 </tr>
                 </thead>
-                <tbody id="table-of-articles">
+                <tbody id="table-of-lockers">
                 <tr id="row-template" style="display: none">
+                    <td class="cell-locker-number"></td>
+                    <td class="cell-capacity"></td>
+                    <td class="cell-plant-number"></td>
+                    <td class="cell-department"></td>
+                    <td class="cell-location"></td>
                     <td class="cell-id"></td>
-                    <td class="cell-article-number"></td>
-                    <td class="cell-article-name"></td>
-                    <td class="cell-cloth-type"></td>
-                    <td class="cell-depreciation-period"></td>
-                    <td class="cell-depreciation-cap"></td>
-                    <td class="cell-article-redemption-price"></td>
-                    <td><input class="input-new-redemption-price"
-                               type="number"></td>
-                    <td><input type="button" value="zapisz"
-                               class="button-save"></td>
+                    <td><input type="button" value="Usuń"
+                               class="button-delete-locker"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </main>
-
-    
 </div>
+
 </body>
-</html>

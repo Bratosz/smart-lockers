@@ -11,10 +11,10 @@ public class LabelsSheetParameters {
     private int labelsInRow;
     private int labelsInColumn;
 
-    public LabelsSheetParameters() {
+    public LabelsSheetParameters(String sheetName) {
         fontSize = 16;
         fontName = "Times New Roman";
-        sheetName = "Naklejki";
+        this.sheetName = sheetName;
         sheetFormat = new A4();
         labelsInRow = 3;
         labelsInColumn = 8;

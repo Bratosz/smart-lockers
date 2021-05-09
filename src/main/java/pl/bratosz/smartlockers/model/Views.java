@@ -14,6 +14,8 @@ public class Views {
 
     }
 
+    public static class InternalForEmployeesWithClothes extends Public {}
+
     public static class InternalForBoxes extends Public {
 
     }
@@ -39,5 +41,11 @@ public class Views {
     public static class InternalForClothOrders extends Public {}
 
     public static class InternalForEmployeesForOurStaff extends InternalForEmployees{
+    }
+
+    public static class EmployeeCompleteInfo extends Public {
+    }
+
+    public static class LockersWithoutBoxes extends Public {
     }
 }

@@ -8,6 +8,7 @@ import pl.bratosz.smartlockers.service.managers.creators.LockerCreator;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static pl.bratosz.smartlockers.model.Box.*;
 import static pl.bratosz.smartlockers.model.Box.BoxStatus.ALL;
@@ -183,5 +184,30 @@ public class LockerService {
 
     public List<Box> getBoxesBy(long lockerId) {
         return lockersRepository.getLockerById(lockerId).getBoxes();
+    }
+
+    public List<Locker> changeDepartmentAndLocation(
+            int startingLockerNumber,
+            int endLockerNumber,
+            long plantId,
+            long departmentId,
+            long locationId) {
+        Department department = departmentService.getById(departmentId);
+        Location location = locationService.getById(locationId);
+        List<Locker> lockers = lockersRepository.getLockers(
+                startingLockerNumber,
+                endLockerNumber,
+                plantId);
+
+        lockers.stream()
+                .forEach(l -> {
+                    l.setDepartment(department);
+                    l.setLocation(location);
+                });
+        return lockersRepository.saveAll(lockers);
+    }
+
+    public List<Locker> getAllByPlant(long plantId) {
+        return lockersRepository.getAllByPlantId(plantId);
     }
 }
