@@ -20,7 +20,7 @@ function getLockersByPlant(plantId) {
 }
 
 function getLockersByClient(clientId) {
-    return getActualLocation() + `/lockers/get-by-client/${clientId}`;
+    return getActualLocation() + `/lockers/get-by-client/git ${clientId}`;
 }
 
 function getLockersFiltered(plantId, departmentId, locationId) {
