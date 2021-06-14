@@ -12,10 +12,13 @@ public abstract class EmployeeGeneral {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonView(Views.Public.class)
     protected long id;
+
     @JsonView(Views.Public.class)
     protected String firstName;
+
     @JsonView(Views.Public.class)
     protected String lastName;
+
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
     @JsonView({Views.InternalForEmployees.class, Views.InternalForClothes.class})
     protected Box box;

@@ -142,9 +142,15 @@ public class BoxService {
 
     }
 
-    public List<Box> getFiltered(long plantId, long departmentId, long locationId, Box.BoxStatus boxStatus) {
-        List<Box> filtered = boxesRepository.getFiltered(plantId, departmentId, locationId, boxStatus);
-        return filtered;
+    public List<Box> getFiltered(Long plantId,
+                                 Long departmentId,
+                                 Long locationId,
+                                 Box.BoxStatus boxStatus) {
+        if(departmentId == 0) departmentId = null;
+        if(locationId == 0) locationId = null;
+        if(boxStatus.equals(ALL)) boxStatus = null;
+        return boxesRepository.getFiltered(
+                plantId, departmentId, locationId, boxStatus);
     }
 
     public Employee extractEmployee(Box box) {
@@ -178,6 +184,15 @@ public class BoxService {
             boxesRepository.deleteHardById(box.getId());
             return new StandardResponse("Usunięto szafkę", true);
         }
+    }
+
+    public List<Box> getByLastName(String lastName, long clientId) {
+        return boxesRepository.getByLastName(lastName, clientId);
+    }
+
+    public List<Box> getByLockerNumberAndPlant(int lockerNumber, long plantId) {
+        return boxesRepository.getByLockerNumberAndPlant(
+                lockerNumber, plantId);
     }
 }
 

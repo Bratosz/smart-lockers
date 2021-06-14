@@ -1,3 +1,9 @@
+const url = new URL(window.location.href);
+const boxId = url.searchParams.get("id");
+
+loadDepartments($('#select-department'), clientId);
+loadBoxInfo(boxId);
+
 $("#button-add-employee").click(function () {
     const lockerNo = $("#input-locker-number").val();
     const boxNo = $("#input-box-number").val();
@@ -16,6 +22,16 @@ $("#button-add-employee").click(function () {
     })
 });
 
-loadPlants();
-loadDepartments();
+function loadBoxInfo(boxId) {
+    $.ajax({
+        url: getActualLocation() + `/boxes`+
+            `/${boxId}`,
+        method: 'get',
+        success: function (box) {
+            writeBoxInfoToElement(box, $('#box-info'));
+        }
+    });
+}
+
+
 

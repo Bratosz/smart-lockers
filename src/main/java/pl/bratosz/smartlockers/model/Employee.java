@@ -16,11 +16,11 @@ import java.util.Set;
 @Entity
 public class Employee extends EmployeeGeneral {
 
-    @JsonView({Views.EmployeeCompleteInfo.class, Views.InternalForBoxes.class})
+    @JsonView({Views.EmployeeCompleteInfo.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Cloth> clothes;
 
-    @JsonView({Views.EmployeeCompleteInfo.class, Views.InternalForBoxes.class})
+    @JsonView({Views.EmployeeCompleteInfo.class})
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<ClothOrder> clothOrders;
 

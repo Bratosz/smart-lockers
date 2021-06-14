@@ -1,7 +1,6 @@
-loadPlants(clientId);
-loadDepartments(clientId);
-loadLocations(clientId);
-reloadBoxes(clientId);
+loadPlants($('#select-plant'), clientId);
+loadDepartments($('#select-department'), clientId);
+loadLocations($('#select-location'), clientId);
 
 $("#button-filter").click(function () {
     let plantId = $("#select-plant").val();
@@ -9,41 +8,55 @@ $("#button-filter").click(function () {
     let locationId = $("#select-location").val();
     let boxStatus = $("#select-box-status").val();
     $.ajax({
-        url: `http://localhost:8080/lockers/filter/${plantId}/${departmentId}/${locationId}/${boxStatus}`,
+        url: getActualLocation() + `/boxes/get-filtered` +
+            `/${plantId}` +
+            `/${departmentId}` +
+            `/${locationId}` +
+            `/${boxStatus}`,
         method: "get",
-        success: function (lockers) {
-            console.log(lockers);
-            displayBoxes(lockers);
+        success: function (boxes) {
+            console.log(boxes);
+            writeDataToTable(
+                boxes,
+                $("#table-of-boxes"),
+                writeBoxToRow);
         }
     })
 });
 
-$("#button-input-lastname").click(function () {
-    const lastName = $("#input-lastname").val();
+$("#button-search-by-last-name").click(function () {
+    const lastName = $("#input-last-name").val();
     $.ajax({
-        url: getActualLocation() + `/employees/find-by-last-name` +
+        url: getActualLocation() + `/boxes/get-by-last-name` +
             `/${lastName}` +
             `/${clientId}`,
         method: "get",
-        success: function (employees) {
-            console.log(employees);
-            displayEmployees(employees);
+        success: function (boxes) {
+            writeDataToTable(
+                boxes,
+                $("#table-of-boxes"),
+                writeBoxToRow);
         }
     })
 });
 
-$("#button-get-locker-by-number").click(function () {
+$("#button-get-boxes-by-locker-number").click(function () {
     let plantId = $("#select-plant").val();
     let lockerNumber = $("#input-locker-number").val();
     $.ajax({
-        url: `http://localhost:8080/lockers/filter/${plantId}/${lockerNumber}`,
+        url: getActualLocation() + `/boxes/get-by-locker-number-and-plant` +
+            `/${lockerNumber}` +
+            `/${plantId}`,
         method: "get",
-        success: function (lockers) {
-            console.log(lockers);
-            displayBoxes(lockers);
+        success: function (boxes) {
+            console.log(boxes);
+            writeDataToTable(
+                boxes,
+                $("#table-of-boxes"),
+                writeBoxToRow);
         }
-    })
-})
+    });
+});
 
 $("#button-input-first-name").click(function () {
     let firstName = $("#input-first-name").val();

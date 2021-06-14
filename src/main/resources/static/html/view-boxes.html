@@ -9,6 +9,7 @@
     <script src="../js/table-manager.js"></script>
     <script src="../js/utils.js"></script>
     <script src="../js/boxes-manager.js"></script>
+    <script src="../js/row-writer.js"></script>
     <script src="../js/employees-manager.js"></script>
     <script src="../js/view-boxes.js" defer></script>
     <link rel="stylesheet"
@@ -54,13 +55,16 @@
                     <a class="nav-link" href="view-lockers.html">Szafy</a>
                 </li>
                 <li class="nav-item actionToDo">
+                    <a class="nav-link" href="manage-lockers.html">Zarządzaj szafami</a>
+                </li>
+                <li class="nav-item actionToDo">
                     <a class="nav-link" href="view-boxes.html">Boxy</a>
                 </li>
                 <li class="nav-item actionToDo">
                     <a class="nav-link" href="add-lockers.html">Dodaj szafy</a>
                 </li>
                 <li class="nav-item actionToDo">
-                    <a class="nav-link" href="add-employees.html">Dodaj pracowników</span></a>
+                    <a class="nav-link" href="add-employee.html">Dodaj pracowników</span></a>
                 </li>
                 <li class="nav-item actionToDo">
                     <a class="nav-link" href="edit-departments.html">Oddziały</span></a>
@@ -68,8 +72,13 @@
                 <li class="nav-item actionToDo">
                     <a class="nav-link" href="clothing-acceptance.html">Przyjęcie odzieży</span></a>
                 </li>
-            </ul>
-            <span class="navbar-text"></span>
+                <li class="nav-item actionToDo">
+                    <a class="nav-link" href="articles.html">Artykuły</span></a>
+                </li>
+                <li class="nav-item actionToDo">
+                    <a class="nav-link" href="management-list.html">Lista robocza</span></a>
+                </li>
+            </ul>            <span class="navbar-text"></span>
         </div>
     </nav>
 
@@ -82,27 +91,11 @@
             <form class="form-inline">
                 <div class="form-group">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Nazwisko" aria-label="Nazwisko"
-                               aria-describedby="input-lastName" id="input-lastname">
+                        <input type="text" class="form-control" placeholder="Nazwisko"
+                               id="input-last-name">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" id="button-input-lastname">Szukaj
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!--Input first name-->
-    <div class="headerRow">
-        <div class="col-lg-4">
-            <form class="form-inline">
-                <div class="form-group">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Imię" aria-label="Imię"
-                               aria-describedby="input-first-name" id="input-first-name">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" id="button-input-first-name">Szukaj
+                            <button class="btn btn-outline-secondary"
+                                    type="button" id="button-search-by-last-name">Szukaj
                             </button>
                         </div>
                     </div>
@@ -120,7 +113,7 @@
                                placeholder="Numer szafki">
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary" type="button"
-                                    id="button-get-lockers-by-number">Szukaj
+                                    id="button-get-boxes-by-locker-number">Szukaj
                             </button>
                         </div>
                     </div>
@@ -151,9 +144,8 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Imię</th>
             <th>Nazwisko</th>
+            <th>Imię</th>
             <th>Szafa</th>
             <th>Box</th>
             <th>Numer zakładu</th>
@@ -165,16 +157,18 @@
         </thead>
         <tbody id="table-of-boxes">
         <tr id="row-template" style="display: none">
-            <td class="cell-id"></td>
-            <td class="cell-first-name"></td>
             <td class="cell-last-name"></td>
-            <td class="cell-locker"></td>
+            <td class="cell-first-name"></td>
+            <td class="cell-locker-number"></td>
             <td class="cell-box-number"></td>
             <td class="cell-plant-number"></td>
             <td class="cell-department"></td>
             <td class="cell-location"></td>
             <td class="cell-status"></td>
-            <td><input type="button" value="pokaż" class="button-view-employee"></td>
+            <td>
+                <input type="button" value="pokaż" class="button-view-employee" style="display: none">
+                <input type="button" value="dodaj" class="button-add-employee" style="display: none">
+            </td>
         </tr>
         </tbody>
     </table>

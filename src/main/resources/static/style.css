@@ -58,6 +58,14 @@ header {
     height: 20px;
 }
 
+.gap-vertical-10 {
+    height: 10px;
+}
+
+.header-info {
+    font-size: 30px;
+}
+
 main {
     width: 1100px;
     margin-left: auto;

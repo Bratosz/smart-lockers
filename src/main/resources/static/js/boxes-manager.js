@@ -97,3 +97,22 @@ function deleteBox(boxId) {
         }
     })
 }
+
+function writeBoxInfoToElement(box, $element) {
+    let locker,
+        plantNumber,
+        lockerNumber,
+        boxNumber,
+        location,
+        department;
+    locker = box.locker;
+    plantNumber = locker.plant.plantNumber;
+    lockerNumber = locker.lockerNumber;
+    boxNumber = box.boxNumber;
+    location = locker.location.name;
+    department = locker.department.name;
+    $element.text(plantNumber
+    + " " + lockerNumber + "/" + boxNumber
+    + " " + location
+    + " " + department);
+}

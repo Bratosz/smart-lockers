@@ -53,20 +53,30 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
     List<Box> getBoxesByLockersRange(int plantNumber, int firstLocker, int lastLocker);
 
     @Query("select b from Box b " +
-            "where " +
-            "(b.locker.plant.id = :plantId) and " +
-            "(b.locker.department.id = :departmentId) and " +
-            "(b.locker.location.id = :locationId) and " +
-            "(b.boxStatus = :boxStatus) ")
+            "where b.locker.plant.id = :plantId " +
+            "and (b.locker.department.id = :departmentId or :departmentId is null) " +
+            "and (b.locker.location.id = :locationId or :locationId is null) " +
+            "and (b.boxStatus = :boxStatus or :boxStatus is null) ")
     List<Box> getFiltered(
-            @Param("plantId") long plantId,
-            @Param("departmentId") long departmentId,
-            @Param("locationId") long locationId,
-            @Param("boxStatus") Box.BoxStatus boxStatus);
-
+            Long plantId,
+            Long departmentId,
+            Long locationId,
+            Box.BoxStatus boxStatus);
     @Transactional
     @Modifying
     @Query("delete from Box b where b.id = :id ")
     void deleteHardById(long id);
 
+    @Query("select b from Box b " +
+            "where b.employee.lastName like %:lastName% " +
+            "and b.locker.department.id = :clientId " +
+            "order by b.locker.plant.plantNumber, " +
+            "b.locker.lockerNumber, " +
+            "b.boxNumber")
+    List<Box> getByLastName(String lastName, long clientId);
+
+    @Query("select b from Box b " +
+            "where b.locker.lockerNumber = :lockerNumber " +
+            "and b.locker.plant.id = :plantId")
+    List<Box> getByLockerNumberAndPlant(int lockerNumber, long plantId);
 }

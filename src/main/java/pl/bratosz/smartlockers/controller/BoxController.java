@@ -7,6 +7,8 @@ import pl.bratosz.smartlockers.model.EmployeeGeneral;
 import pl.bratosz.smartlockers.model.Views;
 import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.BoxService;
+import pl.bratosz.smartlockers.strings.MyString;
+
 import java.util.List;
 
 @RestController
@@ -44,13 +46,33 @@ public class BoxController {
         return boxesService.getBox(lockerNumber, boxNumber, plantNumber);
     }
 
-    @JsonView(Views.InternalForLockers.class)
-    @GetMapping("/filter/{plantId}/{departmentId}/{locationId}/{boxStatus}")
+    @JsonView(Views.InternalForBoxes.class)
+    @GetMapping("/get-filtered/{plantId}/{departmentId}/{locationId}/{boxStatus}")
     public List<Box> getFiltered(@PathVariable long plantId,
                                  @PathVariable long departmentId,
                                  @PathVariable long locationId,
                                  @PathVariable Box.BoxStatus boxStatus) {
-        return boxesService.getFiltered(plantId, departmentId, locationId, boxStatus);
+        return boxesService.getFiltered(
+                plantId, departmentId, locationId, boxStatus);
+    }
+
+    @JsonView(Views.InternalForBoxes.class)
+    @GetMapping("/get-by-last-name/{lastName}/{clientId}")
+    public List<Box> getByLastName(
+            @PathVariable String lastName,
+            @PathVariable long clientId) {
+        lastName = MyString.create(lastName).get();
+        return boxesService.getByLastName(lastName, clientId);
+    }
+
+    @JsonView(Views.InternalForBoxes.class)
+    @GetMapping("/get-by-locker-number-and-plant" +
+            "/{lockerNumber}/{plantId}")
+    public List<Box> getByLockerNumberAndPlant(
+            @PathVariable int lockerNumber,
+            @PathVariable long plantId) {
+        return boxesService.getByLockerNumberAndPlant(
+                lockerNumber, plantId);
     }
 
     @JsonView(Views.Public.class)

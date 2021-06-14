@@ -29,6 +29,7 @@ function filterLockers() {
         url: getLockersFiltered(plantId, departmentId, locationId),
         method: 'get',
         success: function (lockers) {
+            console.log(lockers);
             writeLockersWithSortingToTable(
                 lockers,
                 $('#table-of-lockers'),
