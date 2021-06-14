@@ -7,10 +7,10 @@ function removeTableRows($table) {
     return $table;
 }
 
-function writeDataToTable(sortedElements, $table, writingMethod) {
+function writeDataToTable(elements, $table, writingMethod) {
     removeTableRows($table);
     const $rowTemplate = getRowTemplate($table);
-    for (let e of sortedElements) {
+    for (let e of elements) {
         let $row = $rowTemplate.clone();
         $row = writingMethod(e, $row);
         $table.append($row);

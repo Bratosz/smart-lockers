@@ -1,8 +1,8 @@
-loadDepartments($('#select-department'), clientId);
-loadDepartments($('#select-department-for-change'), clientId);
-loadLocations($('#select-location'), clientId);
-loadLocations($('#select-location-for-change'), clientId);
-loadPlants($('#select-plant'), clientId);
+loadDepartments(clientId, $('#select-department'));
+loadDepartments(clientId, $('#select-department-for-change'));
+loadLocations(clientId, $('#select-location'));
+loadLocations(clientId, $('#select-location-for-change'));
+loadPlants(clientId, $('#select-plant'));
 
 loadLockers(clientId);
 
@@ -12,13 +12,16 @@ $('#button-filter').click(function () {
     let locationId = $('#select-location').val();
 
     $.ajax({
-        url: getActualLocation() + `/lockers/filter` +
+        url: getActualLocation() + `/lockers/get-filtered` +
             `/${plantId}` +
             `/${departmentId}` +
             `/${locationId}`,
         method: 'get',
         success: function (lockers) {
-            writeLockersToTable(lockers);
+            writeLockersWithSortingToTable(
+                lockers,
+                $('#table-of-lockers'),
+                writeLockerToRow);
         }
     })
 });
@@ -43,7 +46,7 @@ $('#button-change-department-and-location').click(function () {
             writeLockersWithSortingToTable(
                 lockers,
                 $('#table-of-lockers'),
-                writeLockerForManage);
+                writeLockerToRow);
         }
     })
 });
@@ -61,7 +64,7 @@ function loadLockers(clientId) {
                     writeLockersWithSortingToTable(
                         lockers,
                         $('#table-of-lockers'),
-                        writeLockerForManage);
+                        writeLockerToRow);
                 }
             })
         }

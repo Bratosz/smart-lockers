@@ -43,7 +43,7 @@ function writeArticlesToTable(clientArticles) {
     writeDataToTable(
         sort(clientArticles,
             'article.clothType',
-            'rticle.number'),
+            'article.number'),
         $('#table-of-articles'),
         writeArticleToRow);
 }

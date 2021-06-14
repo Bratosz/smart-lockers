@@ -1,6 +1,6 @@
-loadPlants($('#select-plant'), clientId);
-loadDepartments($('#select-department'), clientId);
-loadLocations($('#select-location'), clientId);
+loadDepartments(clientId, $('#select-department'));
+loadLocations(clientId, $('#select-location'));
+loadPlants(clientId, $('#select-plant'));
 
 loadLockers(clientId);
 
@@ -16,7 +16,7 @@ function loadLockers(clientId) {
             writeLockersWithSortingToTable(
                 lockers,
                 $('#table-of-lockers'),
-                writeLockerForView)
+                writeLockerToRowWithViewButton)
         }
     })
 }
@@ -33,7 +33,7 @@ function filterLockers() {
             writeLockersWithSortingToTable(
                 lockers,
                 $('#table-of-lockers'),
-                writeLockerForView);
+                writeLockerToRowWithViewButton);
         }
     });
 }

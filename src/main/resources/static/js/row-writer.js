@@ -1,5 +1,5 @@
 
-function writeLockerForManage(locker, $row) {
+function writeLockerToRow(locker, $row) {
     $row.removeAttr('id');
     $row.css('display', 'table-row');
     $row.find('.cell-locker-number').text(locker.lockerNumber);
@@ -11,7 +11,7 @@ function writeLockerForManage(locker, $row) {
     return $row;
 }
 
-function writeLockerForView(locker, $row) {
+function writeLockerToRowWithViewButton(locker, $row) {
     $row.removeAttr("id");
     $row.css("display", "table-row");
     $row.find(".cell-id").text(locker.id);

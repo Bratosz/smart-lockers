@@ -1,14 +1,17 @@
 let clientId = 1;
 const userId = 6;
 
-function loadPlants($selectPlant, clientId) {
+function loadPlants(clientId, $selectPlant) {
+    if($selectPlant === undefined) {
+        $selectPlant = $('#select-plant');
+    }
     $.ajax({
         url: getPlantsByClient(clientId),
         method: 'get',
         success: function (plants) {
             appendOptionsToSelect(plants, $selectPlant);
         }
-    })
+    });
 }
 
 function getPlantsByClient(clientId) {
@@ -30,7 +33,10 @@ function getLockersFiltered(plantId, departmentId, locationId) {
         `/${locationId}`;
 }
 
-function loadDepartments($selectDepartment, clientId) {
+function loadDepartments(clientId, $selectDepartment) {
+    if($selectDepartment === undefined) {
+        $selectDepartment = $('#select-department');
+    }
     $.ajax({
         url: `http://localhost:8080/department/get_all/${clientId}`,
         method: `get`,
@@ -42,10 +48,13 @@ function loadDepartments($selectDepartment, clientId) {
     })
 }
 
-function loadLocations($selectLocation, clientId) {
+function loadLocations(clientId, $selectLocation) {
+    if($selectLocation === undefined) {
+        $selectLocation = $('#select-location');
+    }
     $.ajax({
         url: `http://localhost:8080/location/get_all/${clientId}`,
-        method: `get`,
+        method: 'get',
         success: function (locations) {
             console.log(locations);
             $selectLocation.append(createSelectPlaceholder("Wybierz lokalizację"));
