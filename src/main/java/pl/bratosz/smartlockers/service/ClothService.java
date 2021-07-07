@@ -217,24 +217,24 @@ public class ClothService {
 
 
     public void updateClothes(
-            List<Cloth> currentClothes,
-            List<Cloth> actualClothes,
+            List<Cloth> updatedClothes,
             Employee employee,
             User user) {
         loadUser(user);
         List<Cloth> newClothes = new LinkedList<>();
+        List<Cloth> currentClothes = employee.getClothes();
         if (currentClothes.isEmpty()) {
-            for (Cloth cloth : actualClothes) {
+            for (Cloth cloth : updatedClothes) {
                 cloth.setEmployee(employee);
                 newClothes.add(cloth);
             }
         } else {
             for (Cloth cloth : currentClothes) {
-                if (!actualClothes.contains(cloth)) {
+                if (!updatedClothes.contains(cloth)) {
                     cloth.setActive(false);
                     continue;
                 }
-                for (Cloth actualCloth : actualClothes) {
+                for (Cloth actualCloth : updatedClothes) {
                     if (!currentClothes.contains(actualCloth)) {
                         actualCloth.setEmployee(employee);
                         newClothes.add(actualCloth);

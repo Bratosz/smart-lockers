@@ -1,17 +1,17 @@
 const url = new URL(window.location.href);
-const boxId = url.searchParams.get("id");
+const employeeId = url.searchParams.get("employee-id");
+const boxId = url.searchParams.get("box-id");
 let lockerNumber,
     boxNumber,
     lastName,
     firstName,
-    employeeId,
     employee,
     clothes,
     clothOrders,
     boxStatus;
 
 
-reloadBox();
+reloadEmployee();
 
 $("#button-load-to-managed-employees").click(function () {
     addToManagedEmployees();
@@ -91,30 +91,19 @@ function performActionOnOrders() {
     });
 }
 
-function updateClothes() {
+function reloadEmployee() {
     $.ajax({
-        url: `http://localhost:8080/scrap/update-clothes/${boxId}/${userId}`,
+        url: getActualLocation() + `/employees/with-complete-info/${employeeId}`,
         method: "get",
-        success: function () {
-            location.reload();
-        }
-    })
-}
-
-function reloadBox() {
-    $.ajax({
-        url: `http://localhost:8080/boxes/${boxId}`,
-        method: "get",
-        success: function (box) {
+        success: function (employee) {
+            let box = employee.box;
             lockerNumber = box.locker.lockerNumber;
             boxNumber = box.boxNumber;
             boxStatus = box.boxStatus;
-            employee = box.employee;
             clothes = employee.clothes;
             clothOrders = employee.clothOrders;
             lastName = employee.lastName;
             firstName = employee.firstName;
-            employeeId = employee.id;
 
             console.log(employee);
 

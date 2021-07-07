@@ -34,19 +34,23 @@ public class EmployeeController {
         return employeeService.getById(id);
     }
 
+    @JsonView(Views.EmployeeCompleteInfo.class)
+    @GetMapping("/with-complete-info/{id}")
+    public Employee getWithCompleteInfo(@PathVariable long id) {
+        return employeeService.getById(id);
+    }
+
     @JsonView(Views.InternalForEmployees.class)
-    @PostMapping("/create_employee/{plantId}/{departmentId}/{lockerNumber}/{boxNumber}/{firstName}/{lastName}")
+    @PostMapping("/create-employee-and-add-to-box/{boxId}/{departmentId}/{firstName}/{lastName}")
     public ResponseEntity<String> createEmployee(
-            @PathVariable long plantId,
+            @PathVariable long boxId,
             @PathVariable long departmentId,
-            @PathVariable int lockerNumber,
-            @PathVariable int boxNumber,
             @PathVariable String firstName,
             @PathVariable String lastName) throws RuntimeException {
         firstName = firstName.toUpperCase();
         lastName = lastName.toUpperCase();
-        employeeService.createEmployee(plantId, departmentId, lockerNumber, boxNumber, firstName, lastName);
-        return ResponseEntity.ok("Employee added successfully!");
+        employeeService.createEmployee(boxId, departmentId, firstName, lastName);
+        return ResponseEntity.ok("Dodano pracownika");
 
     }
 
@@ -130,6 +134,15 @@ public class EmployeeController {
     public Employee changeDepartment(
             @RequestBody Employee employee, @PathVariable Long id) {
         return employeeService.changeDepartment(employee.getDepartment(), id);
+    }
+
+    @PostMapping("/relocate/{plantId}/{departmentId}/{locationId}/{employeeId}")
+    public String relocate(
+            @PathVariable long plantId,
+            @PathVariable long departmentId,
+            @PathVariable long locationId,
+            @PathVariable long employeeId) {
+        return employeeService.relocate(plantId, departmentId, locationId, employeeId);
     }
 
 }

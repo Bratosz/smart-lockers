@@ -126,6 +126,11 @@ public class LockerController {
                 locationId);
     }
 
+    @PostMapping("/create-locker-test")
+    public void createTestingLocker() {
+        lockersService.create(1, 2, 10, 1,1,1);
+    }
+
     @JsonView(Views.InternalForLockers.class)
     @GetMapping("/filter/{plantId}/{departmentId}/{locationId}/{boxStatus}")
     public List<Locker> getFiltered(@PathVariable long plantId,

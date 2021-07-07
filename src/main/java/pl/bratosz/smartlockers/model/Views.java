@@ -43,7 +43,7 @@ public class Views {
     public static class InternalForEmployeesForOurStaff extends InternalForEmployees{
     }
 
-    public static class EmployeeCompleteInfo extends Public {
+    public static class EmployeeCompleteInfo extends InternalForEmployees {
     }
 
     public static class LockersWithoutBoxes extends Public {

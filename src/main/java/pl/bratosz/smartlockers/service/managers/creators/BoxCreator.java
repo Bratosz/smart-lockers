@@ -1,6 +1,7 @@
 package pl.bratosz.smartlockers.service.managers.creators;
 
 import pl.bratosz.smartlockers.model.Box;
+import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.EmployeeDummy;
 import pl.bratosz.smartlockers.model.Locker;
 
@@ -36,6 +37,22 @@ public class BoxCreator {
         box.setEmployee(employeeDummy);
         box.setEmployeeDummy(employeeDummy);
         box.setLocker(locker);
+        return box;
+    }
+
+    public static Box createBox(int boxNumber, Employee employee, EmployeeDummy dummy) {
+        Box box = new Box(boxNumber);
+        box.setEmployee(employee);
+        box.setEmployeeDummy(dummy);
+        box.setBoxStatus(Box.BoxStatus.OCCUPY);
+        return box;
+    }
+
+    public static Box createEmptyBox(int boxNumber, EmployeeDummy dummy) {
+        Box box = new Box(boxNumber);
+        box.setEmployee(dummy);
+        box.setEmployeeDummy(dummy);
+        box.setBoxStatus(Box.BoxStatus.FREE);
         return box;
     }
 }

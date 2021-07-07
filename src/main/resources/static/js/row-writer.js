@@ -1,4 +1,3 @@
-
 function writeLockerToRow(locker, $row) {
     $row.removeAttr('id');
     $row.css('display', 'table-row');
@@ -41,20 +40,23 @@ function writeBoxToRow(box, $row) {
     $row.find(".cell-department").text(box.locker.department.name);
     $row.find(".cell-location").text(box.locker.location.name);
     $row.find(".cell-status").text(box.boxStatus);
-    if(box.boxStatus == "Zajęta") {
+    if (box.boxStatus == "Zajęta") {
         $row.find(".button-view-employee").css("display", "table-cell");
         $row.find(".button-view-employee").click(function () {
-            window.location.href = `view-employee.html?id=${box.employee.id}`;
+            window.location.href = `view-employee.html` +
+                `?employee-id=${box.employee.id}`;
         });
+        $row.find('.button-employee-relocate').css('display', 'table-cell');
+        $row.find('.button-employee-relocate').click(function () {
+            window.location.href = `employee-relocate.html` +
+                `?employee-id=${box.employee.id}`
+        })
     } else {
         $row.find(".button-add-employee").css("display", "table-cell");
         $row.find(".button-add-employee").click(function () {
             window.location.href = `add-employee.html?id=${box.id}`;
         });
     }
-    // $row.find(".button-view-employee").css("display", "table-cell");
-    $row.find(".button-view-employee").click(function () {
-        window.location.href = `view-employee.html?id=${box.id}`;
-    });
+   
     return $row;
 }

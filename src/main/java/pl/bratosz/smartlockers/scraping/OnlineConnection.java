@@ -11,18 +11,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OnlineConnection {
-    final String startURL = "http://klsonline24.pl";
+    final String startURL = "https://klsonline24.pl";
     final String loginURL = startURL + "/default.aspx";
     final String lockersViewURL = startURL + "/baza.aspx";
     final String rotationViewURL = startURL + "/rotacja.aspx";
     String referrer = "https://google.com/";
-    final String userAgentChrome = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36";
+    final String userAgentChrome = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
+    final String userAgentChrome2 = "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6";
     Map<String, String> cookies;
     Map<String, String> formParameters;
     Connection.Response actualResponse;
     Document actualPage;
-
+    Elements elements;
 
     public OnlineConnection(String login, String password) {
         try {
@@ -37,7 +37,7 @@ public class OnlineConnection {
         }
     }
 
-    public void goToLockersView() {
+    public void goToBoxesView() {
         try {
             actualPage = connectTo(lockersViewURL);
         } catch (IOException e) {
@@ -45,9 +45,9 @@ public class OnlineConnection {
         }
     }
 
-    public void goToRotationView() {
+    public void goToClothesView() {
         try {
-            actualPage = connectTo(rotationViewURL, 30);
+            actualPage = connectTo(rotationViewURL, 360);
             System.out.println("something");
         } catch (IOException e) {
             e.printStackTrace();
@@ -116,8 +116,9 @@ public class OnlineConnection {
                 .timeout(timeoutInSeconds * 1000)
                 .cookies(cookies)
                 .followRedirects(true)
+                .maxBodySize(0)
                 .execute();
-        return actualResponse.parse();
+        return Jsoup.parse(actualResponse.body());
     }
 
     public Document checkConnection() throws IOException {
@@ -125,9 +126,12 @@ public class OnlineConnection {
     }
 
     public void standardPost() {
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         try {
         actualResponse = Jsoup.connect(lockersViewURL)
                 .method(Connection.Method.POST)
+                .header("Host","en.wikipedia.org")
+                .header("Content-Type", "application/x-www-form-urlencoded")
                 .userAgent(userAgentChrome)
                 .referrer(referrer)
                 .timeout(10 * 1000)

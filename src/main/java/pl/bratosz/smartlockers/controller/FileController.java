@@ -191,7 +191,7 @@ public class FileController {
             //Adding employee to raport list of deleted employees
             Employee employee = employeeService.getById(id);
             long boxId = employee.getBox().getId();
-                releasedBoxes.add(boxesService.releaseBoxAndDismissEmployee(boxId, userId));
+                releasedBoxes.add(boxesService.releaseBox(boxId, userId));
 
         }
         return releasedBoxes;

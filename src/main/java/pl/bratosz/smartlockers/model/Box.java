@@ -133,4 +133,10 @@ public class Box {
     public void setDuplicated(boolean duplicated) {
         this.duplicated = duplicated;
     }
+
+    @Override
+    public String toString() {
+        return getLocker().toString() +
+                " " + getBoxNumber();
+    }
 }

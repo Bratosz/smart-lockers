@@ -1,11 +1,12 @@
 package pl.bratosz.smartlockers.service;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.comparators.BoxNumberSorter;
 import pl.bratosz.smartlockers.comparators.PlantNumberSorter;
 import pl.bratosz.smartlockers.comparators.LockerNumberSorter;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
+import pl.bratosz.smartlockers.exception.SkippedEmployeeException;
+import pl.bratosz.smartlockers.exception.DoubledBoxException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.users.User;
@@ -65,17 +66,17 @@ public class EmployeeService {
         return employeesRepository.getEmployeesByLastName(lastName, clientId);
     }
 
-    public Employee createEmployee(long plantId,
+    public Employee createEmployee(long boxId,
                                    long departmentId,
-                                   int lockerNumber,
-                                   int boxNumber,
                                    String firstName,
                                    String lastName) throws BoxNotAvailableException {
         Department department = departmentService.getById(departmentId);
-        Box box = boxService.getBox(plantId, lockerNumber, boxNumber);
+        Box box = boxService.getBoxById(boxId);
         if (box.getBoxStatus().equals(OCCUPY)) {
             throw new BoxNotAvailableException("Nie udało się dodać pracownika " +
-                    " bo szafka o numerze " + lockerNumber + "/" + boxNumber + " jest zajęta");
+                    " bo szafka o numerze "
+                    + box.getLocker().getLockerNumber()
+                    + "/" + box.getBoxNumber() + " jest zajęta");
         }
         Employee employee = new Employee(firstName, lastName, department, true);
         employee.addToBox(box);
@@ -87,7 +88,7 @@ public class EmployeeService {
                                    Box box,
                                    String firstName,
                                    String lastName) {
-        if(box.getBoxStatus().equals(OCCUPY)) {
+        if (box.getBoxStatus().equals(OCCUPY)) {
             throw new BoxNotAvailableException("Box is occupy by"
                     + box.getEmployee().getLastName() + " " + box.getEmployee().getFirstName());
         }
@@ -103,7 +104,7 @@ public class EmployeeService {
             String lastName,
             Box box,
             String departmentName) {
-        if(box.getBoxStatus().equals(OCCUPY)) {
+        if (box.getBoxStatus().equals(OCCUPY)) {
             throw new BoxNotAvailableException("Szafka jest zajęta");
         }
         Department department = departmentService.getBy(departmentName, box);
@@ -160,7 +161,7 @@ public class EmployeeService {
         List<Employee> filteredEmployees = new LinkedList<>();
         List<Employee> employees = employeesRepository.getByFirstNameAndLastName(firstName, lastName);
         for (Employee e : employees) {
-            if(e.isActive()) {
+            if (e.isActive()) {
                 filteredEmployees.add(e);
             }
         }
@@ -176,14 +177,13 @@ public class EmployeeService {
     }
 
 
-
     public Employee dismissBy(long employeeId,
                               long userId) {
         loadUser(userId);
         Employee employee = getById(employeeId);
         Box box = employee.getBox();
 
-        if(box.getBoxStatus().equals(OCCUPY)) {
+        if (box.getBoxStatus().equals(OCCUPY)) {
             employee = employeeManager.dismiss(employee, user);
             return employeesRepository.save(employee);
         } else {
@@ -236,11 +236,11 @@ public class EmployeeService {
     }
 
     private Employee filterEmployeesByFullBoxNumber(int lockerNo, int boxNo, List<Employee> employees) {
-        if(employees.size() == 1) {
+        if (employees.size() == 1) {
             return employees.get(0);
         } else if (employees.size() > 1) {
-            for(Employee e : employees) {
-                if(e.getBox().getLocker().getLockerNumber() == lockerNo && e.getBox().getBoxNumber() == boxNo){
+            for (Employee e : employees) {
+                if (e.getBox().getLocker().getLockerNumber() == lockerNo && e.getBox().getBoxNumber() == boxNo) {
                     return e;
                 }
             }
@@ -250,10 +250,10 @@ public class EmployeeService {
 
     public Employee getOneEmployee(String firstName, String lastName) {
         List<Employee> employees = getByFirstNameAndLastName(firstName, lastName);
-        if(employees.size() == 1) {
+        if (employees.size() == 1) {
             return employees.get(0);
         } else {
-            return employeesRepository.getEmployeeById((long)1);
+            return employeesRepository.getEmployeeById((long) 1);
         }
     }
 
@@ -273,5 +273,77 @@ public class EmployeeService {
         return employeesRepository.save(employeeToRelease);
     }
 
+    public String relocate(
+            long plantId,
+            long departmentId,
+            long locationId,
+            long employeeId) {
+        Box newBox = boxService.findNextFreeBox(plantId, departmentId, locationId);
+        if (newBox.getLocker() == null) {
+            return "Nie znaleziono wolnej szafki";
+        }
+        Employee employee = employeesRepository.getEmployeeById(employeeId);
+        Box releasedBox = boxService.releaseBox(employee.getBox());
+        SimpleBox simpleBox = new SimpleBox(releasedBox);
+        employee.setAsPastBox(simpleBox);
+        assignToBox(employee, newBox);
+        return "Przypisano do szafki " + newBox.toString();
+    }
 
+    private Employee assignToBox(Employee employee, Box freeBox) {
+        freeBox.setBoxStatus(OCCUPY);
+        employee.addToBox(freeBox);
+        return employeesRepository.save(employee);
+    }
+
+    public void create(
+            String firstName,
+            String lastName,
+            String comment,
+            Department department,
+            Box box) {
+        Employee employee = Employee.create(
+                firstName,
+                lastName,
+                comment,
+                department,
+                box);
+        employeesRepository.save(employee);
+    }
+
+    public Employee create(
+            String firstName,
+            String lastName,
+            String comment,
+            Department department) {
+        Employee e = Employee.createWithoutBox(
+                firstName,
+                lastName,
+                comment,
+                department);
+        return employeesRepository.save(e);
+    }
+
+    public Employee getBy(
+            SimpleEmployee simpleEmployee,
+            Plant plant) throws SkippedEmployeeException, DoubledBoxException {
+
+        int lockerNumber = simpleEmployee.getLockerNumber();
+        int boxNumber = simpleEmployee.getBoxNumber();
+        List<Employee> employees = employeesRepository.getBy(
+                lockerNumber,
+                boxNumber,
+                plant);
+        if(employees.size() > 1) {
+            throw new DoubledBoxException(simpleEmployee);
+        } else {
+            Employee employee = employees.stream().findFirst().get();
+            if(employee.getLastName().equals(simpleEmployee.getLastName())
+            && employee.getFirstName().equals(simpleEmployee.getFirstName())) {
+                return employee;
+            } else {
+                throw new SkippedEmployeeException(simpleEmployee);
+            }
+        }
+    }
 }

@@ -28,11 +28,11 @@ public class ColumnAssigner {
                     case "IMIĘ":
                     case "IMIE":
                     case "NAME":
-                    case "FIRSTNAME":
+                    case "FIRST_NAME":
                         columnIndexes.put(FIRST_NAME, i);
                         break;
                     case "NAZWISKO":
-                    case "LASTNAME":
+                    case "LAST_NAME":
                     case "SURNAME":
                         columnIndexes.put(LAST_NAME, i);
                         break;

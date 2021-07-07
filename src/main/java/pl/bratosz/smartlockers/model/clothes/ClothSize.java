@@ -7,7 +7,9 @@ import java.util.Map;
 
 public enum ClothSize {
     SIZE_SAME("Taki sam"),
-    SIZE_ZERO("0"),
+    SIZE_0("0"),
+    SIZE_NS("NS"),
+    SIZE_NTP("NTP"),
     SIZE_34("34"),
     SIZE_36("36"),
     SIZE_38("38"),
@@ -60,7 +62,7 @@ public enum ClothSize {
         if(sizesByNames.containsKey(name)) {
             return sizesByNames.get(name);
         } else {
-            return SIZE_ZERO;
+            return SIZE_0;
         }
     }
 

@@ -4,8 +4,10 @@ import pl.bratosz.smartlockers.exception.EmptyElementException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.service.exels.RowForBasicDataBaseUpload;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 public class LockerCreator {
     private Client client;
@@ -46,6 +48,26 @@ public class LockerCreator {
         locker.setDepartment(department);
         locker.setLocation(location);
         return locker;
+    }
+
+    public static Locker create(
+            int lockerNumber,
+            List<Box> boxes,
+            int capacity,
+            Plant plant,
+            Department department,
+            Location location) {
+        Locker l = new Locker();
+        l.setLockerNumber(lockerNumber);
+        l.addBoxes(boxes
+        .stream()
+        .sorted(Comparator.comparing(box -> box.getBoxNumber()))
+        .collect(Collectors.toList()));
+        l.setCapacity(capacity);
+        l.setPlant(plant);
+        l.setDepartment(department);
+        l.setLocation(location);
+        return l;
     }
 
     public Locker createFromRowWithBoxes(RowForBasicDataBaseUpload row) {

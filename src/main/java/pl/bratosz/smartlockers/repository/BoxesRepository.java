@@ -69,14 +69,27 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
 
     @Query("select b from Box b " +
             "where b.employee.lastName like %:lastName% " +
-            "and b.locker.department.id = :clientId " +
+            "and b.locker.plant.client.id = :clientId " +
             "order by b.locker.plant.plantNumber, " +
             "b.locker.lockerNumber, " +
             "b.boxNumber")
-    List<Box> getByLastName(String lastName, long clientId);
+    List<Box> getByLastNameAndClientId(String lastName, long clientId);
 
     @Query("select b from Box b " +
             "where b.locker.lockerNumber = :lockerNumber " +
             "and b.locker.plant.id = :plantId")
     List<Box> getByLockerNumberAndPlant(int lockerNumber, long plantId);
+
+    @Query("select b from Box b " +
+            "where b.locker.plant.id = :plantId " +
+            "and b.locker.department.id = :departmentId " +
+            "and b.locker.location.id = :locationId " +
+            "and b.boxStatus = :boxStatus " +
+            "order by b.locker.lockerNumber, " +
+            "b.boxNumber")
+    List<Box> getBoxesByParameters(
+            long plantId,
+            long departmentId,
+            long locationId,
+            Box.BoxStatus boxStatus);
 }

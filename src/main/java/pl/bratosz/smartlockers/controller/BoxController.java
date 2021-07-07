@@ -32,6 +32,12 @@ public class BoxController {
         return boxesService.getBoxById(id);
     }
 
+    @JsonView(Views.EmployeeCompleteInfo.class)
+    @GetMapping("/get-with-complete-employee-info/{id}")
+    public Box getBoxWithCompleteEmployeeInfo(@PathVariable long id) {
+        return boxesService.getBoxById(id);
+    }
+
 
     @PostMapping("/set_actual_status")
     public List<Box> setActualStatus() {

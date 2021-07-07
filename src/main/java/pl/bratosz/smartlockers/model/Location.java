@@ -99,4 +99,9 @@ public class Location {
     public void setSurrogate(boolean surrogate) {
         this.surrogate = surrogate;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

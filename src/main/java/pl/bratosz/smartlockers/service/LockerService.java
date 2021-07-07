@@ -78,6 +78,7 @@ public class LockerService {
         return lockersRepository.save(locker);
     }
 
+
     public Locker createWithCustomBoxNumbers(
             int lockerNumber,
             List<Integer> boxNumbers,
@@ -121,8 +122,8 @@ public class LockerService {
         return lockersRepository.getAmountOfLockersByPlantId(id);
     }
 
-    public void saveLockers(List<Locker> lockers) {
-        lockersRepository.saveAll(lockers);
+    public List<Locker> saveLockers(List<Locker> lockers) {
+        return lockersRepository.saveAll(lockers);
     }
 
     public List<Locker> getLockersByPlantAndNumber(
@@ -171,16 +172,12 @@ public class LockerService {
     }
 
     public Box getBoxByNumber(Locker locker, int boxNumber) {
-        if (boxNumber <= locker.getCapacity()) {
-            return locker.getBoxes()
-                    .stream()
-                    .filter(b -> b.getBoxNumber() == boxNumber)
-                    .findFirst().get();
-        } else {
-            throw new BoxNotAvailableException(
-                    "Locker number is grater than locker capacity");
-        }
+        return locker.getBoxes()
+                .stream()
+                .filter(b -> b.getBoxNumber() == boxNumber)
+                .findFirst().get();
     }
+
 
     public List<Box> getBoxesBy(long lockerId) {
         return lockersRepository.getLockerById(lockerId).getBoxes();
@@ -209,5 +206,22 @@ public class LockerService {
 
     public List<Locker> getAllByPlant(long plantId) {
         return lockersRepository.getAllByPlantId(plantId);
+    }
+
+    public Locker create(
+            int lockerNumber,
+            List<Box> boxes,
+            int capacity,
+            Plant plant,
+            Department department,
+            Location location) {
+        Locker l = LockerCreator.create(
+                lockerNumber,
+                boxes,
+                capacity,
+                plant,
+                department,
+                location);
+        return lockersRepository.save(l);
     }
 }

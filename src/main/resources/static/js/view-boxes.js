@@ -1,6 +1,6 @@
-loadPlants($('#select-plant'), clientId);
-loadDepartments($('#select-department'), clientId);
-loadLocations($('#select-location'), clientId);
+loadPlants(clientId, $('#select-plant'));
+loadDepartments(clientId, $('#select-department'));
+loadLocations(clientId, $('#select-location'));
 
 $("#button-filter").click(function () {
     let plantId = $("#select-plant").val();

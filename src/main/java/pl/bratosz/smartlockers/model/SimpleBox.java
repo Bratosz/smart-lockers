@@ -27,6 +27,12 @@ public class SimpleBox {
         this.employee = employee;
     }
 
+    public SimpleBox(Box box) {
+        this.plantNumber = box.getLocker().getPlant().getPlantNumber();
+        this.lockerNumber = box.getLocker().getLockerNumber();
+        this.boxNumber = box.getBoxNumber();
+    }
+
     public int getPlantNumber() {
         return plantNumber;
     }

@@ -48,9 +48,46 @@ public class Employee extends EmployeeGeneral {
     @JsonView(Views.InternalForEmployeesForOurStaff.class)
     private Double redemptionPrice;
 
+    private String comment;
+
+    private boolean isEmpty;
+
 
     public Employee() {
     }
+
+    public static Employee createEmpty() {
+        Employee e = new Employee();
+        e.isEmpty = true;
+        return e;
+    }
+
+    public static Employee create(
+            String firstName,
+            String lastName,
+            String comment,
+            Department department,
+            Box box) {
+        Employee e = createWithoutBox(
+                firstName, lastName, comment, department);
+        e.addToBox(box);
+        return e;
+    }
+
+    public static Employee createWithoutBox(
+            String firstName,
+            String lastName,
+            String comment,
+            Department department) {
+        Employee e = new Employee();
+        e.setFirstName(firstName);
+        e.setLastName(lastName);
+        e.setComment(comment);
+        e.setDepartment(department);
+        e.setActive(true);
+        return e;
+    }
+
 
     public Employee(String firstName, String lastName, Department department, boolean active) {
         setFirstName(firstName);
@@ -68,7 +105,8 @@ public class Employee extends EmployeeGeneral {
     }
 
     public List<Cloth> getClothes() {
-        return clothes;
+        if(clothes == null) return new LinkedList<>();
+        else return clothes;
     }
 
     public void setClothes(List<Cloth> clothes) {
@@ -123,6 +161,7 @@ public class Employee extends EmployeeGeneral {
     }
 
     public void setAsPastBox(SimpleBox box) {
+        box.setEmployee(this);
         if(pastBoxes == null) {
             pastBoxes = new LinkedList<>();
         }
@@ -155,4 +194,18 @@ public class Employee extends EmployeeGeneral {
     public void setClothOrders(List<ClothOrder> clothOrders) {
         this.clothOrders = clothOrders;
     }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public boolean isEmpty() {
+        return isEmpty;
+    }
+
+
 }

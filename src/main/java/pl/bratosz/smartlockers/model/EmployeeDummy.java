@@ -21,6 +21,13 @@ public class EmployeeDummy extends EmployeeGeneral {
         this.dummy = true;
     }
 
+    public static EmployeeDummy create() {
+        EmployeeDummy dummy = new EmployeeDummy();
+        dummy.setFirstName("");
+        dummy.setLastName("");
+        return dummy;
+    }
+
     public Box getDummyBox() {
         return dummyBox;
     }

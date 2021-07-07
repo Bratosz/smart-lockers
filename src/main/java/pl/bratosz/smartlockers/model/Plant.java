@@ -158,4 +158,9 @@ public class Plant {
     public void setUserClients(Set<UserClient> userClients) {
         this.userClients = userClients;
     }
+
+    @Override
+    public String toString() {
+        return getPlantNumber() + "";
+    }
 }

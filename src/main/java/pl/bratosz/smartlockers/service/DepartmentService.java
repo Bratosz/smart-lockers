@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.DepartmentsRepository;
 import pl.bratosz.smartlockers.service.managers.DepartmentManager;
+import pl.bratosz.smartlockers.strings.MyString;
 
 import java.util.*;
 
@@ -25,9 +26,29 @@ public class DepartmentService {
     }
 
     public Department getByNameAndPlantNumber(String name, int plantNumber) {
-        name = name.toUpperCase().trim();
-        return departmentsRepository.getByNameAndMainPlantNumber(name, plantNumber);
+        name = MyString.create(name).get();
+        return departmentsRepository.getByNameAndMainPlantNumber(
+                name, plantNumber);
     }
+
+    public Department getByNameAndClientId(String name, long clientId) {
+        name = MyString.create(name).get();
+        return departmentsRepository.getByNameAndClientId(
+                name, clientId);
+    }
+
+    public Department getByAliasAndClientId(String alias, long clientId) {
+        alias = MyString.create(alias).get();
+        Department department = departmentsRepository.getByAliasAndClientId(
+                alias, clientId);
+        if(department == null) {
+            return getSurrogateBy(clientId);
+        } else {
+            return department;
+        }
+    }
+
+
 
     public Department create(String departmentName, long clientId, int plantNumber) {
         return create(departmentName, clientId, plantNumber, false);
@@ -97,5 +118,9 @@ public class DepartmentService {
 
     public Department getSurrogateBy(Client client) {
         return departmentsRepository.getBySurrogateAndClient(true, client);
+    }
+
+    public Department getSurrogateBy(long clientId) {
+        return departmentsRepository.getBySurrogateAndClientId(true, clientId);
     }
 }

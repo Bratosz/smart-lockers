@@ -33,35 +33,32 @@ public class ScrappingController {
         }
     }
 
+    @PostMapping("/test/{plantId}")
+    public void test(@PathVariable long plantId) {
+        scrapingService.test(plantId);
+    }
+
     @GetMapping("/load-employee/{boxId}")
     @JsonView(Views.InternalForBoxes.class)
     public Box loadEmployee(@PathVariable long boxId) {
        return scrapingService.loadEmployee(boxId);
     }
 
+
     @PostMapping("/load-plant-box-by-box/{plantId}")
     @JsonView(Views.Public.class)
-    public LockersLoadReport loadPlantBoxByBox(@PathVariable long plantId) {
-        return scrapingService.loadPlantBoxByBox(plantId);
+    public StandardResponse loadLockersWithBoxesAndEmployees(@PathVariable long plantId) {
+        return scrapingService.loadLockersWithBoxesAndEmployees(plantId);
     }
 
-    @PostMapping("/load-plant-locker-by-locker/" +
-            "{plantId}/{firstLockerNumber}/{lastLockerNumber}/{capacity}/{withClothes}")
-    @JsonView(Views.Public.class)
-    public StandardResponse loadLockersWithClothes(
-            @PathVariable long plantId,
-            @PathVariable int firstLockerNumber,
-            @PathVariable int lastLockerNumber,
-            @PathVariable int capacity,
-            @PathVariable boolean withClothes) {
-        return scrapingService.loadLockers(
-                plantId, firstLockerNumber, lastLockerNumber, capacity, withClothes);
+    @PostMapping("/update-clothes/{plantId}")
+    public StandardResponse updateClothes(@PathVariable long plantId) {
+        return scrapingService.updateClothes(plantId);
     }
 
-    @PostMapping("/load-locker/{lockerId}")
-    @JsonView(Views.InternalForLockers.class)
-    public LockersLoadReport loadLocker(@PathVariable long lockerId) {
-        return scrapingService.loadLocker(lockerId);
+    @PostMapping("/load-clothes/{plantId}")
+    public StandardResponse loadClothes(@PathVariable long plantId) {
+        return scrapingService.loadClothes(plantId);
     }
 
 

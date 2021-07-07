@@ -37,7 +37,7 @@ $(document).ready(function () {
                 } else if (assignmentType == "RELEASE_ROTATIONAL_CLOTH") {
                     sentRequestForReleaseRotationalCloth(barcode)
                 }
-                reloadBox();
+                reloadEmployee();
                 clearInput($(this));
             } else {
                 alert("Nieprawidłowy kod kreskowy!");

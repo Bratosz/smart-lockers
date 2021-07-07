@@ -26,7 +26,7 @@ public class Cloth {
     @JsonView(Views.Public.class)
     protected int ordinalNumber;
 
-    @JsonView({Views.InternalForBoxes.class, Views.InternalForClothOrders.class})
+    @JsonView({Views.EmployeeCompleteInfo.class, Views.InternalForBoxes.class, Views.InternalForClothOrders.class})
     @ManyToOne
     protected ClientArticle clientArticle;
 
@@ -66,6 +66,9 @@ public class Cloth {
 
     @JsonView(Views.Public.class)
     protected Double actualRedemptionPrice;
+
+    @JsonView(Views.Public.class)
+    protected LengthModification lengthModification;
 
     public Cloth() {
     }
@@ -124,6 +127,7 @@ public class Cloth {
                  int ordinalNumber,
                  ClientArticle clientArticle,
                  ClothSize size,
+                 LengthModification lengthModification,
                  LifeCycleStatus lifeCycleStatus) {
         this.barcode = barcode;
         this.assignment = assignment;
@@ -132,6 +136,7 @@ public class Cloth {
         this.ordinalNumber = ordinalNumber;
         this.clientArticle = clientArticle;
         this.size = size;
+        this.lengthModification = lengthModification;
         active = true;
         this.lifeCycleStatus = lifeCycleStatus;
     }
@@ -265,6 +270,14 @@ public class Cloth {
 
     public void setReleaseOrder(ClothOrder releaseOrder) {
         this.releaseOrder = releaseOrder;
+    }
+
+    public LengthModification getLengthModification() {
+        return lengthModification;
+    }
+
+    public void setLengthModification(LengthModification lengthModification) {
+        this.lengthModification = lengthModification;
     }
 
     @Override

@@ -1,6 +1,4 @@
-
-
-function writeBoxToRowForLockerView(box, $row){
+function writeBoxToRowForLockerView(box, $row) {
     $row.removeAttr("id");
     $row.css("display", "table-row");
     $row.find(".cell-id").text(box.id);
@@ -9,15 +7,20 @@ function writeBoxToRowForLockerView(box, $row){
     $row.find(".cell-box-number").text(box.boxNumber);
     $row.find(".cell-status").text(box.boxStatus);
     $row.find(".button-view-employee").click(function () {
-        window.location.href = `view-employee.html?id=${box.id}`});
-    $row.find(".button-dismiss-employee").click(function() {
-        if(confirm('Czy na pewno chcesz zwolnić pracownika ' +
-        box.employee.firstName + ' ' + box.employee.lastName + '?')) {
+        if (box.boxStatus == "Wolna") {
+            window.alert("Ta szafka jest pusta");
+        } else {
+            window.location.href = `view-employee.html?employee-id=${box.employee.id}`;
+        }
+    });
+    $row.find(".button-dismiss-employee").click(function () {
+        if (confirm('Czy na pewno chcesz zwolnić pracownika ' +
+            box.employee.firstName + ' ' + box.employee.lastName + '?')) {
             dismissEmployee(box.employee.id);
         }
     });
-    $row.find(".button-delete-box").click(function() {
-        if(confirm('Czy na pewno chcesz usunąć ten box nr ?' + box.boxNumber)) {
+    $row.find(".button-delete-box").click(function () {
+        if (confirm('Czy na pewno chcesz usunąć ten box nr ?' + box.boxNumber)) {
             deleteBox(box.id);
         }
     });
@@ -47,11 +50,11 @@ function writeBoxToRowWithLockerData(box, $row) {
 function getBoxesFromLockers(lockers) {
     let allBoxes = [];
     lockers = sortLockersByPlantAndNumber(lockers);
-    for(let locker of lockers) {
+    for (let locker of lockers) {
         let boxesToExtend = locker.boxes;
         delete locker.boxes;
         let boxes = addFieldToObjects("locker", locker, boxesToExtend);
-        if(allBoxes.length == 0) {
+        if (allBoxes.length == 0) {
             allBoxes = boxes;
         } else {
             $.merge(allBoxes, boxes);
@@ -63,7 +66,7 @@ function getBoxesFromLockers(lockers) {
 
 function getBoxesFromEmployees(employees) {
     let boxes = [];
-    for(let employee of employees) {
+    for (let employee of employees) {
         let boxToExtend = employee.box;
         delete employee.box;
         boxToExtend[employee] = employee;
@@ -73,14 +76,14 @@ function getBoxesFromEmployees(employees) {
 }
 
 function sortBoxesByNumber(boxes) {
-    boxes.sort(function (a,b) {
+    boxes.sort(function (a, b) {
         return a.boxNumber - b.boxNumber;
     });
     return boxes;
 }
 
 function sortLockersByPlantAndNumber(lockers) {
-    lockers.sort(function (a,b) {
+    lockers.sort(function (a, b) {
         return a.plant.plantNumber - b.plant.plantNumber ||
             a.lockerNumber - b.lockerNumber;
     });
@@ -112,7 +115,7 @@ function writeBoxInfoToElement(box, $element) {
     location = locker.location.name;
     department = locker.department.name;
     $element.text(plantNumber
-    + " " + lockerNumber + "/" + boxNumber
-    + " " + location
-    + " " + department);
+        + " " + lockerNumber + "/" + boxNumber
+        + " " + location
+        + " " + department);
 }

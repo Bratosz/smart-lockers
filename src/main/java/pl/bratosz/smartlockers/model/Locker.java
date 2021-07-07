@@ -67,6 +67,13 @@ public class Locker {
         this.boxes = boxes;
     }
 
+    public void addBoxes(List<Box> boxes) {
+        for(Box b : boxes) {
+            b.setLocker(this);
+        }
+        setBoxes(boxes);
+    }
+
     public Department getDepartment() {
         return department;
     }
@@ -113,5 +120,12 @@ public class Locker {
 
     public void setPlant(Plant plant) {
         this.plant = plant;
+    }
+
+    @Override
+    public String toString() {
+        return getPlant().toString() +
+                " " + getLocation().toString() +
+                " " + getLockerNumber();
     }
 }

@@ -8,9 +8,11 @@ import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.managers.creators.BoxCreator;
 import pl.bratosz.smartlockers.service.managers.BoxManager;
+import pl.bratosz.smartlockers.utils.Utils;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static pl.bratosz.smartlockers.model.Box.BoxStatus.*;
 
@@ -22,16 +24,34 @@ public class BoxService {
     private User user;
     private BoxManager boxManager;
     private EmployeeService employeeService;
+    private EmployeeDummyService employeeDummyService;
 
-    public BoxService(BoxesRepository boxesRepository, BoxManager boxManager) {
+    public BoxService(BoxesRepository boxesRepository, BoxManager boxManager, EmployeeDummyService employeeDummyService) {
         this.boxesRepository = boxesRepository;
         this.boxManager = boxManager;
+        this.employeeDummyService = employeeDummyService;
     }
 
 
     public void loadUser(User user) {
         this.user = user;
     }
+
+    public Box findNextFreeBox(
+            long plantId,
+            long departmentId,
+            long locationId) {
+        Box.BoxStatus boxStatus = FREE;
+        return boxesRepository.getBoxesByParameters(
+                plantId,
+                departmentId,
+                locationId,
+                boxStatus)
+                .stream()
+                .findFirst()
+                .orElse(new Box());
+    }
+
 
     public Box findNextFreeBox(Department department, int plantNumber, Location location) throws BoxNotAvailableException {
         Box.BoxStatus boxStatus = FREE;
@@ -42,7 +62,7 @@ public class BoxService {
         return boxes.stream().findFirst().get();
     }
 
-    public Box releaseBoxAndDismissEmployee(long boxId, long userId) {
+    public Box releaseBox(long boxId, long userId) {
         user = userService.getUserById(userId);
         Box box = boxesRepository.getById(boxId);
 
@@ -50,9 +70,14 @@ public class BoxService {
         return boxesRepository.save(box);
     }
 
+    public Box releaseBox(Box box) {
+        box = boxManager.release(box);
+        return boxesRepository.save(box);
+    }
+
 
     public Box setEmployee(EmployeeGeneral employee, Box box) {
-        if(employee.getClass().isInstance(Employee.class)) {
+        if (employee.getClass().isInstance(Employee.class)) {
             box.setEmployee(employee);
             box.setBoxStatus(OCCUPY);
             return boxesRepository.save(box);
@@ -146,16 +171,16 @@ public class BoxService {
                                  Long departmentId,
                                  Long locationId,
                                  Box.BoxStatus boxStatus) {
-        if(departmentId == 0) departmentId = null;
-        if(locationId == 0) locationId = null;
-        if(boxStatus.equals(ALL)) boxStatus = null;
+        if (departmentId == 0) departmentId = null;
+        if (locationId == 0) locationId = null;
+        if (boxStatus.equals(ALL)) boxStatus = null;
         return boxesRepository.getFiltered(
                 plantId, departmentId, locationId, boxStatus);
     }
 
     public Employee extractEmployee(Box box) {
-        if(box.getBoxStatus().equals(OCCUPY)) {
-            Employee employeeToRelease = (Employee)box.getEmployee();
+        if (box.getBoxStatus().equals(OCCUPY)) {
+            Employee employeeToRelease = (Employee) box.getEmployee();
             Box releasedBox = boxManager.release(box);
             updateBox(releasedBox);
             return employeeService.release(employeeToRelease, releasedBox);
@@ -177,7 +202,7 @@ public class BoxService {
 
     public StandardResponse hardDeleteBy(long boxId) {
         Box box = boxesRepository.getById(boxId);
-        if(box.getBoxStatus().equals(OCCUPY)) {
+        if (box.getBoxStatus().equals(OCCUPY)) {
             return new StandardResponse("Szafka jest zajęta. Aby ją usunąć " +
                     "zwolnij najpierw pracownika, który się w niej znajduje", false);
         } else {
@@ -187,12 +212,65 @@ public class BoxService {
     }
 
     public List<Box> getByLastName(String lastName, long clientId) {
-        return boxesRepository.getByLastName(lastName, clientId);
+        return boxesRepository.getByLastNameAndClientId(lastName, clientId);
     }
 
     public List<Box> getByLockerNumberAndPlant(int lockerNumber, long plantId) {
         return boxesRepository.getByLockerNumberAndPlant(
                 lockerNumber, plantId);
+    }
+
+    public void setDuplicatedBoxes(int boxNumber, Locker locker) {
+        locker.getBoxes()
+                .stream()
+                .filter(b -> b.getBoxNumber() == boxNumber)
+                .forEach(b -> {
+                    b.setDuplicated(true);
+                    boxesRepository.save(b);
+                });
+    }
+
+    public List<Box> setDuplicatedBoxes(List<Box> boxes) {
+        List<Integer> duplicates = Utils.getDuplicates(boxes
+                .stream()
+                .map(b -> b.getBoxNumber())
+                .collect(Collectors.toList()));
+        for(Box b : boxes) {
+            if(duplicates.contains(b.getBoxNumber())){
+                b.setDuplicated(true);
+            }
+        }
+        return boxes;
+    }
+
+    public Box create(int boxNumber, Employee employee) {
+        EmployeeDummy dummy = employeeDummyService.createDummy();
+        Box b = BoxCreator.createBox(boxNumber, employee, dummy);
+        return boxesRepository.save(b);
+    }
+
+    public Box create(int boxNumber) {
+        EmployeeDummy dummy = employeeDummyService.createDummy();
+        Box b = BoxCreator.createEmptyBox(boxNumber, dummy);
+        return boxesRepository.save(b);
+    }
+
+    public List<Box> createMissingEmptyBoxes(List<Box> boxes, int capacity) {
+        List<Integer> sortedBoxNumbers = boxes.stream()
+                .map(b -> b.getBoxNumber())
+                .sorted()
+                .collect(Collectors.toList());
+        int firstBoxNumber = boxes.get(0).getBoxNumber();
+        if (firstBoxNumber != 0) firstBoxNumber = 1;
+        List<Integer> missingBoxNumbers =
+                Utils.findMissingNumbersFromRange(
+                        sortedBoxNumbers,
+                        firstBoxNumber,
+                        capacity);
+        for (int i : missingBoxNumbers) {
+            boxes.add(create(i));
+        }
+        return boxes;
     }
 }
 

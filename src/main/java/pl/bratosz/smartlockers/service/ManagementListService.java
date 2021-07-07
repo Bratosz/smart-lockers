@@ -2,6 +2,7 @@ package pl.bratosz.smartlockers.service;
 
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.users.ManagementList;
+import pl.bratosz.smartlockers.repository.ManagementListRepository;
 
 import java.util.HashSet;
 import java.util.LinkedList;
