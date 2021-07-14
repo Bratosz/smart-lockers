@@ -23,10 +23,7 @@ public class Article {
     @JsonView(Views.Public.class)
     private ClothType clothType;
 
-    @OneToMany(mappedBy = "clientArticle")
-    private Set<Cloth> clothes;
-
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     private Set<ClientArticle> clientArticles;
 
     public Article() {
@@ -69,14 +66,6 @@ public class Article {
 
     public void setClothType(ClothType clothType) {
         this.clothType = clothType;
-    }
-
-    public Set<Cloth> getClothes() {
-        return clothes;
-    }
-
-    public void setClothes(Set<Cloth> clothes) {
-        this.clothes = clothes;
     }
 
     public Set<ClientArticle> getClientArticles() {

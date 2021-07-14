@@ -21,7 +21,7 @@ public class Box {
     private BoxStatus boxStatus;
 
     @JsonView({Views.InternalForLockers.class, Views.InternalForBoxes.class})
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private EmployeeGeneral employee;
 
     @OneToOne(fetch = FetchType.LAZY)

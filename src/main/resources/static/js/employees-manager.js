@@ -29,3 +29,28 @@ function writeEmployeeInfoToElement(employee, $element) {
         " " + lastName +
         " " + firstName);
 }
+
+function displayEmployee(employee) {
+    let box = employee.box,
+        lockerNumber = box.locker.lockerNumber,
+        boxNumber = box.boxNumber,
+        boxStatus = box.boxStatus,
+        clothes = employee.clothes,
+        clothOrders = employee.clothOrders,
+        lastName = employee.lastName,
+        firstName = employee.firstName;
+
+    $("#employee").text(lockerNumber + "/" + boxNumber
+        + " " + lastName + " " + firstName);
+
+    let beforeRelease = extractClothes("BEFORE_RELEASE", clothes);
+    let inRotation = extractClothes("IN_ROTATION", clothes);
+    let accepted = extractClothes("ACCEPTED", clothes);
+    let withdrawn = extractClothes("WITHDRAWN", clothes);
+    let activeOrders = extractActiveOrders(clothOrders);
+
+    displayClothes(inRotation);
+    displayAcceptedClothes(accepted);
+    displayWithdrawnClothes(withdrawn);
+    displayOrders(activeOrders);
+}

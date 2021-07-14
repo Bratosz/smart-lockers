@@ -1,14 +1,7 @@
 const url = new URL(window.location.href);
 const employeeId = url.searchParams.get("employee-id");
 const boxId = url.searchParams.get("box-id");
-let lockerNumber,
-    boxNumber,
-    lastName,
-    firstName,
-    employee,
-    clothes,
-    clothOrders,
-    boxStatus;
+let employeeMain;
 
 
 reloadEmployee();
@@ -18,11 +11,7 @@ $("#button-load-to-managed-employees").click(function () {
 });
 
 $("#refresh-button").click(function () {
-    if (boxStatus == "Wolna") {
-        loadEmployee();
-    } else {
-        updateClothes();
-    }
+        updateEmployee();
 });
 
 $("#button-perform-action-on-orders").click(function () {
@@ -33,6 +22,23 @@ $('#button-add-order').click(function () {
     addOrder();
 
 });
+
+function updateEmployee() {
+    $.ajax({
+        url: getActualLocation() + `/employees/update` +
+            `/${employeeId}/${userId}`, // with complete info
+        method: 'post',
+        success: function(response) {
+            console.log(response);
+            if(response.succeed) {
+                window.alert(response.message)
+                reloadEmployee();
+            } else {
+                window.alert(response.message);
+            }
+        }
+    })
+}
 
 function refreshOrders() {
     $.ajax({
@@ -91,35 +97,19 @@ function performActionOnOrders() {
     });
 }
 
+function reloadEmployee(employee) {
+    employeeMain = employee;
+    displayEmployee(employeeMain);
+}
+
 function reloadEmployee() {
     $.ajax({
         url: getActualLocation() + `/employees/with-complete-info/${employeeId}`,
-        method: "get",
+        method: 'get',
         success: function (employee) {
-            let box = employee.box;
-            lockerNumber = box.locker.lockerNumber;
-            boxNumber = box.boxNumber;
-            boxStatus = box.boxStatus;
-            clothes = employee.clothes;
-            clothOrders = employee.clothOrders;
-            lastName = employee.lastName;
-            firstName = employee.firstName;
-
             console.log(employee);
-
-            $("#employee").text(lockerNumber + "/" + boxNumber
-                + " " + lastName + " " + firstName);
-
-            let beforeRelease = extractClothes("BEFORE_RELEASE", clothes);
-            let inRotation = extractClothes("IN_ROTATION", clothes);
-            let accepted = extractClothes("ACCEPTED", clothes);
-            let withdrawn = extractClothes("WITHDRAWN", clothes);
-            let activeOrders = extractActiveOrders(clothOrders);
-
-            displayClothes(inRotation);
-            displayAcceptedClothes(accepted);
-            displayWithdrawnClothes(withdrawn);
-            displayOrders(activeOrders);
+            employeeMain = employee;
+            displayEmployee(employeeMain);
         }
     })
 }

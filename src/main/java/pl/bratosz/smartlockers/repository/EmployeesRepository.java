@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pl.bratosz.smartlockers.model.Department;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.Plant;
 
@@ -33,9 +34,11 @@ public interface EmployeesRepository extends JpaRepository<Employee, Long> {
     @Query("select e from Employee e " +
             "where e.box.locker.lockerNumber = :lockerNumber " +
             "and e.box.boxNumber = :boxNumber " +
-            "and e.box.locker.plant = :plant")
+            "and e.box.locker.plant = :plant " +
+            "and e.department = :department")
     List<Employee> getBy(
-            int lockerNumber, int boxNumber, Plant plant);
+            int lockerNumber, int boxNumber, Plant plant, Department department);
 
-
+    @Query("select e from Employee e ")
+    List<Employee> getAll();
 }

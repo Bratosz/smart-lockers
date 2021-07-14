@@ -1,5 +1,5 @@
 let clientId = 1;
-const userId = 6;
+const userId = 7;
 
 function loadPlants(clientId, $selectPlant) {
     if($selectPlant === undefined) {

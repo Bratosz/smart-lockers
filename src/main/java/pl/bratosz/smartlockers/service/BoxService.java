@@ -174,8 +174,11 @@ public class BoxService {
         if (departmentId == 0) departmentId = null;
         if (locationId == 0) locationId = null;
         if (boxStatus.equals(ALL)) boxStatus = null;
-        return boxesRepository.getFiltered(
+//        List<Box> boxes = boxesRepository.getFilteredBy(
+//                plantId, departmentId, locationId, boxStatus);
+        return boxesRepository.findTop15ByLockerPlantIdAndLockerDepartmentIdAndLockerLocationIdAndBoxStatus(
                 plantId, departmentId, locationId, boxStatus);
+
     }
 
     public Employee extractEmployee(Box box) {
@@ -271,6 +274,10 @@ public class BoxService {
             boxes.add(create(i));
         }
         return boxes;
+    }
+
+    public Box save(Box b) {
+        return boxesRepository.save(b);
     }
 }
 

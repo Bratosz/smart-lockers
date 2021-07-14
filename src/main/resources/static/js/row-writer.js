@@ -54,9 +54,9 @@ function writeBoxToRow(box, $row) {
     } else {
         $row.find(".button-add-employee").css("display", "table-cell");
         $row.find(".button-add-employee").click(function () {
-            window.location.href = `add-employee.html?id=${box.id}`;
+            window.location.href = `add-employee.html?box-id=${box.id}`;
         });
     }
-   
+
     return $row;
 }

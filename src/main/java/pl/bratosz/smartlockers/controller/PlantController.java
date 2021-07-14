@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.model.Views;
+import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.PlantService;
 
 import java.util.List;
@@ -35,4 +36,5 @@ public class PlantController {
                         @PathVariable String login, @PathVariable String password) {
         return plantService.create(clientId, plantNumber, name, login, password);
     }
+
 }

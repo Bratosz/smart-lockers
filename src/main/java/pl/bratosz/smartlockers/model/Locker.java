@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -72,6 +73,14 @@ public class Locker {
             b.setLocker(this);
         }
         setBoxes(boxes);
+    }
+
+    public void addBox(Box box) {
+        if(boxes == null) {
+            boxes = new LinkedList<>();
+        }
+            box.setLocker(this);
+            boxes.add(box);
     }
 
     public Department getDepartment() {

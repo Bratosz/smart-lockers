@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.exception.WrongIdException;
 import pl.bratosz.smartlockers.model.*;
+import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.EmployeeService;
 import pl.bratosz.smartlockers.strings.MyString;
 
@@ -36,8 +37,17 @@ public class EmployeeController {
 
     @JsonView(Views.EmployeeCompleteInfo.class)
     @GetMapping("/with-complete-info/{id}")
-    public Employee getWithCompleteInfo(@PathVariable long id) {
+    public Employee getWithCompleteInfo(
+            @PathVariable long id) {
         return employeeService.getById(id);
+    }
+
+    @JsonView(Views.EmployeeCompleteInfo.class)
+    @PostMapping("/update/{employeeId}/{userId}")
+    public StandardResponse update(
+            @PathVariable long userId,
+            @PathVariable long employeeId) {
+        return employeeService.update(employeeId, userId);
     }
 
     @JsonView(Views.InternalForEmployees.class)

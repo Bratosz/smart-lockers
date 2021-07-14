@@ -5,6 +5,7 @@ import pl.bratosz.smartlockers.comparators.BoxNumberSorter;
 import pl.bratosz.smartlockers.comparators.PlantNumberSorter;
 import pl.bratosz.smartlockers.comparators.LockerNumberSorter;
 import pl.bratosz.smartlockers.exception.BoxNotAvailableException;
+import pl.bratosz.smartlockers.exception.EmptyElementException;
 import pl.bratosz.smartlockers.exception.SkippedEmployeeException;
 import pl.bratosz.smartlockers.exception.DoubledBoxException;
 import pl.bratosz.smartlockers.model.*;
@@ -12,6 +13,7 @@ import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.EmployeeGeneralRepository;
 import pl.bratosz.smartlockers.repository.EmployeesRepository;
+import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.managers.EmployeeManager;
 
 import java.util.*;
@@ -30,6 +32,7 @@ public class EmployeeService {
     private ClothService clothService;
     private User user;
     private EmployeeManager employeeManager;
+    private ScrapingService scrapingService;
 
     public EmployeeService(EmployeesRepository employeesRepository,
                            EmployeeGeneralRepository employeeGeneralRepository,
@@ -38,7 +41,7 @@ public class EmployeeService {
                            DepartmentService departmentService,
                            UserService userService,
                            ClothService clothService,
-                           EmployeeManager employeeManager) {
+                           EmployeeManager employeeManager, ScrapingService scrapingService) {
         this.employeesRepository = employeesRepository;
         this.employeeGeneralRepository = employeeGeneralRepository;
         this.boxService = boxesService;
@@ -47,6 +50,7 @@ public class EmployeeService {
         this.userService = userService;
         this.clothService = clothService;
         this.employeeManager = employeeManager;
+        this.scrapingService = scrapingService;
     }
 
     private void loadUser(User user) {
@@ -59,7 +63,7 @@ public class EmployeeService {
     }
 
     public List<Employee> getAllEmployees() {
-        return employeesRepository.findAll();
+        return employeesRepository.getAll();
     }
 
     public List<Employee> getEmployeesByLastName(String lastName, long clientId) {
@@ -129,6 +133,19 @@ public class EmployeeService {
         employee.setLastName(lastName);
         return employeesRepository.save(employee);
     }
+
+    public Employee createEmployee(SimpleEmployee e,
+                                   long clientId) {
+        Department department = departmentService.getByAliasAndClientId(
+                e.getDepartmentAlias(),
+                clientId);
+        return create(
+                e.getFirstName(),
+                e.getLastName(),
+                e.getComment(),
+                department);
+    }
+
 
     public Employee createEmployeeAndAssignToBox(int plantNumber,
                                                  Department department,
@@ -327,23 +344,68 @@ public class EmployeeService {
     public Employee getBy(
             SimpleEmployee simpleEmployee,
             Plant plant) throws SkippedEmployeeException, DoubledBoxException {
-
         int lockerNumber = simpleEmployee.getLockerNumber();
         int boxNumber = simpleEmployee.getBoxNumber();
+        Department department = departmentService.getByAliasAndClientId(
+                simpleEmployee.getDepartmentAlias(), plant.getClient().getId());
         List<Employee> employees = employeesRepository.getBy(
                 lockerNumber,
                 boxNumber,
-                plant);
-        if(employees.size() > 1) {
+                plant,
+                department);
+        if (employees.size() > 1) {
             throw new DoubledBoxException(simpleEmployee);
+        } else if(employees.size() == 0) {
+            throw new SkippedEmployeeException(simpleEmployee);
         } else {
             Employee employee = employees.stream().findFirst().get();
-            if(employee.getLastName().equals(simpleEmployee.getLastName())
-            && employee.getFirstName().equals(simpleEmployee.getFirstName())) {
+            if (employee.getLastName().equals(simpleEmployee.getLastName())
+                    && employee.getFirstName().equals(simpleEmployee.getFirstName())) {
                 return employee;
             } else {
                 throw new SkippedEmployeeException(simpleEmployee);
             }
         }
+    }
+
+    public StandardResponse update(long employeeId, long userId) {
+        Employee employee = employeesRepository.getEmployeeById(employeeId);
+        User user = userService.getUserById(userId);
+        int status = scrapingService.checkBoxStatusBy(employee);
+        if(status == 1) {
+            try {
+                List<Cloth> actualClothes = scrapingService.getClothes(employee);
+                clothService.updateClothes(
+                        actualClothes, employee, user);
+                return new StandardResponse(
+                        "Zaktualizowano ubrania", true);
+            } catch (EmptyElementException e) {
+               return new StandardResponse(
+                       "Pracownik nie ma ubrań",
+                       false);
+            }
+        } else if(status == 0) {
+            return new StandardResponse(
+                    "Szafka jest pusta", false);
+        } else {
+            try {
+                SimpleEmployee simpleEmployee =
+                        scrapingService.getEmployee(employee.getBox());
+                return new StandardResponse(
+                        "Inny pracownik w szafce: " +
+                        simpleEmployee.getLastName() + " " +
+                        simpleEmployee.getFirstName() + " " +
+                        simpleEmployee.getDepartmentAlias(),
+                        false);
+            } catch (DoubledBoxException e) {
+                return new StandardResponse(
+                        "Znaleziono 2 szafki o tym numerze",
+                        false);
+            }
+        }
+    }
+
+    public void save(List<Employee> employees) {
+        employeesRepository.saveAll(employees);
     }
 }

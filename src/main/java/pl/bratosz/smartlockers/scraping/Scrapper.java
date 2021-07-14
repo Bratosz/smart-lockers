@@ -4,6 +4,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.date.FormatDate;
+import pl.bratosz.smartlockers.exception.EmptyElementException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.model.clothes.*;
 
@@ -39,8 +40,8 @@ public class Scrapper {
     }
 
     public void createConnection(Plant plant) {
-        login = plant.getLogin();
-        password = plant.getPassword();
+        String login = plant.getLogin();
+        String password = plant.getPassword();
         if (itIsSamePlant(login, password) && connection != null) {
             try {
                 connection.checkConnection();
@@ -77,6 +78,7 @@ public class Scrapper {
     public void find(Locker locker) {
         findLocker(locker.getLockerNumber());
     }
+
 
     public void findLocker(int lockerNumber) {
         searchByLockerNumber(lockerNumber);
@@ -211,18 +213,18 @@ public class Scrapper {
         return new SimpleEmployee(
                 firstName, lastName, lockerNumber, boxNumber, departmentName);
     }
+
     private void updateFormWithClick(int buttonIndex) {
-        connection.formParameters.clear();
         connection.formParameters.put("__EVENTTARGET", "ctl00$MainContent$GridView102");
         connection.formParameters.put("__EVENTARGUMENT", "Select$" + buttonIndex);
     }
 
 
     private void putLockerNoAndBoxNoToForm(String lockerNo, String boxNo) {
-        connection.setFormParameters(new HashMap<String, String>());
+        connection.formParameters.clear();
         connection.formParameters.put("ctl00$MainContent$szafa_akt", lockerNo);
         connection.formParameters.put("ctl00$MainContent$box_akt", boxNo);
-        connection.formParameters.put("__EVENTTARGET", "ctl00$MainContent$box_akt");
+        connection.formParameters.put("__EVENTTARGET", "ctl00$MainContent$szafa_akt");
     }
 
     private void putLockerNumberToForm(String lockerNumber) {
@@ -256,7 +258,7 @@ public class Scrapper {
     }
 
     private String getStringSize(Elements td) {
-        return  MyString.create(
+        return MyString.create(
                 td.get(columnIndexes.get(SIZE)).text()).get();
     }
 
@@ -344,11 +346,20 @@ public class Scrapper {
     }
 
     public String getLastName(Elements boxTable) {
-        return MyString.create(boxTable.select("td")
-        .get(columnIndexes.get(LAST_NAME)).text()).get();
+        return MyString.create(
+                boxTable.select("td")
+                        .get(columnIndexes
+                                .get(LAST_NAME)).text())
+                .get();
     }
 
-
+    public String getFirstName(Elements boxTable) {
+        return MyString.create(
+                boxTable.select("td")
+                        .get(columnIndexes
+                                .get(FIRST_NAME)).text())
+                .get();
+    }
 
     private Elements getHeaderRow(TableSelector selector) {
         return connection.actualPage.select(selector.get() + HEADER.get());
@@ -364,8 +375,11 @@ public class Scrapper {
         return mainBody = getBody(selector);
     }
 
-    public Elements selectAsSecondaryTable(TableSelector selector) {
+    public Elements selectAsSecondaryTable(TableSelector selector) throws EmptyElementException {
         secondaryBody = getBody(selector);
+        if(secondaryBody.size() == 0) {
+            throw new EmptyElementException("There is no table");
+        }
         if (!secondaryIndexesLoaded) {
             headerRow = getHeaderRow(selector);
             loadColumnIndexes();

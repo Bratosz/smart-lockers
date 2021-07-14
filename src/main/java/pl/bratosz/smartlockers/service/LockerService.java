@@ -54,6 +54,10 @@ public class LockerService {
         return lockersRepository.getLockersFromRange(plantNumber, firstLocker, lastLocker);
     }
 
+    public List<Locker> getLockers(int from, int to, long plantId) {
+        return lockersRepository.getLockers(from, to, plantId);
+    }
+
     public Locker create(
             int lockerNumber,
             int capacity,
@@ -204,7 +208,7 @@ public class LockerService {
         return lockersRepository.saveAll(lockers);
     }
 
-    public List<Locker> getAllByPlant(long plantId) {
+    public List<Locker> getAllBy(long plantId) {
         return lockersRepository.getAllByPlantId(plantId);
     }
 
@@ -223,5 +227,9 @@ public class LockerService {
                 department,
                 location);
         return lockersRepository.save(l);
+    }
+
+    public void saveLocker(Locker l) {
+        lockersRepository.save(l);
     }
 }

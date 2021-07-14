@@ -39,7 +39,7 @@ public class Cloth {
     private ClothOrder releaseOrder;
 
     @JsonView(Views.InternalForClothes.class)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     protected Employee employee;
 
     @JsonView({Views.InternalForEmployees.class, Views.InternalForBoxes.class})

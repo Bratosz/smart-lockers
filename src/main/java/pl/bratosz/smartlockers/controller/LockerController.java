@@ -46,7 +46,7 @@ public class LockerController {
     @GetMapping("/get-by-plant/{plantId}")
     public List<Locker> getByAllByPlant(
             @PathVariable long plantId) {
-        return lockersService.getAllByPlant(plantId);
+        return lockersService.getAllBy(plantId);
     }
 
     @JsonView(Views.InternalForLockers.class)

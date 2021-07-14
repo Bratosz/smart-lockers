@@ -7,9 +7,10 @@ import java.util.Objects;
 public class SimpleEmployee {
     private String firstName;
     private String lastName;
-    private int locker;
-    private int box;
+    private int lockerNumber;
+    private int boxNumber;
     private String departmentAlias;
+    private String comment;
 
     public SimpleEmployee(String firstName, String lastName) {
         this.firstName = firstName;
@@ -22,8 +23,8 @@ public class SimpleEmployee {
                           int box) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.locker = locker;
-        this.box = box;
+        this.lockerNumber = locker;
+        this.boxNumber = box;
     }
 
     public SimpleEmployee(String firstName,
@@ -33,21 +34,35 @@ public class SimpleEmployee {
                           String departmentAlias) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.locker = locker;
-        this.box = box;
+        this.lockerNumber = locker;
+        this.boxNumber = box;
         this.departmentAlias = departmentAlias;
+    }
+
+    public SimpleEmployee(String firstName,
+                          String lastName,
+                          String comment,
+                          String departmentAlias,
+                          int lockerNumber,
+                          int boxNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.comment = comment;
+        this.departmentAlias = departmentAlias;
+        this.lockerNumber = lockerNumber;
+        this.boxNumber = boxNumber;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public void setLastName(String lastName) {
@@ -55,19 +70,19 @@ public class SimpleEmployee {
     }
 
     public int getLockerNumber() {
-        return locker;
+        return lockerNumber;
     }
 
-    public void setLocker(int locker) {
-        this.locker = locker;
+    public void setLockerNumber(int lockerNumber) {
+        this.lockerNumber = lockerNumber;
     }
 
     public int getBoxNumber() {
-        return box;
+        return boxNumber;
     }
 
-    public void setBox(int box) {
-        this.box = box;
+    public void setBoxNumber(int boxNumber) {
+        this.boxNumber = boxNumber;
     }
 
     public String getDepartmentAlias() {
@@ -76,6 +91,14 @@ public class SimpleEmployee {
 
     public void setDepartmentAlias(String departmentAlias) {
         this.departmentAlias = departmentAlias;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override

@@ -1,7 +1,10 @@
 package pl.bratosz.smartlockers.response;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import pl.bratosz.smartlockers.model.Employee;
+import pl.bratosz.smartlockers.model.SimpleEmployee;
 import pl.bratosz.smartlockers.model.Views;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 public class StandardResponse {
     @JsonView(Views.Public.class)

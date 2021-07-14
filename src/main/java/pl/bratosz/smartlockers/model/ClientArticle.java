@@ -2,8 +2,10 @@ package pl.bratosz.smartlockers.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import pl.bratosz.smartlockers.model.clothes.Article;
+import pl.bratosz.smartlockers.model.clothes.Cloth;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class ClientArticle {
@@ -30,6 +32,9 @@ public class ClientArticle {
 
     @JsonView(Views.Public.class)
     private int depreciationPeriod;
+
+    @OneToMany(mappedBy = "clientArticle")
+    private Set<Cloth> clothes;
 
     public ClientArticle() {
     }
@@ -68,6 +73,14 @@ public class ClientArticle {
 
     public Client getClient() {
         return client;
+    }
+
+    public Set<Cloth> getClothes() {
+        return clothes;
+    }
+
+    public void setClothes(Set<Cloth> clothes) {
+        this.clothes = clothes;
     }
 
     public void setClient(Client client) {

@@ -2,6 +2,7 @@ package pl.bratosz.smartlockers.service.exels;
 
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import pl.bratosz.smartlockers.exception.EmptyElementException;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.service.managers.creators.EmployeeCreator;
 import pl.bratosz.smartlockers.service.managers.creators.LockerCreator;
@@ -89,9 +90,15 @@ public class DataBaseLoader {
         int actualLockerNumber = -1;
         for(RowForBasicDataBaseUpload row : loadedRows) {
             if(actualLockerNumber != row.getLockerNumber()) {
-                Locker locker = lockerCreator.createFromRowWithBoxes(row);
-                actualLockerNumber = locker.getLockerNumber();
-                lockers.add(locker);
+                Locker locker = null;
+                try {
+                    locker = lockerCreator.createFromRowWithBoxes(row);
+                    actualLockerNumber = locker.getLockerNumber();
+                    lockers.add(locker);
+                } catch (EmptyElementException e) {
+                    continue;
+                }
+
             }
         }
     }

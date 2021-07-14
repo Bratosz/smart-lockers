@@ -70,7 +70,7 @@ public class LockerCreator {
         return l;
     }
 
-    public Locker createFromRowWithBoxes(RowForBasicDataBaseUpload row) {
+    public Locker createFromRowWithBoxes(RowForBasicDataBaseUpload row) throws EmptyElementException {
         int lockerNumber = row.getLockerNumber();
         int capacity = row.getCapacity();
         try {
@@ -91,7 +91,10 @@ public class LockerCreator {
 
             return locker;
         } catch (NoSuchElementException e) {
-            throw new EmptyElementException("Locker #" + lockerNumber + " has not been created.\n" + row.getLocationName() + "\n" + row.getLastName());
+            throw new EmptyElementException(
+                    "Locker #" +
+                            lockerNumber + " has not been created.\n" +
+                            row.getLocationName() + "\n" + row.getLastName());
         }
 
     }

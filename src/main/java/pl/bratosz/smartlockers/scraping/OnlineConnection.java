@@ -126,12 +126,9 @@ public class OnlineConnection {
     }
 
     public void standardPost() {
-        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         try {
         actualResponse = Jsoup.connect(lockersViewURL)
                 .method(Connection.Method.POST)
-                .header("Host","en.wikipedia.org")
-                .header("Content-Type", "application/x-www-form-urlencoded")
                 .userAgent(userAgentChrome)
                 .referrer(referrer)
                 .timeout(10 * 1000)

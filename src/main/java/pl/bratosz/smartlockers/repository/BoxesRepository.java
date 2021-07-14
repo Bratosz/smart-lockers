@@ -57,11 +57,12 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             "and (b.locker.department.id = :departmentId or :departmentId is null) " +
             "and (b.locker.location.id = :locationId or :locationId is null) " +
             "and (b.boxStatus = :boxStatus or :boxStatus is null) ")
-    List<Box> getFiltered(
+    List<Box> getFilteredBy(
             Long plantId,
             Long departmentId,
             Long locationId,
             Box.BoxStatus boxStatus);
+
     @Transactional
     @Modifying
     @Query("delete from Box b where b.id = :id ")
@@ -92,4 +93,7 @@ public interface BoxesRepository extends JpaRepository<Box, Long> {
             long departmentId,
             long locationId,
             Box.BoxStatus boxStatus);
+
+    List<Box> findTop15ByLockerPlantIdAndLockerDepartmentIdAndLockerLocationIdAndBoxStatus(
+            Long plantId, Long departmentId, Long locationId, Box.BoxStatus boxStatus);
 }

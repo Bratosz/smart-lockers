@@ -215,6 +215,17 @@ public class ClothService {
         }
     }
 
+    public void loadClothes(
+            List<Cloth> clothesToLoad,
+            Employee employee,
+            User user) {
+        loadUser(user);
+        if (employee.getClothes().isEmpty()) {
+            employee.addClothes(clothesToLoad);
+            employeeService.save(employee);
+        }
+    }
+
 
     public void updateClothes(
             List<Cloth> updatedClothes,
@@ -369,4 +380,7 @@ public class ClothService {
     }
 
 
+    public List<Cloth> getAllClothesBy(long plantId) {
+        return clothesRepository.findAll();
+    }
 }

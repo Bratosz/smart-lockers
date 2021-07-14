@@ -1,13 +1,14 @@
 package pl.bratosz.smartlockers.service;
 
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.Client;
 import pl.bratosz.smartlockers.model.Department;
-import pl.bratosz.smartlockers.model.Locker;
+import pl.bratosz.smartlockers.model.Location;
 import pl.bratosz.smartlockers.model.Plant;
 import pl.bratosz.smartlockers.repository.PlantsRepository;
+import pl.bratosz.smartlockers.response.StandardResponse;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,10 +18,12 @@ public class PlantService {
 
     private PlantsRepository plantsRepository;
     private ClientService clientService;
+    private ScrapingService scrapingService;
 
-    public PlantService(PlantsRepository plantsRepository, ClientService clientService) {
+    public PlantService(PlantsRepository plantsRepository, ClientService clientService, ScrapingService scrapingService) {
         this.plantsRepository = plantsRepository;
         this.clientService = clientService;
+        this.scrapingService = scrapingService;
     }
 
     public Plant getByNumber(int plantNumber) {
