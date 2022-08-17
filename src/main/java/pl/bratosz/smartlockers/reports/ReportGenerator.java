@@ -5,10 +5,7 @@ import pl.bratosz.smartlockers.date.DateComparator;
 import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.*;
-import pl.bratosz.smartlockers.model.orders.ClothOrder;
-import pl.bratosz.smartlockers.model.orders.ExchangeStrategy;
-import pl.bratosz.smartlockers.model.orders.MainOrder;
-import pl.bratosz.smartlockers.model.orders.OrderType;
+import pl.bratosz.smartlockers.model.orders.*;
 import pl.bratosz.smartlockers.service.exels.SpreadSheetWriter;
 
 import java.time.LocalDate;
@@ -73,7 +70,7 @@ public class ReportGenerator {
         for (Employee e : employees) {
             TreeSet<MainOrder> sortedOrders = new TreeSet<>(getActiveSortedMainOrders(e));
             for (MainOrder o : sortedOrders) {
-                if(o.isActive() && !o.isReported()) {
+                if (o.isActive() && !o.isReported()) {
                     writeNewEmployeeToLoad(e, i);
                     reportedOrders.add(o);
                     writeMainOrderToLoad(o);
@@ -111,7 +108,7 @@ public class ReportGenerator {
     }
 
     private List<MainOrder> getActiveSortedMainOrders() {
-        for(Employee e : employees) {
+        for (Employee e : employees) {
             getActiveSortedMainOrders(e).forEach(o -> mainOrders.add(o));
         }
         Collections.sort(mainOrders, Comparator.comparing(MainOrder::getOrderType)
@@ -122,12 +119,12 @@ public class ReportGenerator {
 
     private void writeGeneralOrdersToRowsWithSkippingEmployeeIfRepeats() {
         writer.nextRow();
-        for(Employee e : employees) {
+        for (Employee e : employees) {
             System.out.println(e.getLastName());
             writeEmployeeWithNameAndLastNameInOneCell(e);
             TreeSet<MainOrder> sortedOrders = new TreeSet<>(getActiveSortedMainOrders(e));
-            for(MainOrder o : sortedOrders) {
-                if(o.isActive() && !o.isReported()) {
+            for (MainOrder o : sortedOrders) {
+                if (o.isActive() && !o.isReported()) {
                     reportedOrders.add(o);
                     writeMainOrder(o);
                     writer.nextRow();
@@ -147,7 +144,7 @@ public class ReportGenerator {
     private void createSheetWithBoxesNumbers() {
         writer.createSheet("Numery szafek");
         createEmployeeDataHeader(SMALL_BOLDED);
-        for(Employee e :employees) {
+        for (Employee e : employees) {
             writer.nextRow();
             writeEmployeeWithNameAndLastNameInOneCell(e);
         }
@@ -173,7 +170,7 @@ public class ReportGenerator {
     private void writeEmployeesWithClothQuantities() {
         writer.nextRow();
         int i = 0;
-        for(Employee e : employees) {
+        for (Employee e : employees) {
             i++;
             Collections.sort(e.getClothes());
             Map<Article, Integer> clothesQuantities = countClothes(e.getClothes());
@@ -196,9 +193,9 @@ public class ReportGenerator {
 
     private Map<Article, Integer> countClothes(List<Cloth> clothes) {
         Map<Article, Integer> clothesQuantities = new LinkedHashMap<>();
-        for(Cloth c : clothes) {
+        for (Cloth c : clothes) {
             Article article = c.getClientArticle().getArticle();
-            if(clothesQuantities.containsKey(article)) {
+            if (clothesQuantities.containsKey(article)) {
                 Integer integer = clothesQuantities.get(article);
                 integer += 1;
                 clothesQuantities.put(article, integer);
@@ -230,7 +227,7 @@ public class ReportGenerator {
             for (MainOrder o : sortedOrders) {
                 if (o.isActive() && !o.isReported()) {
                     for (ClothOrder clothOrder : o.getClothOrders()) {
-                        if(clothOrder.isActive()) {
+                        if (clothOrder.isActive()) {
                             writer.nextRow();
                             writeEmployeeWithNameAndLastNameInOneCell(e);
                             writeOrderParameters(clothOrder);
@@ -257,10 +254,10 @@ public class ReportGenerator {
         articlesAmounts.forEach((article, amounts) -> {
             writer.nextRow();
             int actualArticleNumber = article.getArticle().getNumber();
-            if(previousArticleNumber.get() == 0) {
+            if (previousArticleNumber.get() == 0) {
                 previousArticleNumber.set(actualArticleNumber);
             }
-            if(itIsNextArticle(previousArticleNumber.get(), actualArticleNumber)) {
+            if (itIsNextArticle(previousArticleNumber.get(), actualArticleNumber)) {
                 writer.nextRow();
                 previousArticleNumber.set(actualArticleNumber);
             }
@@ -269,8 +266,8 @@ public class ReportGenerator {
         writer.formatSheet();
     }
 
-    private boolean itIsNextArticle(int previousArticleNumber,int actualArticleNumber) {
-        if(previousArticleNumber != actualArticleNumber) {
+    private boolean itIsNextArticle(int previousArticleNumber, int actualArticleNumber) {
+        if (previousArticleNumber != actualArticleNumber) {
             return true;
         } else {
             return false;
@@ -326,12 +323,13 @@ public class ReportGenerator {
         writer.set(DESIRED_ARTICLE_NUMBER, order.getDesiredClientArticle()
                 .getArticle().getNumber());
         writer.set(CLOTHES_TO_EXCHANGE, getClothesToRelease(order));
+        writer.set(CLOTHES_DEPRECIATED, getOrdinalNumbersOfDepreciatedClothes(order));
         writer.set(ColumnDataType.EMPTY, "    -    ");
-        if(order.getOrderType().equals(OrderType.CHANGE_ARTICLE)) {
+        if (order.getOrderType().equals(OrderType.CHANGE_ARTICLE)) {
             writer.set(ACTUAL_ARTICLE_NAME, order.getPreviousClientArticle()
                     .getArticle().getName());
             writer.set(ACTUAL_ARTICLE_NUMBER, order.getPreviousClientArticle()
-            .getArticle().getNumber());
+                    .getArticle().getNumber());
         }
     }
 
@@ -342,7 +340,7 @@ public class ReportGenerator {
     }
 
     private String getLengthModification(MainOrder order) {
-        if(order.getLengthModification().getLength() != 0) {
+        if (order.getLengthModification().getLength() != 0) {
             return order.getLengthModification().toString();
         } else {
             return "";
@@ -352,8 +350,8 @@ public class ReportGenerator {
     private String getClothOrdinalNumbersToExchange(MainOrder order) {
         List<Integer> ordinalNumbers = new LinkedList<>();
         Set<ClothOrder> clothOrders = order.getClothOrders();
-        for(ClothOrder c : clothOrders) {
-            if(c.isActive()) {
+        for (ClothOrder c : clothOrders) {
+            if (c.isActive()) {
                 int ordinalNumber = c.getClothToExchange().getOrdinalNumber();
                 ((LinkedList<Integer>) ordinalNumbers).push(ordinalNumber);
             }
@@ -365,25 +363,51 @@ public class ReportGenerator {
     private String convertOrdinalNumbersToString(List<Integer> ordinalNumbers) {
         ordinalNumbers = ordinalNumbers.stream().sorted().collect(Collectors.toList());
         String result = "";
-        for(Integer i : ordinalNumbers) {
+        for (Integer i : ordinalNumbers) {
             result = result + i + ", ";
         }
         return result;
     }
 
-    private String getClothesToRelease(MainOrder order) {
+    private String getClothesToRelease(MainOrder mainOrder) {
         List<Integer> ordinalNumbers = new LinkedList<>();
-        Set<ClothOrder> clothOrders = order.getClothOrders();
-        for(ClothOrder c :  clothOrders) {
-            OrderStage orderStage = c.getOrderStatus().getOrderStage();
-            if((!c.isReported() && c.isActive()) &&
-                    (orderStage.equals(READY_FOR_REALIZATION) ||
-                            orderStage.equals(READY_BUT_PENDING_FOR_ASSIGNMENT))) {
-                int ordinalNumber = c.getClothToExchange().getOrdinalNumber();
-                ((LinkedList<Integer>) ordinalNumbers).push(ordinalNumber);
+        Set<ClothOrder> clothOrders = mainOrder.getClothOrders();
+        for (ClothOrder order : clothOrders) {
+            OrderStage orderStage = order.getOrderStatus().getOrderStage();
+            if (isClothOrderActiveAndNotReported(order, orderStage)) {
+                if(clothIsReturned(order.getClothToExchange())) {
+                    int ordinalNumber = order.getClothToExchange().getOrdinalNumber();
+                    ((LinkedList<Integer>) ordinalNumbers).push(ordinalNumber);
+                }
             }
         }
         return convertOrdinalNumbersToString(ordinalNumbers);
+    }
+
+    private boolean clothIsReturned(Cloth cloth) {
+        return cloth.getLifeCycleStatus().equals(LifeCycleStatus.ACCEPTED);
+    }
+
+    private String getOrdinalNumbersOfDepreciatedClothes(MainOrder mainOrder) {
+        List<Integer> ordinalNumbers = new LinkedList<>();
+        Set<ClothOrder> clothOrders = mainOrder.getClothOrders();
+        for (ClothOrder order : clothOrders) {
+            OrderStage orderStage = order.getOrderStatus().getOrderStage();
+            if(isClothOrderActiveAndNotReported(order, orderStage)) {
+                if(clothIsDeprecated(order.getClothToExchange())) {
+                    int ordinalNumber = order.getClothToExchange().getOrdinalNumber();
+                    ordinalNumbers.add(ordinalNumber);
+                }
+            }
+        }
+        return convertOrdinalNumbersToString(ordinalNumbers);
+    }
+
+    private boolean isClothOrderActiveAndNotReported(ClothOrder order, OrderStage orderStage) {
+        return (!order.isReported() && order.isActive())
+                && (orderStage.equals(READY_FOR_REALIZATION) ||
+                        orderStage.equals(READY_BUT_PENDING_FOR_ASSIGNMENT) ||
+                        orderStage.equals(PENDING_FOR_ASSIGNMENT));
     }
 
 
@@ -423,7 +447,7 @@ public class ReportGenerator {
         writer.set(PLANT, e.getBox().getLocker().getPlant().getPlantNumber());
         writer.set(LOCKER, e.getBox().getLocker().getLockerNumber());
         writer.set(BOX, e.getBox().getBoxNumber());
-        if(writer.present(FIRST_NAME) && writer.present(LAST_NAME)) {
+        if (writer.present(FIRST_NAME) && writer.present(LAST_NAME)) {
             writer.set(FIRST_NAME, SMALL_BOLDED, e.getFirstName());
             writer.set(LAST_NAME, SMALL_BOLDED, e.getLastName());
         } else {
@@ -465,7 +489,7 @@ public class ReportGenerator {
 
     private boolean clothIsDeprecated(Cloth cloth) {
         LocalDate releaseDate = cloth.getReleaseDate();
-        if(releaseDate == null) {
+        if (releaseDate == null) {
             return false;
         } else {
             int depreciationPeriod = cloth.getClientArticle().getDepreciationPeriod();
@@ -544,9 +568,10 @@ public class ReportGenerator {
         columnIndexes.put(DESIRED_CLOTH, 9);
         columnIndexes.put(DESIRED_ARTICLE_NUMBER, 10);
         columnIndexes.put(CLOTHES_TO_EXCHANGE, 11);
-        columnIndexes.put(ColumnDataType.EMPTY, 12);
-        columnIndexes.put(ACTUAL_ARTICLE_NAME, 13);
-        columnIndexes.put(ACTUAL_ARTICLE_NUMBER, 14);
+        columnIndexes.put(CLOTHES_DEPRECIATED, 12);
+        columnIndexes.put(ColumnDataType.EMPTY, 13);
+        columnIndexes.put(ACTUAL_ARTICLE_NAME, 14);
+        columnIndexes.put(ACTUAL_ARTICLE_NUMBER, 15);
         writer.addHeader(columnIndexes, style);
     }
 
@@ -597,6 +622,7 @@ public class ReportGenerator {
         AMOUNT_CLOTHES_TO_RETURN("Do zwrotu"),
         AMOUNT_SUM_OF_ALL_CLOTHES("Razem"),
         CLOTHES_TO_EXCHANGE("Zwrócone sztuki"),
+        CLOTHES_DEPRECIATED("Zamortyzowane sztuki"),
         EMPTY(""),
         QUANTITY("Ilość"),
         BADGE_NUMBER("Nr emblematu"),
@@ -630,9 +656,9 @@ public class ReportGenerator {
         }
 
         private void resolveClothDestinationAndIncrementAppropriateCounter(ClothOrder clothOrder) {
-            if(clothIsToRelease(clothOrder)) {
+            if (clothIsToRelease(clothOrder)) {
                 incrementToRelease();
-            } else if(clothIsDeprecated(clothOrder.getClothToExchange())) {
+            } else if (clothIsDeprecated(clothOrder.getClothToExchange())) {
                 incrementDepreciated();
             } else {
                 incrementToReturn();
@@ -642,7 +668,7 @@ public class ReportGenerator {
         private boolean clothIsToRelease(ClothOrder clothOrder) {
             LifeCycleStatus lifeCycleStatus = clothOrder.getClothToExchange().getLifeCycleStatus();
             ExchangeStrategy exchangeStrategy = clothOrder.getExchangeStrategy();
-            if(exchangeStrategy == ExchangeStrategy.PIECE_FOR_PIECE &&
+            if (exchangeStrategy == ExchangeStrategy.PIECE_FOR_PIECE &&
                     lifeCycleStatus != LifeCycleStatus.ACCEPTED) {
                 return false;
             } else {
@@ -684,7 +710,7 @@ public class ReportGenerator {
 
     }
 
-    private class ClothToOrder implements Comparable<ClothToOrder>{
+    private class ClothToOrder implements Comparable<ClothToOrder> {
         private Article article;
         private ClothSize size;
         private LengthModification modification;
@@ -719,7 +745,6 @@ public class ReportGenerator {
         public void setModification(LengthModification modification) {
             this.modification = modification;
         }
-
 
 
         @Override

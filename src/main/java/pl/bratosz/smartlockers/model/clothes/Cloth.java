@@ -26,7 +26,7 @@ public class Cloth implements Comparable<Cloth> {
     protected int ordinalNumber;
 
     @JsonView({Views.EmployeeCompleteInfo.class, Views.InternalForBoxes.class, Views.InternalForClothOrders.class})
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     protected ClientArticle clientArticle;
 
     @JsonView(Views.InternalForClothes.class)

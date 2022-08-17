@@ -2,14 +2,18 @@ function getRowTemplate($table) {
     return $table.find("tr:nth-child(1)");
 }
 
-function rowClickedThenSelectCheckBox($row) {
+function rowClickedBehaviour($row) {
     let $checkBox = $row.find('.my-check-box');
+    // let rowWithoutSelects = $row.not($row.find('.form-control'));
     $row.click(function () {
         checkAndUncheck($checkBox);
     });
     $row.find('.my-check-box').click(function () {
         checkAndUncheck($checkBox);
     });
+    $row.find('.select-department').change(function () {
+        loadPositionsByDepartment($row.find('.select-department'), $row.find('.select-position'));
+    })
 }
 
 function checkAndUncheck($checkBox) {

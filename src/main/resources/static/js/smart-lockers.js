@@ -329,6 +329,8 @@ function getAndLoadLocations(userId, $selectLocation, placeholder) {
     })
 }
 
+
+
 function loadPositionsByDepartment($selectDepartment, $selectPosition) {
     if ($selectDepartment == undefined || $selectPosition == undefined) {
         $selectDepartment = $('#select-department');
@@ -341,10 +343,10 @@ function loadPositionsByDepartment($selectDepartment, $selectPosition) {
     let positionsByDepartment = [];
     for(let e of loadedClient.departments) {
         if(e.id == departmentId) {
-            positionsByDepartment = e.positions;
+            positionsByDepartment = sort(e.positions, "name");
         }
     }
-    appendOptionsToSelect(positionsByDepartment, $selectPosition);
+    appendOptionsToSelect(positionsByDepartment, $selectPosition, "Wybierz stanowisko");
 }
 
 function appendCollectionToSelectWithPlaceholder(collection, $select, placeholder) {
@@ -420,6 +422,22 @@ function displayConfirmWindowForDownloadFile(response) {
             window.open(response.fileDownloadUri);
     } else {
         window.alert(response.message);
+    }
+}
+
+function getPositionsByDepartment(department, departments) {
+    console.log("weszło")
+    let positions = [];
+    if(department.surrogate) {
+        return positions;
+    } else {
+        for(let d of departments) {
+            if(d.id == department.id) {
+                return d.positions;
+            } else {
+                return positions;
+            }
+        }
     }
 }
 

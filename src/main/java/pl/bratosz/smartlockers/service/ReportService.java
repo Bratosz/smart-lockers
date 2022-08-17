@@ -47,7 +47,7 @@ public class ReportService {
         this.clientArticlesRepository = clientArticlesRepository;
     }
 
-    public DownloadFileResponse generateSTDReport(long userId) {
+    public DownloadFileResponse generateAllOrdersReport(long userId) {
         long clientId = usersRepository.getActualClientId(userId);
         Set<Employee> employees = employeeService.getEmployeesWithActiveOrdersThatAreNotReported(clientId);
         return generate(employees);

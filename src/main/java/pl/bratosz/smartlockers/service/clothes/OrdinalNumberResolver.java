@@ -4,11 +4,9 @@ import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.Cloth;
 import pl.bratosz.smartlockers.model.clothes.ClothSize;
-import pl.bratosz.smartlockers.model.orders.parameters.newArticle.OrderParameters;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class OrdinalNumberResolver {
     private ClothSize desiredSize;
@@ -23,11 +21,12 @@ public class OrdinalNumberResolver {
 
     public static OrdinalNumberResolver createForChangeSize(
             ClothSize desiredSize,
-            Cloth clothToExchange) {
+            Cloth clothToExchange,
+            Employee employee) {
         return new OrdinalNumberResolver(
                 desiredSize,
                 clothToExchange.getClientArticle(),
-                clothToExchange.getEmployee());
+                employee);
     }
 
     public static OrdinalNumberResolver createForChangeArticle(
@@ -122,7 +121,8 @@ public class OrdinalNumberResolver {
     }
 
     private Set<Cloth> getActualClothes() {
-        List<Cloth> clothes = employee.getClothes().stream()
+        List<Cloth> clothes = employee.getClothes();
+        clothes = clothes.stream()
                 .filter(c -> c.isActive())
                 .filter(c -> c.getClientArticle().equals(desiredClientArticle))
                 .filter(c -> c.getSize().equals(desiredSize))

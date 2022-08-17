@@ -102,12 +102,11 @@ function writeEmployeeToCreateToRow(employee, $row) {
     $row.find('.cell-first-name').text(employee.firstName);
     loadSelectInRowForEmployeeToCreate(
         $selectDepartment, loadedClient.departments, employee.department, "Wybierz oddział");
-    loadSelectInRowForEmployeeToCreate(
-        $selectPosition, loadedClient.positions, employee.position, "Wybierz stanowisko");
-    console.log(loadedClient.locations);
+    loadPositionsForEmployeeToCreate(
+        $selectPosition, getPositionsByDepartment(employee.department, loadedClient.departments), employee.position, "Wybierz stanowisko");
     loadSelectInRowForEmployeeToCreate(
         $selectLocation, loadedClient.locations, employee.location, "Wybierz lokalizację");
-    rowClickedThenSelectCheckBox($row);
+    rowClickedBehaviour($row);
     $row.find('.button-swap-names').click(function () {
        swapNames(employee.id);
     });

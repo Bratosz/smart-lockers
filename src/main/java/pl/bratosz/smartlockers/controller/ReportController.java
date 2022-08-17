@@ -17,7 +17,7 @@ public class ReportController {
 
     @GetMapping("/generate/{userId}")
     public DownloadFileResponse generate(@PathVariable long userId){
-        return reportService.generateSTDReport(userId);
+        return reportService.generateAllOrdersReport(userId);
     }
 
     @GetMapping("/generate-for-new-employees/{userId}")

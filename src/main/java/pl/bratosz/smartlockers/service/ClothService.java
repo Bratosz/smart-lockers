@@ -11,6 +11,7 @@ import pl.bratosz.smartlockers.model.orders.*;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.BoxesRepository;
 import pl.bratosz.smartlockers.repository.ClothOrdersRepository;
+import pl.bratosz.smartlockers.repository.EmployeesRepository;
 import pl.bratosz.smartlockers.response.ResponseClothAcceptance;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.ClothesRepository;
@@ -49,6 +50,7 @@ public class ClothService {
     private ClothesCreator clothesCreator;
     private BoxesRepository boxesRepository;
     private RotationalClothService rotationalClothService;
+    private EmployeesRepository employeesRepository;
 
     public ClothService(ClothesRepository clothesRepository,
                         ClothOrdersRepository clothOrdersRepository,
@@ -61,7 +63,7 @@ public class ClothService {
                         ClientArticleService clientArticleService,
                         ClothesManager clothesManager,
                         ClothesCreator clothesCreator,
-                        BoxesRepository boxesRepository, RotationalClothService rotationalClothService) {
+                        BoxesRepository boxesRepository, RotationalClothService rotationalClothService, EmployeesRepository employeesRepository) {
         this.clothesRepository = clothesRepository;
         this.clothOrdersRepository = clothOrdersRepository;
         this.orderService = orderService;
@@ -75,6 +77,7 @@ public class ClothService {
         this.clothesCreator = clothesCreator;
         this.boxesRepository = boxesRepository;
         this.rotationalClothService = rotationalClothService;
+        this.employeesRepository = employeesRepository;
     }
 
     private void loadUser(User user) {
@@ -327,7 +330,8 @@ public class ClothService {
                     size,
                     lengthModification,
                     exchangeStrategy);
-            OrdinalNumberResolver onr = OrdinalNumberResolver.createForChangeSize(size, clothForExchange);
+            OrdinalNumberResolver onr = OrdinalNumberResolver.createForChangeSize(
+                    size, clothForExchange, employeesRepository.getEmployeeById(clothForExchange.getEmployee().getId()));
             ClothOrder clothOrder = orderService.placeOne(
                     clothForExchange,
                     orderType,

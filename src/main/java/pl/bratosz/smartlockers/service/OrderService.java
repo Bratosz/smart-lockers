@@ -9,9 +9,9 @@ import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Employee;
 import pl.bratosz.smartlockers.model.clothes.*;
 import pl.bratosz.smartlockers.model.orders.*;
-import pl.bratosz.smartlockers.model.orders.parameters.newArticle.OrderParameters;
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteForExchangeAndRelease;
 import pl.bratosz.smartlockers.model.orders.parameters.complete.CompleteOrderParameters;
+import pl.bratosz.smartlockers.model.orders.parameters.newArticle.OrderParameters;
 import pl.bratosz.smartlockers.model.users.User;
 import pl.bratosz.smartlockers.repository.*;
 import pl.bratosz.smartlockers.response.ResponseOrdersCreated;
@@ -19,14 +19,13 @@ import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.response.UpdateResponse;
 import pl.bratosz.smartlockers.service.clothes.OrdinalNumberResolver;
 import pl.bratosz.smartlockers.service.managers.OrderManager;
-import sun.applet.Main;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static pl.bratosz.smartlockers.model.orders.ExchangeStrategy.*;
-import static pl.bratosz.smartlockers.model.orders.OrderStatus.*;
+import static pl.bratosz.smartlockers.model.orders.ExchangeStrategy.NONE;
+import static pl.bratosz.smartlockers.model.orders.OrderStatus.OrderStage;
 import static pl.bratosz.smartlockers.model.orders.OrderType.NEW_ARTICLE;
 
 @Service
@@ -414,7 +413,8 @@ public class OrderService {
         MainOrder mainOrder = null;
         OrdinalNumberResolver onr = OrdinalNumberResolver.createForChangeSize(
                 desiredSize,
-                clothesForExchange.get(0));
+                clothesForExchange.get(0),
+                employeesRepository.getEmployeeById(clothesForExchange.get(0).getEmployee().getId()));
         for (Cloth c : clothesForExchange) {
             OrderStatus clothOrderStatus = orderStatusService.create(orderType, user);
             clothesService.updateStatusWhenOrderIsCreated(c, orderType, exchangeStrategy, user);

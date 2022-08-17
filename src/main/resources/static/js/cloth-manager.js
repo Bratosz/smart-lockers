@@ -70,7 +70,7 @@ function writeClothToRow(cloth, $row) {
     $row.find(".cell-released-to-employee-date").text(formatDateDMY(
         cloth.releasedToEmployeeAsRotation));
     $row.find(".cell-washing-date").text(formatDateDMY(cloth.lastWashing));
-    rowClickedThenSelectCheckBox($row);
+    rowClickedBehaviour($row);
     return $row;
 }
 
@@ -145,7 +145,7 @@ function getLengthModificationFromInput($input) {
     if(modification == "" || modification == 0) {
         return "NONE";
     } else {
-        return modification.toUpperCase;
+        return modification.toUpperCase();
     }
 }
 

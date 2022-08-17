@@ -35,7 +35,7 @@ public class ClientArticle implements Comparable<ClientArticle> {
     @JsonView(Views.Public.class)
     private int depreciationPeriod;
 
-    @OneToMany(mappedBy = "clientArticle")
+    @OneToMany(mappedBy = "clientArticle", fetch = FetchType.LAZY)
     private Set<Cloth> clothes;
 
     @ManyToOne

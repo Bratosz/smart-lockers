@@ -59,9 +59,6 @@ function getClientArticlesFromEmployeePosition() {
     return clientArticles;
 }
 
-
-
-
 function getArticlesByClothType(clientArticles, clothType) {
     let articlesByClothType = [];
     if (clothType != "Inne") {

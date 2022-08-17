@@ -66,7 +66,6 @@ function displayEmployeeForEmployeeView(employee) {
 
     let beforeRelease = extractClothes("BEFORE_RELEASE", clothes);
     let inRotation = extractClothes("IN_ROTATION", clothes);
-    let activeRotationalClothes = extractClothes("IN_ROTATION", rotationalClothes);
     let accepted = extractClothes("ACCEPTED", clothes);
     let withdrawn = extractClothes("WITHDRAWN", clothes);
     let activeOrders = extractActiveOrders(mainOrders);
@@ -79,5 +78,5 @@ function displayEmployeeForEmployeeView(employee) {
     displayAcceptedClothes(accepted);
     displayWithdrawnClothes(withdrawn);
     displayOrders(activeOrders);
-    displayRotationalClothes(activeRotationalClothes);
+    displayRotationalClothes(rotationalClothes);
 }

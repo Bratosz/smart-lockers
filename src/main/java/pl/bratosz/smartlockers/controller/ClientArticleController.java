@@ -1,7 +1,6 @@
 package pl.bratosz.smartlockers.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import org.apache.el.stream.Stream;
 import org.springframework.web.bind.annotation.*;
 import pl.bratosz.smartlockers.model.ClientArticle;
 import pl.bratosz.smartlockers.model.Views;
@@ -29,7 +28,7 @@ public class ClientArticleController {
         return clientArticleService.add(articleId, badgeNumber, userId);
     }
 
-    @PostMapping("/createWithDepartmentPositionAndLocation-article-and-add-client-article" +
+    @PostMapping("/create-article-and-add-client-article" +
             "/{articleNumber}/{articleName}/{badgeNumber}/{userId}")
     public StandardResponse createArticleAndAddClientArticle(
             @PathVariable int articleNumber,
@@ -63,7 +62,7 @@ public class ClientArticleController {
         return clientArticleService.updatePrice(price, clientArticleId);
     }
 
-    @PutMapping("/set-depreciation-period/for-all/{periodInMonths}/{userId}")
+    @PostMapping("/set-depreciation-period/for-all/{periodInMonths}/{userId}")
     @JsonView(Views.Public.class)
     public List<ClientArticle> setDepreciationPeriod(
             @PathVariable int periodInMonths,

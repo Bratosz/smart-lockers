@@ -41,10 +41,16 @@ public class PlantDataFromFileExtractor {
         for (SheetTypeForPlantLoad sheetType : templateType.getSheetTypes()) {
             XSSFSheet sheet;
             sheet = workbook.getSheet(sheetType.getName());
-            if (sheet == null) throw new MyException("Brak arkusza o nazwie: " + sheetType.getName());
-            int lastColIndex = resolveLastColumnIndex(sheet);
-            int lastRowIndex = resolveLastRowIndex(sheet, sheetType, lastColIndex);
-            sheets.put(sheetType, new MySheet(sheet, lastRowIndex, lastColIndex));
+            if (sheet == null && !sheetType.isAdditional())
+            {
+                throw new MyException("Brak arkusza o nazwie: " + sheetType.getName());
+            } else if (sheetType.isAdditional()) {
+                continue;
+            } else {
+                int lastColIndex = resolveLastColumnIndex(sheet);
+                int lastRowIndex = resolveLastRowIndex(sheet, sheetType, lastColIndex);
+                sheets.put(sheetType, new MySheet(sheet, lastRowIndex, lastColIndex));
+            }
         }
     }
 

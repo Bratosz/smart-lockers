@@ -40,7 +40,7 @@ $('#button-set-depreciation-period').click(function () {
     let period = $('#select-depreciation-period').val();
     $.ajax({
         url: putClientArticlesDepreciationPeriod(period),
-        method: 'put',
+        method: 'post',
         success: function (clientArticles) {
             writeArticlesToTable(clientArticles);
         }

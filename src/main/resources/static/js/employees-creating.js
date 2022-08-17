@@ -131,3 +131,16 @@ function loadSelectInRowForEmployeeToCreate($select, options, actual, placeholde
     }
 }
 
+function loadPositionsForEmployeeToCreate($selectPosition, positions, actualPosition, placeholder) {
+    if(actualPosition.surrogate || positions.length == 0) {
+        appendOptionsToSelect(positions, $selectPosition, placeholder);
+    } else {
+        appendOptionsToSelectAndSelectActual(
+            sort(positions, "name"),
+            $selectPosition,
+            actualPosition
+        );
+    }
+}
+
+
