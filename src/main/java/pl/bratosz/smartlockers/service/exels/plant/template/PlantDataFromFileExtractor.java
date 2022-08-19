@@ -34,7 +34,8 @@ public class PlantDataFromFileExtractor {
 
     public PlantDataContainer getInitialPlantData(XSSFWorkbook workbook, List<ClientArticle> clientArticles) throws MyException {
         validateAndExtractSheets(workbook);
-        return validateAndExtractData(clientArticles);
+        PlantDataContainer plantDataContainer = validateAndExtractData(clientArticles);
+        return plantDataContainer;
     }
 
     private void validateAndExtractSheets(XSSFWorkbook workbook) throws MyException {

@@ -89,9 +89,6 @@ function loadNav() {
         $('#button-view-boxes').click(function () {
             loadContent($('#div-content-1'), 'view-boxes.html');
         });
-        $('#button-clothing-acceptance').click(function () {
-            loadContent($('#div-content-1'), 'clothing-acceptance.html');
-        });
         $('#button-measurement-list').click(function () {
             loadContent($('#div-content-1'), 'measurement-list.html');
         });

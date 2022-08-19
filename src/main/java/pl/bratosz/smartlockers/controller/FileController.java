@@ -159,8 +159,8 @@ public class FileController {
         try {
             TemplateTypeForPlantLoad templateType = TemplateTypeForLoadPlantResolver.resolve(loadPlantFile);
             XSSFWorkbook workbook = new XSSFWorkbook(loadPlantFile.getInputStream());
-            PlantDataContainer plantDataContainer = PlantDataFromFileExtractor.create(templateType)
-                    .getInitialPlantData(workbook, clientArticles);
+            PlantDataFromFileExtractor plantDataExtractor = PlantDataFromFileExtractor.create(templateType);
+            PlantDataContainer plantDataContainer = plantDataExtractor.getInitialPlantData(workbook, clientArticles);
             plant = clientService.createFromFileWithResponse(plantNumber, userId, plantDataContainer);
         } catch (MyException e) {
             return StandardResponse.createForFailure(e.getMessage());
