@@ -11,6 +11,7 @@ import pl.bratosz.smartlockers.repository.UsersRepository;
 import pl.bratosz.smartlockers.response.CreateResponse;
 import pl.bratosz.smartlockers.utils.string.MyString;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -109,7 +110,7 @@ public class LocationService {
         return createAndAssignToPlant(client, plantNumber + " GŁÓWNA", false, plant);
     }
 
-    public List<Location> create(List<String> locationsNames, Client client, Plant plant) {
+    public List<Location> create(Collection<String> locationsNames, Client client, Plant plant) {
         List<Location> locations = new LinkedList<>();
         locations.add(createAndAssignToPlant(
                 client,"ZASTĘPCZA", true, plant));

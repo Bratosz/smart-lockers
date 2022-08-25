@@ -77,19 +77,17 @@ public class ClientService {
         Client client = getByUser(userId);
         Plant plant = client.getPlants().stream()
                 .filter(p -> p.getPlantNumber() == plantNumber).findFirst().get();
-        Department mainDepartment = departmentService
-                .createDefaultDepartmentsAndReturnMain(client, plantNumber);
-//        List<Department> departments = departmentService.createWithDepartmentPositionAndLocation(dataContainer.getDepartments(), client, plantNumber);
-//        List<Location> locations = locationService.createWithDepartmentPositionAndLocation(
-//                dataContainer.getLocations(), client, plant);
-//        lockerService.createFromZUSO(
-//                dataContainer, plant, mainDepartment, locations);
-//        clientArticleService
-//                .addNewArticles(dataContainer.getArticles(), client);
-//        List<Position> positions = positionService.createPositions(
-//                dataContainer.getPositions(), client);
-//        employeeService.createWithDepartmentPositionAndLocation(
-//                dataContainer.getEmployees(), positions, locations, departments, mainDepartment);
+        Department mainDepartment = departmentService.createDefaultDepartmentsAndReturnMain(client, plantNumber);
+        List<Department> departments = departmentService.create(
+                dataContainer.getDepartments(), client, plantNumber);
+        List<Location> locations = locationService.create(
+                dataContainer.getLocations(), client, plant);
+        lockerService.createFromZUSO(
+                dataContainer, plant, mainDepartment, locations);
+        List<Position> positions = positionService.createPositions(
+                dataContainer.getPositions(), client);
+        employeeService.create(
+                dataContainer.getEmployees().values(), positions, locations, departments, mainDepartment);
         return plant;
     }
 

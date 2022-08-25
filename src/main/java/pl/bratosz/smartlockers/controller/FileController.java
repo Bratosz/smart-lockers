@@ -139,8 +139,7 @@ public class FileController {
         Client client = clientService.getByUser(userId);
         Set<Plant> plants = client.getPlants();
         if(plants.size() == 1) {
-            Plant plant = plants.stream().findFirst().get();
-            int plantNumber = plant.getPlantNumber();
+            int plantNumber = plants.stream().findFirst().get().getPlantNumber();
             return loadPlantByPlantNumberFromExcelFile(plantNumber, userId, loadPlantFile);
         } else {
             return StandardResponse.createForFailure("Ten klient posiada kilka zakładów. Wybierz jeden z nich i spróbuj ponownie");

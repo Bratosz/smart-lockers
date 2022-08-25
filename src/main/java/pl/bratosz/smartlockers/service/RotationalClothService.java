@@ -54,8 +54,6 @@ public class RotationalClothService {
         return StandardResponse.createForSucceed("Ustawiono odzież jako rotacyjną");
     }
 
-
-
     public void setClothesAsRotational(Employee employee) {
         clothesRepository.setRotationalByEmployee(employee);
     }
@@ -63,7 +61,6 @@ public class RotationalClothService {
     public void setClothesAsRotational(long employeeId) {
         clothesRepository.setRotationalByEmployeeId(employeeId);
     }
-
 
     public ResponseClothAssignment releaseRotationalCloth(
             long barcode, long employeeId, long userId) {

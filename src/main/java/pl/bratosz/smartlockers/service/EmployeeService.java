@@ -126,7 +126,7 @@ public class EmployeeService {
 
 
     public List<Employee> create(
-            List<TemplateEmployee> templateEmployees,
+            Collection<TemplateEmployee> templateEmployees,
             List<Position> positions,
             List<Location> locations,
             List<Department> departments,

@@ -4,10 +4,12 @@ import org.springframework.stereotype.Service;
 import pl.bratosz.smartlockers.model.*;
 import pl.bratosz.smartlockers.repository.*;
 import pl.bratosz.smartlockers.response.StandardResponse;
+import pl.bratosz.smartlockers.service.exels.plant.template.data.TemplateArticle;
 import pl.bratosz.smartlockers.service.exels.plant.template.data.TemplatePosition;
 import pl.bratosz.smartlockers.utils.string.MyString;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -65,13 +67,16 @@ public class PositionService {
     public Position create(TemplatePosition templatePosition, Client client) {
         Set<Department> departments = departmentService.get(templatePosition.getDepartments(), client.getId());
         Position position = create(templatePosition.getName(), client);
-        return addDepartments(position, departments);
+        addDepartments(position, departments);
+        addArticlesWithQuantity(position, templatePosition);
+        return position;
     }
 
-    public List<Position> createPositions(List<TemplatePosition> templatePositions, Client client) {
+
+    public List<Position> createPositions(Collection<TemplatePosition> templatePositions, Client client) {
         List<Position> positions = new ArrayList<>();
-        templatePositions.forEach(zp -> positions.add(
-                create(zp, client)));
+        templatePositions.forEach(templatePosition -> positions.add(
+                create(templatePosition, client)));
         return positions;
     }
 
@@ -92,7 +97,7 @@ public class PositionService {
     }
 
     public Position addDepartments(Position position, Set<Department> departments) {
-        position.setDepartments(departments);
+        departments.forEach(d -> position.addDepartment(d));
         return positionsRepository.save(position);
     }
 
@@ -139,6 +144,17 @@ public class PositionService {
                 "Dodano artykuł wraz z  ilością",
                 position);
     }
+
+    private void addArticlesWithQuantity(Position position, TemplatePosition templatePosition) {
+        templatePosition.getArticlesWithQuantities().forEach((article, quantity) ->
+                create(article, quantity, position));
+    }
+
+    private void create(TemplateArticle article, Integer quantity, Position position) {
+        long clientArticleId = clientArticleService.get(article.getArticleNumber(), position.getClient().getId()).getId();
+        addArticleWithQuantity(clientArticleId, quantity, position.getId());
+    }
+
 
     public StandardResponse addAnotherArticle(
             long clientArticleId,

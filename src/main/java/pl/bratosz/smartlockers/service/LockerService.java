@@ -91,7 +91,7 @@ public class LockerService {
             Plant plant,
             Department department,
             List<Location> locations) {
-        List<TemplateLockers> templateLockerList = (List<TemplateLockers>) dataContainer.getLockers();
+        Collection<TemplateLockers> templateLockerList = dataContainer.getLockers();
         Map<String, Location> locationsMap = Utils.toMapWithToStringKey(locations);
         List<Locker> lockers = new ArrayList<>();
         for (TemplateLockers templateLocker : templateLockerList) {

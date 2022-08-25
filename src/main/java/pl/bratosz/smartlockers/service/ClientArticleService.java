@@ -12,6 +12,7 @@ import pl.bratosz.smartlockers.repository.UsersRepository;
 import pl.bratosz.smartlockers.response.StandardResponse;
 import pl.bratosz.smartlockers.service.exels.plant.template.data.TemplateArticle;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -175,7 +176,7 @@ public class ClientArticleService {
     }
 
 
-    public void addNewArticles(List<TemplateArticle> articles, Client client) {
+    public void addNewArticles(Collection<TemplateArticle> articles, Client client) {
         articles.forEach(a -> addNewArticle(
                 a.getArticleNumber(),
                 a.getArticleName(),

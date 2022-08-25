@@ -67,9 +67,13 @@ public class DepartmentService {
         Client client = clientRepository.getById(clientId);
         Plant plant = plantsRepository.getById(plantId);
         DepartmentAlias alias = departmentAliasService.create(departmentName);
-        Department department = new Department(
-                departmentName, client, plant, plant.getPlantNumber(), alias, surrogate);
-        return departmentsRepository.save(department);
+        Department department = departmentsRepository.getByNameAndClientId(departmentName, clientId);
+        if(department == null) {
+            department = new Department(
+                    departmentName, client, plant, plant.getPlantNumber(), alias, surrogate);
+            department = departmentsRepository.save(department);
+        }
+        return department;
     }
 
     public Department create(String departmentName,
@@ -172,7 +176,7 @@ public class DepartmentService {
         return create("GŁÓWNY", client.getId(), plantNumber, false);
     }
 
-    public List<Department> create(List<String> departmentsNames, Client client, int plantNumber) {
+    public List<Department> create(Collection<String> departmentsNames, Client client, int plantNumber) {
         List<Department> departments = departmentsRepository.getAll(client.getId());
         departmentsNames.forEach(name -> {
                     if(departmentNotExist(departments, name)){
